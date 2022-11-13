@@ -19,7 +19,7 @@ from absl.testing import absltest
 import jax
 import numpy as np
 
-from open_spiel.python.algorithms.rnad import rnad
+import rnad
 
 # TODO(author18): test the losses and jax ops
 
