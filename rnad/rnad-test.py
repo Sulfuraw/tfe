@@ -27,12 +27,12 @@ import rnad
 class RNADTest(absltest.TestCase):
 
   def test_run_kuhn(self):
-    solver = rnad.RNaDSolver(rnad.RNaDConfig(game_name="y"))
+    solver = rnad.RNaDSolver(rnad.RNaDConfig(game_name="yorktown"))
     for _ in range(10):
       solver.step()
 
   def test_serialization(self):
-    solver = rnad.RNaDSolver(rnad.RNaDConfig(game_name="y"))
+    solver = rnad.RNaDSolver(rnad.RNaDConfig(game_name="yorktown"))
     solver.step()
 
     state_bytes = pickle.dumps(solver)

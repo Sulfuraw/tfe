@@ -906,6 +906,12 @@ class RNaDSolver(policy_lib.Policy):
     self.optimizer.state = state["optimizer"]
     self.optimizer_target.state = state["optimizer_target"]
 
+  # MODIFICATION OF THOMAS ROBERT IN THE LIBRARY
+  def play_a_move(self, state):
+    env_step = self._state_as_env_step(state)
+    a, actor_step = self.actor_step(env_step, self._next_rng_key())
+    return a
+
   def step(self):
     """One step of the algorithm, that plays the game and improves params."""
     timestep = self.collect_batch_trajectory()
