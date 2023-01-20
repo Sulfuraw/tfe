@@ -640,14 +640,21 @@ class RNaDConfig:
 @chex.dataclass(frozen=True)
 class EnvStep:
   """Holds the tensor data representing the current game state."""
+  # Indicates whether the state is a valid one or just a padding. Shape: [...]
+  # The terminal state being the first one to be marked !valid.
+  # All other tensors in EnvStep contain data, but only for valid timesteps.
+  # Once !valid the data needs to be ignored, since it's a duplicate of
+  # some other previous state.
+  # The rewards is the only exception that contains reward values
+  # in the terminal state, which is marked !valid.
+  # TODO(author16): This is a confusion point and would need to be clarified.
+  valid: chex.Array = ()
   # The single tensor representing the state observation. Shape: [..., ??]
   obs: chex.Array = ()
   # The legal actions mask for the current player. Shape: [..., A]
   legal: chex.Array = ()
   # The current player id as an int. Shape: [...]
   player_id: chex.Array = ()
-  # Indicates whether the state is a valid one or just a padding. Shape: [...]
-  valid: chex.Array = ()
   # The rewards of all the players. Shape: [..., P]
   rewards: chex.Array = ()
 
@@ -749,10 +756,11 @@ class RNaDSolver(policy_lib.Policy):
 
     # Create initial parameters.
     env_step = self._state_as_env_step(self._ex_state)
-    self.params = self.network.init(self._next_rng_key(), env_step)
-    self.params_target = self.network.init(self._next_rng_key(), env_step)
-    self.params_prev = self.network.init(self._next_rng_key(), env_step)
-    self.params_prev_ = self.network.init(self._next_rng_key(), env_step)
+    key = self._next_rng_key()  # Make sure to use the same key for all.
+    self.params = self.network.init(key, env_step)
+    self.params_target = self.network.init(key, env_step)
+    self.params_prev = self.network.init(key, env_step)
+    self.params_prev_ = self.network.init(key, env_step)
 
     # Parameter optimizers.
     self.optimizer = optax_optimizer(
@@ -786,7 +794,7 @@ class RNaDSolver(policy_lib.Policy):
     v_target_list, has_played_list, v_trace_policy_target_list = [], [], []
     for player in range(self._game.num_players()):
       reward = ts.actor.rewards[:, :, player]  # [T, B, Player]
-      v_target, has_played, policy_target_ = v_trace(
+      v_target_, has_played, policy_target_ = v_trace(
           v_target,
           ts.env.valid,
           ts.env.player_id,
@@ -801,7 +809,7 @@ class RNaDSolver(policy_lib.Policy):
           c=self.config.c_vtrace,
           rho=np.inf,
           eta=self.config.eta_reward_transform)
-      v_target_list.append(v_target)
+      v_target_list.append(v_target_)
       has_played_list.append(has_played)
       v_trace_policy_target_list.append(policy_target_)
     loss_v = get_loss_v([v] * self._game.num_players(), v_target_list,
@@ -906,12 +914,6 @@ class RNaDSolver(policy_lib.Policy):
     self.optimizer.state = state["optimizer"]
     self.optimizer_target.state = state["optimizer_target"]
 
-  # MODIFICATION OF THOMAS ROBERT IN THE LIBRARY
-  def play_a_move(self, state):
-    env_step = self._state_as_env_step(state)
-    a, actor_step = self.actor_step(env_step, self._next_rng_key())
-    return a
-
   def step(self):
     """One step of the algorithm, that plays the game and improves params."""
     timestep = self.collect_batch_trajectory()
@@ -940,8 +942,17 @@ class RNaDSolver(policy_lib.Policy):
     return subkey
 
   def _state_as_env_step(self, state: pyspiel.State) -> EnvStep:
+    # A terminal state must be communicated to players, however since
+    # it's a terminal state things like the state_representation or
+    # the set of legal actions are meaningless and only needed
+    # for the sake of creating well a defined trajectory tensor.
+    # Therefore the code below:
+    # - extracts the rewards
+    # - if the state is terminal, uses a dummy other state for other fields.
+    rewards = np.array(state.returns(), dtype=np.float64)
+
     valid = not state.is_terminal()
-    if state.is_terminal():
+    if not valid:
       state = self._ex_state
 
     if self.config.state_representation == "observation":
@@ -953,12 +964,13 @@ class RNaDSolver(policy_lib.Policy):
           f"Invalid state_representation: {self.config.state_representation}. "
           "Must be either 'info_set' or 'observation'.")
 
+    # TODO(author16): clarify the story around rewards and valid.
     return EnvStep(
         obs=np.array(obs, dtype=np.float64),
         legal=np.array(state.legal_actions_mask(), dtype=np.int8),
         player_id=np.array(state.current_player(), dtype=np.float64),
         valid=np.array(valid, dtype=np.float64),
-        rewards=np.array(state.returns(), dtype=np.float64))
+        rewards=rewards)
 
   def action_probabilities(self,
                            state: pyspiel.State,
@@ -968,8 +980,11 @@ class RNaDSolver(policy_lib.Policy):
     probs = self._network_jit_apply_and_post_process(
         self.params_target, env_step)
     probs = jax.device_get(probs[0])  # Squeeze out the 1-element batch.
-    return {action: probs[action]
-            for action in jax.device_get(env_step.legal[0])}
+    return {
+        action: probs[action]
+        for action, valid in enumerate(jax.device_get(env_step.legal[0]))
+        if valid
+    }
 
   @functools.partial(jax.jit, static_argnums=(0,))
   def _network_jit_apply_and_post_process(
@@ -978,25 +993,23 @@ class RNaDSolver(policy_lib.Policy):
     pi = self.config.finetune.post_process_policy(pi, env_step.legal)
     return pi
 
-  @functools.partial(jax.jit, static_argnums=(0,))
-  def actor_step(self, env_step: EnvStep,
-                 rng_key: chex.PRNGKey):
+  # TODO(author16): jit actor_step.
+  def actor_step(self, env_step: EnvStep):
     pi, _, _, _ = self.network.apply(self.params, env_step)
+    pi = np.asarray(pi).astype("float64")
     # TODO(author18): is this policy normalization really needed?
-    pi = pi / jnp.sum(pi, axis=-1, keepdims=True)
+    pi = pi / np.sum(pi, axis=-1, keepdims=True)
 
-    # Sample from the policy pi respecting legal actions.
-    cumsum = jnp.cumsum(pi, axis=-1)
-    eps = jnp.finfo(pi.dtype).eps
-    unirnd = jax.random.uniform(
-        key=rng_key, shape=pi.shape[:-1] + (1,), dtype=pi.dtype, minval=eps)
-    action = jnp.argmin(
-        jnp.logical_or(
-            jnp.logical_or(unirnd > cumsum, pi < eps), env_step.legal == 0),
-        axis=-1)
-    # Make sure to cast to int32 as expected by open-spiel.
-    action = action.astype(jnp.int32)
-    action_oh = jax.nn.one_hot(action, pi.shape[-1])
+    action = np.apply_along_axis(
+        lambda x: self._np_rng.choice(
+          range(pi.shape[1]),
+          p=x), 
+        axis=-1, 
+        arr=pi)
+    # TODO(author16): reapply the legal actions mask to bullet-proof sampling.
+    action_oh = np.zeros(pi.shape, dtype="float64")
+    action_oh[range(pi.shape[0]), action] = 1.0
+
     actor_step = ActorStep(policy=pi, action_oh=action_oh, rewards=())
 
     return action, actor_step
@@ -1011,7 +1024,7 @@ class RNaDSolver(policy_lib.Policy):
     env_step = self._batch_of_states_as_env_step(states)
     for _ in range(self.config.trajectory_max):
       prev_env_step = env_step
-      a, actor_step = self.actor_step(env_step, self._next_rng_key())
+      a, actor_step = self.actor_step(env_step)
 
       states = self._batch_of_states_apply_action(states, a)
       env_step = self._batch_of_states_as_env_step(states)
@@ -1024,24 +1037,23 @@ class RNaDSolver(policy_lib.Policy):
                   rewards=env_step.rewards),
           ))
     # Concatenate all the timesteps together to form a single rollout [T, B, ..]
-    return jax.tree_util.tree_map(lambda *xs: jnp.stack(xs, axis=0), *timesteps)
+    return jax.tree_util.tree_map(lambda *xs: np.stack(xs, axis=0), *timesteps)
 
   def _batch_of_states_as_env_step(self,
                                    states: Sequence[pyspiel.State]) -> EnvStep:
     envs = [self._state_as_env_step(state) for state in states]
-    return jax.tree_util.tree_map(lambda *e: jnp.stack(e, axis=0), *envs)
+    return jax.tree_util.tree_map(lambda *e: np.stack(e, axis=0), *envs)
 
   def _batch_of_states_apply_action(
       self, states: Sequence[pyspiel.State],
       actions: chex.Array) -> Sequence[pyspiel.State]:
     """Apply a batch of `actions` to a parallel list of `states`."""
-    def _play_action(state, action):
-      if state.is_terminal():
-        return state
-      self.actor_steps += 1
-      state.apply_action(action)
-      return self._play_chance(state)
-    return [_play_action(state, actions[i]) for i, state in enumerate(states)]
+    for state, action in zip(states, list(actions)):
+      if not state.is_terminal():
+        self.actor_steps += 1
+        state.apply_action(action)
+        self._play_chance(state)
+    return states
 
   def _play_chance(self, state: pyspiel.State) -> pyspiel.State:
     """Plays the chance nodes until we end up at another type of node.
@@ -1057,3 +1069,22 @@ class RNaDSolver(policy_lib.Policy):
       action = self._np_rng.choice(chance_outcome, p=chance_proba)
       state.apply_action(action)
     return state
+
+
+  # MODIFICATION OF THOMAS ROBERT IN THE LIBRARY
+  def custom_actor_step(self, env_step: EnvStep):
+    pi, _, _, _ = self.network.apply(self.params, env_step)
+    pi = np.asarray(pi).astype("float64")
+    pi = pi / np.sum(pi, axis=-1, keepdims=True)         # pi = pi / jnp.sum(pi, axis=-1, keepdims=True)
+
+    action = self._np_rng.choice(range(len(pi)), p=pi)
+    action_oh = np.zeros(pi.shape, dtype="float64")
+    action_oh[action] = 1.0
+    actor_step = ActorStep(policy=pi, action_oh=action_oh, rewards=())
+
+    return action, actor_step
+
+  def play_a_move(self, state):
+    env_step = self._state_as_env_step(state)
+    a, actor_step = self.custom_actor_step(env_step)
+    return a

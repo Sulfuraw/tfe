@@ -7,6 +7,7 @@ import random
 import sys
 import time
 import curses
+import pickle
 from curses import wrapper
 from absl import app
 import numpy as np
@@ -14,8 +15,9 @@ from open_spiel.python.bots import human
 from open_spiel.python.bots import uniform_random
 import alphaBeta
 import rnadBot
+import customBot
 
-player1 = "rnad5000"
+player1 = "custom"
 player2 = "random"
 num_games = 1
 replay = True
@@ -34,6 +36,15 @@ def everythingEverywhereAllAtOnce(filename, iterations):
     print("Bot saved successfully")
     print("===========================================")
 
+def saveGame(filename, data):
+    with open(filename, 'wb') as outp:  # Overwrites any existing file.
+        pickle.dump(data, outp, pickle.HIGHEST_PROTOCOL)
+
+def getGame(filename):
+    with open(filename, 'rb') as file:
+        data = pickle.load(file)
+    return data
+
 def stateIntoCharMatrix(state):
     stat = str(state).split(" ")[0]
     stat = ' '.join(stat)
@@ -42,10 +53,17 @@ def stateIntoCharMatrix(state):
         statInLines.append(stat[i:i+20].rstrip().split(" "))
     return statInLines
 
-def print_board(stdscr, states):
+# wrapper(print_board, getGame("games/0"), ["rnad", "random"])
+def print_board(stdscr, states, players):
     curses.init_pair(1, curses.COLOR_RED, curses.COLOR_BLACK)
     curses.init_pair(4, curses.COLOR_BLUE, curses.COLOR_BLACK)
     curses.init_pair(7, curses.COLOR_WHITE, curses.COLOR_BLACK)
+
+    color = curses.color_pair(1)
+    stdscr.addstr(1, len(states[0][0])*2+len(states[0][0])+6, "Player 1 plays as "+str(players[0]), color)
+    color = curses.color_pair(4)
+    stdscr.addstr(7, len(states[0][1])*2+len(states[0][1])+6, "Player 2 plays as "+str(players[1]), color)
+
     nthState = 0
     while nthState < len(states):
         state = states[nthState]
@@ -57,36 +75,24 @@ def print_board(stdscr, states):
                 elif oldPiece in ["Y", "O", "W", "X", "V", "U", "R", "S", "T", "Q", "N", "P"]:
                     color = curses.color_pair(4)
                 else: color = curses.color_pair(7)
-                if oldPiece in ["M", "Y"]:
-                    piece = "Fl"
-                elif oldPiece in ["C", "O"]:
-                    piece = "Sp"
-                elif oldPiece in ["D", "P"]:
-                    piece = "Sc"
-                elif oldPiece in ["E", "Q"]:
-                    piece = "Mi"
-                elif oldPiece in ["F", "R"]:
-                    piece = "Sg"
-                elif oldPiece in ["B", "N"]:
-                    piece = "Bo"
-                elif oldPiece in ["G", "S"]:
-                    piece = "Lt"
-                elif oldPiece in ["H", "T"]:
-                    piece = "Cp"
-                elif oldPiece in ["I", "U"]:
-                    piece = "Mj"
-                elif oldPiece in ["J", "V"]:
-                    piece = "Co"
-                elif oldPiece in ["K", "W"]:
-                    piece = "Ge"
-                elif oldPiece in ["L", "X"]:
-                    piece = "Ms"
-                elif oldPiece in ["_"]:
-                    piece = "##"
-                elif oldPiece in ["A"]:
-                    piece = "__"
+                if oldPiece in ["M", "Y"]: piece = "Fl"
+                elif oldPiece in ["C", "O"]: piece = "Sp"
+                elif oldPiece in ["D", "P"]: piece = "Sc"
+                elif oldPiece in ["E", "Q"]: piece = "Mi"
+                elif oldPiece in ["F", "R"]: piece = "Sg"
+                elif oldPiece in ["B", "N"]: piece = "Bo"
+                elif oldPiece in ["G", "S"]: piece = "Lt"
+                elif oldPiece in ["H", "T"]: piece = "Cp"
+                elif oldPiece in ["I", "U"]: piece = "Mj"
+                elif oldPiece in ["J", "V"]: piece = "Co"
+                elif oldPiece in ["K", "W"]: piece = "Ge"
+                elif oldPiece in ["L", "X"]: piece = "Ms"
+                elif oldPiece in ["_"]: piece = "##"
+                elif oldPiece in ["A"]: piece = "__"
                 else: piece = "??"
                 stdscr.addstr(i+1, j*2+j+2, piece, color)
+        color = curses.color_pair(7)
+        stdscr.addstr(i+1, j*2+j+9, "Turn number "+str(nthState), color)
         if auto:
             stdscr.timeout(1000)
         while True:
@@ -99,6 +105,9 @@ def print_board(stdscr, states):
                     nthState -= 1
                     break
                 if c == ord('f'):
+                    nthState += 100
+                    break
+                if c == ord('g'):
                     nthState += 2500
                     break
             else:
@@ -114,9 +123,11 @@ def _init_bot(bot_type, game, player_id):
         return human.HumanBot()
     if bot_type == "ab":
         return alphaBeta.AlphaBetaBot(player_id, game)
+    if bot_type == "custom":
+        return customBot.CustomBot(player_id, game)
     if bot_type == "rnad5000":
         try:
-            bot = rnadBot.rnadBot().getSavedState("state5000.pkl")
+            bot = rnadBot.rnadBot().getSavedState("states/state5000.pkl")
             print("Bot rnad 5000 loaded")
             return bot
         except:
@@ -125,7 +136,7 @@ def _init_bot(bot_type, game, player_id):
             return bot
     if bot_type == "rnad100":
         try:
-            bot = rnadBot.rnadBot().getSavedState("state100.pkl")
+            bot = rnadBot.rnadBot().getSavedState("states/state100.pkl")
             print("Bot rnad 100 loaded")
             return bot
         except:
@@ -145,7 +156,6 @@ def _play_game(game, bots, initial_actions):
     allStates = []
     # "FEBMBEFEEFBGIBHIBEDBGJDDDHCGJGDHDLIFKDDHAA__AA__AAAA__AA__AASTQPNSQPTSUPWPVRPXPURNQONNQSNVPTNQRRTYUP r 0"  # Base state debugged
     state = game.new_initial_state("FEBMBEFEEFBGIBHIBEDBGJDDDHCGJGDHDLIFKDDHAA__AA__AAAA__AA__AATPPWRUXPTPSVSOTPPPVSNPQNUTNUSNRQQRQNYNQR r 0") # Equal state
-    # wrapper(print_board, stateIntoCharMatrix(state))
     allStates.append(stateIntoCharMatrix(state))
     history = []
     for action_str in initial_actions:
@@ -156,7 +166,6 @@ def _play_game(game, bots, initial_actions):
         for bot in bots:
             bot.inform_action(state, state.current_player(), action)
         state.apply_action(action)
-        # wrapper(print_board, stateIntoCharMatrix(state))
         allStates.append(stateIntoCharMatrix(state))
 
     while not state.is_terminal():
@@ -169,7 +178,6 @@ def _play_game(game, bots, initial_actions):
                 bot.inform_action(state, current_player, action)
         history.append(action_str)
         state.apply_action(action)
-        # wrapper(print_board, stateIntoCharMatrix(state))
         allStates.append(stateIntoCharMatrix(state))
 
     # Game is now done. Print return for each player
@@ -180,8 +188,8 @@ def _play_game(game, bots, initial_actions):
     for bot in bots:
         bot.restart()
     if replay:
-        wrapper(print_board, allStates)
-    return returns, history
+        wrapper(print_board, allStates, bots)
+    return returns, history, allStates
 
 def main(argv):
     game = pyspiel.load_game("yorktown")
@@ -195,7 +203,9 @@ def main(argv):
     game_num = 0
     try:
         for game_num in range(num_games):
-            returns, history = _play_game(game, bots, argv[1:])
+            init_actions = [] # To make a certain sequence of move before involving the players
+            returns, history, allStates = _play_game(game, bots, init_actions)
+            saveGame("games/"+str(game_num), allStates)
             histories[" ".join(history)] += 1
             for i, v in enumerate(returns):
                 overall_returns[i] += v
@@ -214,23 +224,10 @@ def main(argv):
 if __name__ == "__main__":
     app.run(main)
 
-
-
-
-
-
-
-# t1 = time.time()
-# everythingEverywhereAllAtOnce("state500.pkl", 500)
-# t2 = time.time()
-# print(t2-t1)
-
-# t1 = time.time()
-# everythingEverywhereAllAtOnce("state1000.pkl", 1000)
-# t2 = time.time()
-# print(t2-t1)
-
-# t1 = time.time()
-# everythingEverywhereAllAtOnce("state5000.pkl", 5000)
-# t2 = time.time()
-# print(t2-t1)
+# colone 
+#   a  b  c  d  e  f  g  h  i  k (k au lieu de j mais sinon nice)
+# 1
+# 2
+# ...
+# 9
+# : (au lieu de 10)
