@@ -107,7 +107,7 @@ class CustomBot(pyspiel.Bot):
             policy_sum = 1
             policy[minimum_pain[1]] = 1
         policy = np.array(policy) / policy_sum
-        print(policy)
+        # print(policy)
         return policy
         
     def step_with_policy(self, state):

@@ -92,6 +92,7 @@ def print_board(stdscr, states, players):
                 else: piece = "??"
                 stdscr.addstr(i+1, j*2+j+2, piece, color)
         color = curses.color_pair(7)
+        print(nthState)
         stdscr.addstr(i+1, j*2+j+9, "Turn number "+str(nthState), color)
         if auto:
             stdscr.timeout(1000)
