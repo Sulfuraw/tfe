@@ -3,10 +3,7 @@ from __future__ import division
 from __future__ import print_function
 import pyspiel
 import collections
-import random
-import sys
 import time
-import curses
 import pickle
 from curses import wrapper
 from absl import app
@@ -16,11 +13,12 @@ from open_spiel.python.bots import uniform_random
 import alphaBeta
 import rnadBot
 import customBot
+from statework import stateIntoCharMatrix, print_board, printCharMatrix
 
 player1 = "custom"
 player2 = "random"
-num_games = 1
-replay = True
+num_games = 50
+replay = False
 auto = False
 
 # For training purposes only
@@ -37,82 +35,13 @@ def everythingEverywhereAllAtOnce(filename, iterations):
     print("===========================================")
 
 def saveGame(filename, data):
-    with open(filename, 'wb') as outp:  # Overwrites any existing file.
+    with open(filename, 'wb') as outp: # Overwrites any existing file.
         pickle.dump(data, outp, pickle.HIGHEST_PROTOCOL)
 
 def getGame(filename):
     with open(filename, 'rb') as file:
         data = pickle.load(file)
     return data
-
-def stateIntoCharMatrix(state):
-    stat = str(state).split(" ")[0]
-    stat = ' '.join(stat)
-    statInLines = []
-    for i in range(0, len(stat), 20):
-        statInLines.append(stat[i:i+20].rstrip().split(" "))
-    return statInLines
-
-# wrapper(print_board, getGame("games/0"), ["rnad", "random"])
-def print_board(stdscr, states, players):
-    curses.init_pair(1, curses.COLOR_RED, curses.COLOR_BLACK)
-    curses.init_pair(4, curses.COLOR_BLUE, curses.COLOR_BLACK)
-    curses.init_pair(7, curses.COLOR_WHITE, curses.COLOR_BLACK)
-
-    color = curses.color_pair(1)
-    stdscr.addstr(1, len(states[0][0])*2+len(states[0][0])+6, "Player 1 plays as "+str(players[0]), color)
-    color = curses.color_pair(4)
-    stdscr.addstr(7, len(states[0][1])*2+len(states[0][1])+6, "Player 2 plays as "+str(players[1]), color)
-
-    nthState = 0
-    while nthState < len(states):
-        state = states[nthState]
-        for i in range(len(state)):
-            for j in range(len(state[i])):
-                oldPiece = state[i][j].upper()
-                if oldPiece in ["M", "C", "K", "L", "J", "I", "F", "G", "H", "E", "B", "D"]:
-                    color = curses.color_pair(1)
-                elif oldPiece in ["Y", "O", "W", "X", "V", "U", "R", "S", "T", "Q", "N", "P"]:
-                    color = curses.color_pair(4)
-                else: color = curses.color_pair(7)
-                if oldPiece in ["M", "Y"]: piece = "Fl"
-                elif oldPiece in ["C", "O"]: piece = "Sp"
-                elif oldPiece in ["D", "P"]: piece = "Sc"
-                elif oldPiece in ["E", "Q"]: piece = "Mi"
-                elif oldPiece in ["F", "R"]: piece = "Sg"
-                elif oldPiece in ["B", "N"]: piece = "Bo"
-                elif oldPiece in ["G", "S"]: piece = "Lt"
-                elif oldPiece in ["H", "T"]: piece = "Cp"
-                elif oldPiece in ["I", "U"]: piece = "Mj"
-                elif oldPiece in ["J", "V"]: piece = "Co"
-                elif oldPiece in ["K", "W"]: piece = "Ge"
-                elif oldPiece in ["L", "X"]: piece = "Ms"
-                elif oldPiece in ["_"]: piece = "##"
-                elif oldPiece in ["A"]: piece = "__"
-                else: piece = "??"
-                stdscr.addstr(i+1, j*2+j+2, piece, color)
-        color = curses.color_pair(7)
-        stdscr.addstr(i+1, j*2+j+9, "Turn number "+str(nthState), color)
-        if auto:
-            stdscr.timeout(1000)
-        while True:
-            c = stdscr.getch()
-            if not auto:
-                if c == ord('d'):
-                    nthState += 1
-                    break
-                if c == ord('s'):
-                    nthState -= 1
-                    break
-                if c == ord('f'):
-                    nthState += 100
-                    break
-                if c == ord('g'):
-                    nthState += 2500
-                    break
-            else:
-                nthState += 1
-                break
 
 def _init_bot(bot_type, game, player_id):
     """Initializes a bot by type."""
@@ -124,8 +53,8 @@ def _init_bot(bot_type, game, player_id):
     if bot_type == "ab":
         return alphaBeta.AlphaBetaBot(player_id, game)
     if bot_type == "custom":
-        return customBot.CustomBot(player_id, game)
-    if bot_type == "rnad5000":
+        return customBot.CustomBot(game, 1.5, 10000, customBot.CustomEvaluator(), player_id) # customBot.RandomRolloutEvaluator()
+    if bot_type == "rnad1":
         try:
             bot = rnadBot.rnadBot().getSavedState("states/state5000.pkl")
             print("Bot rnad 5000 loaded")
@@ -134,7 +63,7 @@ def _init_bot(bot_type, game, player_id):
             bot = rnadBot.rnadBot()
             print("Bot rnad 5000 failed so start a base bot")
             return bot
-    if bot_type == "rnad100":
+    if bot_type == "rnad2":
         try:
             bot = rnadBot.rnadBot().getSavedState("states/state100.pkl")
             print("Bot rnad 100 loaded")
@@ -151,22 +80,12 @@ def _get_action(state, action_str):
             return action
     return None
 
-def _play_game(game, bots, initial_actions):
+def _play_game(game, bots):
     """Plays one game."""
-    allStates = []
     # "FEBMBEFEEFBGIBHIBEDBGJDDDHCGJGDHDLIFKDDHAA__AA__AAAA__AA__AASTQPNSQPTSUPWPVRPXPURNQONNQSNVPTNQRRTYUP r 0"  # Base state debugged
     state = game.new_initial_state("FEBMBEFEEFBGIBHIBEDBGJDDDHCGJGDHDLIFKDDHAA__AA__AAAA__AA__AATPPWRUXPTPSVSOTPPPVSNPQNUTNUSNRQQRQNYNQR r 0") # Equal state
-    allStates.append(stateIntoCharMatrix(state))
     history = []
-    for action_str in initial_actions:
-        action = _get_action(state, action_str)
-        if action is None:
-            sys.exit("Invalid action: {}".format(action_str))
-        history.append(action_str)
-        for bot in bots:
-            bot.inform_action(state, state.current_player(), action)
-        state.apply_action(action)
-        allStates.append(stateIntoCharMatrix(state))
+    allStates = []
 
     while not state.is_terminal():
         current_player = state.current_player()
@@ -177,18 +96,17 @@ def _play_game(game, bots, initial_actions):
             if i != current_player:
                 bot.inform_action(state, current_player, action)
         history.append(action_str)
-        state.apply_action(action)
         allStates.append(stateIntoCharMatrix(state))
+        state.apply_action(action)
 
     # Game is now done. Print return for each player
     returns = state.returns()
-    print("Returns:", " ".join(map(str, returns)), ", Game actions:",
-        " ".join(history))
-    print("Number of moves played:", len(history))
+    # print("Game actions:", " ".join(history), "\nReturns:", 
+    #         " ".join(map(str, returns)), "\n# moves:", len(history), "\n")
+    print("\nReturns:", 
+        " ".join(map(str, returns)), "\n# moves:", len(history), "\n")
     for bot in bots:
         bot.restart()
-    if replay:
-        wrapper(print_board, allStates, bots)
     return returns, history, allStates
 
 def main(argv):
@@ -203,8 +121,10 @@ def main(argv):
     game_num = 0
     try:
         for game_num in range(num_games):
-            init_actions = [] # To make a certain sequence of move before involving the players
-            returns, history, allStates = _play_game(game, bots, init_actions)
+            returns, history, allStates = _play_game(game, bots)
+            print("Game Number:", game_num)
+            if replay:
+                wrapper(print_board, allStates, bots, auto)
             saveGame("games/"+str(game_num), allStates)
             histories[" ".join(history)] += 1
             for i, v in enumerate(returns):
@@ -215,19 +135,11 @@ def main(argv):
         game_num -= 1
         print("Caught a KeyboardInterrupt, stopping early.")
     print("Number of games played:", game_num + 1)
-    print("Number of distinct games played:", len(histories))
     print("Players:", player1, player2)
     print("Overall wins", overall_wins)
     print("Overall returns", overall_returns)
 
 
 if __name__ == "__main__":
-    app.run(main)
-
-# colone 
-#   a  b  c  d  e  f  g  h  i  k (k au lieu de j mais sinon nice)
-# 1
-# 2
-# ...
-# 9
-# : (au lieu de 10)
+    # app.run(main)
+    wrapper(print_board, getGame("FullKnown1/30"), ["custom", "random"], auto)

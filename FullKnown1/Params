@@ -1,0 +1,48 @@
+Full known state
+Bot(game, 1.5, 10000, Custom)
+
+Stats Vs random: 33 wins, 0 loses
+
+Temps d'execution pour une partie entière entre 3 et 10 minutes (dépendant du nombre de moves)
+
+Game 30: 231 moves
+Game 15: 403 moves
+Game 10: 653 moves
+Game 16: 747 moves
+Game 12: 989 moves
+Game 24: 1789 moves
+
+
+class CustomEvaluator(Evaluator):
+  """
+  """
+
+  def __init__(self, n_rollouts=10, random_state=None):
+    self.n_rollouts = n_rollouts
+    self._random_state = random_state or np.random.RandomState()
+
+  def evaluate(self, state, maximizing_player_id):
+      """Returns evaluation on given state."""
+      state_str = str(state)  # state.information_state_string(maximizing_player_id) #
+      score = [0, 0]
+      # 0's pieces 
+      for piece, value in [("M", 65), ("C", 1), ("K", 9), ("L", 10), ("J", 8), ("I", 7), ("F", 4), ("G", 5), ("H", 6), ("E", 3), ("B", 5), ("D", 2), ("?", 5)]:
+          score[0] += state_str.count(piece)#*value
+          # make more weight to moving forward
+          score[0] += state_str[-50:].count(piece)
+      # 1's pieces
+      for piece, value in [("Y", 65), ("O", 1), ("W", 9), ("X", 10), ("V", 8), ("U", 7), ("R", 4), ("S", 5), ("T", 6), ("Q", 3), ("N", 5), ("P", 2), ("?", 5)]:
+          score[1] += state_str.count(piece)#*value
+          score[1] += state_str[:50].count(piece)
+      returns = [(score[0]-score[1])/500, (score[1]-score[0])/500] # (score[maximizing_player_id] - score[1-maximizing_player_id])
+      return returns
+
+  def prior(self, state):
+    """Returns equal probability for all actions."""
+    if state.is_chance_node():
+        return state.chance_outcomes()
+    else:
+        legal_actions = state.legal_actions(state.current_player())
+        # if state.current_player == 0:
+        # print(legal_actions)
+        return [(action, 1.0 / len(legal_actions)) for action in legal_actions]
