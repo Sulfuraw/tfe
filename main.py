@@ -140,6 +140,6 @@ replay = False
 auto = False
 
 if __name__ == "__main__":
-    # app.run(main)
+    app.run(main)
     # wrapper(print_board, getGame("FullKnown1/30"), ["custom", "random"], auto)
-    wrapper(print_board, getGame("games/23"), ["custom", "random"], auto)
+    # wrapper(print_board, getGame("games/23"), ["custom", "random"], auto)
