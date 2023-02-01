@@ -1,7 +1,10 @@
 Full known state
 Bot(game, 1.5, 10000, Custom)
+20000 n'était pas relevant, ça n'affectait pas les perfs (nombre de coups a faire)
+5000 speedup mais on y perd en perf (nombre de coup et % victoire)
+8000 Pareil on y perd: 46/4, ya des 400, 600, etc mais aussi tjrs des 1600
 
-Stats Vs random: 33 wins, 0 loses
+Stats Vs random: 82 wins, 1 loses
 
 Temps d'execution pour une partie entière entre 3 et 10 minutes (dépendant du nombre de moves)
 
@@ -11,6 +14,11 @@ Game 10: 653 moves
 Game 16: 747 moves
 Game 12: 989 moves
 Game 24: 1789 moves
+
++ 2 rajouts: Game 14lose c'est la game lose
+             Game 47short317moves c'est une short game de plus
+
+Les autres n'ont pas été sauvegardée plus que ça.
 
 
 class CustomEvaluator(Evaluator):

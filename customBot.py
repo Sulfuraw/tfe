@@ -68,38 +68,48 @@ class RandomRolloutEvaluator(Evaluator):
 
 
 class CustomEvaluator(Evaluator):
-  """
-  """
+    """
+    """
 
-  def __init__(self, n_rollouts=10, random_state=None):
-    self.n_rollouts = n_rollouts
-    self._random_state = random_state or np.random.RandomState()
+    def __init__(self, n_rollouts=10, random_state=None):
+        self.n_rollouts = n_rollouts
+        self._random_state = random_state or np.random.RandomState()
 
-  def evaluate(self, state, maximizing_player_id):
-      """Returns evaluation on given state."""
-      state_str = str(state)  # state.information_state_string(maximizing_player_id) #
-      score = [0, 0]
-      # 0's pieces 
-      for piece, value in [("M", 65), ("C", 1), ("K", 9), ("L", 10), ("J", 8), ("I", 7), ("F", 4), ("G", 5), ("H", 6), ("E", 3), ("B", 5), ("D", 2), ("?", 5)]:
-          score[0] += state_str.count(piece)#*value
-          # make more weight to moving forward
-          score[0] += state_str[-50:].count(piece)
-      # 1's pieces
-      for piece, value in [("Y", 65), ("O", 1), ("W", 9), ("X", 10), ("V", 8), ("U", 7), ("R", 4), ("S", 5), ("T", 6), ("Q", 3), ("N", 5), ("P", 2), ("?", 5)]:
-          score[1] += state_str.count(piece)#*value
-          score[1] += state_str[:50].count(piece)
-      returns = [(score[0]-score[1])/500, (score[1]-score[0])/500] # (score[maximizing_player_id] - score[1-maximizing_player_id])
-      return returns
+    def evaluate(self, state, maximizing_player_id):
+        """Returns evaluation on given state."""
+        state_str = str(state)  # state.information_state_string(maximizing_player_id) #
+        score = [0, 0]
+        # 0's pieces (175.5 + 24.5 at start)
+        for piece, value in [("M", 24.5), ("C", 3.5), ("K", 9), ("L", 10), ("J", 8), ("I", 7), ("F", 4), ("G", 5), ("H", 6), ("E", 3), ("B", 5), ("D", 2), ("?", 4.5)]:
+            score[0] += state_str.count(piece)#*value
+            # make more weight to moving forward
+            score[0] += state_str[-50:].count(piece)
+        # 1's pieces (175.5 = (39*4.5) + 24.5 at start if unkown)
+        for piece, value in [("Y", 24.5), ("O", 3.5), ("W", 9), ("X", 10), ("V", 8), ("U", 7), ("R", 4), ("S", 5), ("T", 6), ("Q", 3), ("N", 5), ("P", 2), ("?", 4.5)]:
+            score[1] += state_str.count(piece)#*value
+            score[1] += state_str[:50].count(piece)
+        returns = [(score[0]-score[1])/500, (score[1]-score[0])/500] # (score[maximizing_player_id] - score[1-maximizing_player_id])
+        return returns
 
-  def prior(self, state):
-    """Returns equal probability for all actions."""
-    if state.is_chance_node():
-        return state.chance_outcomes()
-    else:
-        legal_actions = state.legal_actions(state.current_player())
-        # if state.current_player == 0:
-        # print(legal_actions)
-        return [(action, 1.0 / len(legal_actions)) for action in legal_actions]
+    def is_forward(self, action, player):
+        _, pos1, _, pos2 = list(action)
+        return pos1 < pos2 if player == 0 else pos1 > pos2
+  
+    def prior(self, state):
+        """Returns equal probability for all actions."""
+        if state.is_chance_node():
+            return state.chance_outcomes()
+        else:
+            sum = 0.0
+            prio = []
+            player = state.current_player()
+            for action in state.legal_actions(player):
+                value = 5.0 if self.is_forward(state.action_to_string(player, action), player) else 1.0
+                sum += value
+                prio.append([action, value])
+            for i in range(len(prio)):
+                prio[i][1] = prio[i][1]/sum
+            return prio
 
 class SearchNode(object):
   """A node in the search tree.
@@ -350,6 +360,7 @@ class CustomBot(pyspiel.Bot):
         ]
 
       if working_state.is_chance_node():
+        print("ah")
         # For chance nodes, rollout according to chance node's probability
         # distribution
         outcomes = working_state.chance_outcomes()
@@ -419,6 +430,7 @@ class CustomBot(pyspiel.Bot):
       else:
         returns = self.evaluator.evaluate(working_state, self.player_id)  # Modified here to add the playerid
         solved = False
+        # print(returns)
 
       while visit_path:
         # For chance nodes, walk up the tree to find the decision-maker.

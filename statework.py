@@ -1,5 +1,20 @@
 import curses
 
+# It is: Fl, Bo, Sp, Sc, Mi, Sg, Lt, Cp, Mj, Co, Ge, Ms
+piece = [1/12]*12 # Proba that it is a specific piece
+matrix_of_possibilities = [[piece]*10]*10
+number_of_piece_left = [1, 6, 1, 8, 5, 4, 4, 4, 3, 2, 1, 1]  # [nbr]*12
+player_id = 0
+knowledge = [matrix_of_possibilities, number_of_piece_left, player_id]
+
+def generate_state(state, knowledge):
+    final = ""
+    players_piece = [["M", "C", "K", "L", "J", "I", "F","G", "H", "E", "B", "D"],
+                    ["Y", "O", "W", "X", "V", "U", "R", "S", "T", "Q", "N", "P"]]
+    player_id = knowledge[3]
+
+    return final
+
 def stateIntoCharMatrix(state):
     stat = str(state).split(" ")[0]
     stat = ' '.join(stat)

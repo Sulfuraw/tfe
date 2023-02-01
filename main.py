@@ -15,12 +15,6 @@ import rnadBot
 import customBot
 from statework import stateIntoCharMatrix, print_board, printCharMatrix
 
-player1 = "custom"
-player2 = "random"
-num_games = 50
-replay = False
-auto = False
-
 # For training purposes only
 def everythingEverywhereAllAtOnce(filename, iterations):
     try:
@@ -53,7 +47,7 @@ def _init_bot(bot_type, game, player_id):
     if bot_type == "ab":
         return alphaBeta.AlphaBetaBot(player_id, game)
     if bot_type == "custom":
-        return customBot.CustomBot(game, 1.5, 10000, customBot.CustomEvaluator(), player_id) # customBot.RandomRolloutEvaluator()
+        return customBot.CustomBot(game, 1.5, 500, customBot.CustomEvaluator(), player_id) # customBot.RandomRolloutEvaluator()
     if bot_type == "rnad1":
         try:
             bot = rnadBot.rnadBot().getSavedState("states/state5000.pkl")
@@ -139,7 +133,13 @@ def main(argv):
     print("Overall wins", overall_wins)
     print("Overall returns", overall_returns)
 
+player1 = "custom"
+player2 = "random"
+num_games = 50
+replay = False
+auto = False
 
 if __name__ == "__main__":
     # app.run(main)
-    wrapper(print_board, getGame("FullKnown1/30"), ["custom", "random"], auto)
+    # wrapper(print_board, getGame("FullKnown1/30"), ["custom", "random"], auto)
+    wrapper(print_board, getGame("games/23"), ["custom", "random"], auto)

@@ -303,7 +303,7 @@ def basic_test():
     allStates = []
 
     #while not state.is_terminal():
-    for _ in range(1):
+    for _ in range(3):
         current_player = state.current_player()
         bot = bots[current_player]
         action = bot.step(state)
@@ -326,6 +326,3 @@ def basic_test():
     return returns, history, allStates
 
 basic_test()
-
-
-
