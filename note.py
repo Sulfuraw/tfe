@@ -16,7 +16,7 @@ import alphaBeta
 import rnadBot
 import customBot
 from main import _init_bot
-from statework import stateIntoCharMatrix, print_board, printCharMatrix
+from statework import stateIntoCharMatrix, print_board, printCharMatrix, flag_protec, generate_possibilities_matrix, is_valid_state, generate_state
 
 def game_list(_):
     games_list = pyspiel.registered_games()
@@ -286,11 +286,53 @@ class CustomBot(pyspiel.Bot):
 
 ###############################################################################
 
-player1 = "custom"
-player2 = "random"
-num_games = 50
-replay = False
-auto = False
+class Evaluator(object):
+    """Abstract class representing an evaluation function for a game.
+
+    The evaluation function takes in an intermediate state in the game and returns
+    an evaluation of that state, which should correlate with chances of winning
+    the game. It returns the evaluation from all player's perspectives.
+    """
+
+    def evaluate(self, state):
+        """Returns evaluation on given state."""
+        raise NotImplementedError
+
+    def prior(self, state):
+        """Returns a probability for each legal action in the given state."""
+        raise NotImplementedError
+
+class RandomRolloutEvaluator(Evaluator):
+    """A simple evaluator doing random rollouts.
+
+    This evaluator returns the average outcome of playing random actions from the
+    given state until the end of the game.  n_rollouts is the number of random
+    outcomes to be considered.
+    """
+
+    def __init__(self, n_rollouts=1, random_state=None):
+        self.n_rollouts = n_rollouts
+        self._random_state = random_state or np.random.RandomState()
+
+    def evaluate(self, state, id):
+        """Returns evaluation on given state."""
+        result = None
+        for _ in range(self.n_rollouts):
+            working_state = state.clone()
+        while not working_state.is_terminal():
+            action = self._random_state.choice(working_state.legal_actions())
+            working_state.apply_action(action)
+        returns = np.array(working_state.returns())
+        result = returns if result is None else result + returns
+
+        return result / self.n_rollouts
+
+    def prior(self, state):
+        """Returns equal probability for all actions."""
+        legal_actions = state.legal_actions(state.current_player())
+        return [(action, 1.0 / len(legal_actions)) for action in legal_actions]
+
+###############################################################################
 
 def basic_test():
     game = pyspiel.load_game("yorktown")
@@ -299,22 +341,48 @@ def basic_test():
         _init_bot(player2, game, 1),
     ]
     state = game.new_initial_state("FEBMBEFEEFBGIBHIBEDBGJDDDHCGJGDHDLIFKDDHAA__AA__AAAA__AA__AATPPWRUXPTPSVSOTPPPVSNPQNUTNUSNRQQRQNYNQR r 0") # Equal state
+    
+    for i, bot in enumerate(bots):
+        if str(bot) == "custom":
+            bot.init_knowledge(state)
+    
     history = []
     allStates = []
+    allStates.append(stateIntoCharMatrix(state))
 
     #while not state.is_terminal():
-    for _ in range(3):
+    for n in range(10):
         current_player = state.current_player()
         bot = bots[current_player]
-        action = bot.step(state)
+
+        if str(bot) == "custom":
+            # print("\n==============================================")
+            # print("move number: " + str(n))
+            # printCharMatrix(stateIntoCharMatrix(state))
+            # print()
+            # printCharMatrix(stateIntoCharMatrix(state.information_state_string(state.current_player())))
+            # print("Pieces_left:")
+            # print(bot.information[1])
+            # print("moved:")
+            # print(bot.information[2])
+            # print("scout:")
+            # print(bot.information[3])
+            generated = generate_state(state, bot.matrix_of_possibilities, bot.information[1])
+            action = bot.step(game.new_initial_state(generated))
+            # print(generated)
+            # print(is_valid_state(generated))
+        else:
+            action = bot.step(state)
         action_str = state.action_to_string(current_player, action)
         for i, bot in enumerate(bots):
             if i != current_player:
                 bot.inform_action(state, current_player, action)
+            if str(bot) == "custom":
+                bot.update_knowledge(state.clone(), action)
         history.append(action_str)
-        allStates.append(stateIntoCharMatrix(state))
         state.apply_action(action)
         allStates.append(stateIntoCharMatrix(state))
+        # printCharMatrix(stateIntoCharMatrix(state.information_state_string(maximizing_player_id)))
 
     # Game is now done. Print return for each player
     returns = state.returns()
@@ -325,4 +393,14 @@ def basic_test():
     wrapper(print_board, allStates, bots, auto)
     return returns, history, allStates
 
-basic_test()
+player1 = "custom"
+player2 = "random"
+num_games = 50
+replay = False
+auto = False
+
+players_piece = [["M", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L"],
+                 ["Y", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X"]]
+# It is:         [Fl,  Bo,   Sp,  Sc,  Mi,  Sg,  Lt,  Cp,  Mj,  Co,  Ge,  Ms]
+# Nbr of each:   [1,   6,    1,   8,   5,   4,   4,   4,   3,   2,   1,   1]
+# basic_test()

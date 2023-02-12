@@ -13,7 +13,7 @@ from open_spiel.python.bots import uniform_random
 import alphaBeta
 import rnadBot
 import customBot
-from statework import stateIntoCharMatrix, print_board, printCharMatrix
+from statework import stateIntoCharMatrix, print_board, printCharMatrix, flag_protec, generate_possibilities_matrix, is_valid_state, generate_state
 
 # For training purposes only
 def everythingEverywhereAllAtOnce(filename, iterations):
@@ -47,7 +47,7 @@ def _init_bot(bot_type, game, player_id):
     if bot_type == "ab":
         return alphaBeta.AlphaBetaBot(player_id, game)
     if bot_type == "custom":
-        return customBot.CustomBot(game, 1.5, 500, customBot.CustomEvaluator(), player_id) # customBot.RandomRolloutEvaluator()
+        return customBot.CustomBot(game, 1.5, 2000, customBot.CustomEvaluator(), player_id) # customBot.RandomRolloutEvaluator()
     if bot_type == "rnad1":
         try:
             bot = rnadBot.rnadBot().getSavedState("states/state5000.pkl")
@@ -81,16 +81,39 @@ def _play_game(game, bots):
     history = []
     allStates = []
 
+    for i, bot in enumerate(bots):
+        if str(bot) == "custom":
+            bot.init_knowledge(state)
+
+    move = 0
     while not state.is_terminal():
         current_player = state.current_player()
         bot = bots[current_player]
-        action = bot.step(state)
+
+        if str(bot) == "custom":
+            # print("\n==============================================")
+            # print(state)
+            # print(state.information_state_string(state.current_player()))
+            generated = generate_state(state, bot.matrix_of_possibilities, bot.information)
+            action = bot.step(game.new_initial_state(generated))
+            # print(generated)
+            # print(is_valid_state(generated))
+        else:
+            action = bot.step(state)
+
         action_str = state.action_to_string(current_player, action)
         for i, bot in enumerate(bots):
             if i != current_player:
                 bot.inform_action(state, current_player, action)
+            if str(bot) == "custom":
+                bot.update_knowledge(state.clone(), action)
         history.append(action_str)
         allStates.append(stateIntoCharMatrix(state))
+
+        # print("moves:", move)
+        # printCharMatrix(stateIntoCharMatrix(state))
+        move+=1
+
         state.apply_action(action)
 
     # Game is now done. Print return for each player
@@ -98,10 +121,10 @@ def _play_game(game, bots):
     # print("Game actions:", " ".join(history), "\nReturns:", 
     #         " ".join(map(str, returns)), "\n# moves:", len(history), "\n")
     print("\nReturns:", 
-        " ".join(map(str, returns)), "\n# moves:", len(history), "\n")
+        " ".join(map(str, returns)), "\n# moves:", len(history))
     for bot in bots:
         bot.restart()
-    return returns, history, allStates
+    return returns, history, allStates, move
 
 def main(argv):
     game = pyspiel.load_game("yorktown")
@@ -113,9 +136,10 @@ def main(argv):
     overall_returns = [0, 0]
     overall_wins = [0, 0]
     game_num = 0
+    moves = 0
     try:
         for game_num in range(num_games):
-            returns, history, allStates = _play_game(game, bots)
+            returns, history, allStates, move = _play_game(game, bots)
             print("Game Number:", game_num)
             if replay:
                 wrapper(print_board, allStates, bots, auto)
@@ -125,10 +149,12 @@ def main(argv):
                 overall_returns[i] += v
                 if v > 0:
                     overall_wins[i] += 1
+            moves += move
     except (KeyboardInterrupt, EOFError):
         game_num -= 1
         print("Caught a KeyboardInterrupt, stopping early.")
     print("Number of games played:", game_num + 1)
+    print("Average number of moves till finish:", moves//game_num)
     print("Players:", player1, player2)
     print("Overall wins", overall_wins)
     print("Overall returns", overall_returns)
@@ -142,4 +168,5 @@ auto = False
 if __name__ == "__main__":
     app.run(main)
     # wrapper(print_board, getGame("FullKnown1/30"), ["custom", "random"], auto)
-    # wrapper(print_board, getGame("games/23"), ["custom", "random"], auto)
+    # wrapper(print_board, getGame("FullKnown1/14lose"), ["custom", "random"], auto)
+    # wrapper(print_board, getGame("games/0"), ["custom", "random"], auto)

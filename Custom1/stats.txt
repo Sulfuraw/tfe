@@ -1,0 +1,64 @@
+Custom knowing state
+Bot(game, 1.5, 2000, Custom)
+
+53 wins / 1 loses
+
+Temps d'execution très variable à cause de la génération des states 
+
+Partie: Nbr Moves
+14:     1256  (Lose)
+3:      271
+12:     273
+7:      311
+44:     355
+30:     403
+6:      523
+24:     679
+16:     843
+41:     977
+49:     1071
+11:     1489
+9:      2367
+
+(50: 1121 
+51: 809 
+52: 729 
+53: 549)
+
+def evaluate(self, state, maximizing_player_id):
+    """Returns evaluation on given state."""
+    state_str = str(state)
+    # state_str = state.information_state_string(maximizing_player_id)
+
+    score = [0, 0]
+    # 0's pieces (value 175.5 at start) (unkown (?)*39 = 175.5 at start too)
+    for piece, value in [("M", 124.5), ("C", 3.5), ("K", 9), ("L", 10), ("J", 8), ("I", 7), ("F", 4), ("G", 5), ("H", 6), ("E", 3), ("B", 5), ("D", 2), ("?", 4.5)]:
+        score[0] += state_str.count(piece)#*value
+        # make more weight to moving forward
+        score[0] += state_str[-50:].count(piece)
+        # make more weight if flag is protected
+        score[0] += 20 if flag_protec(state, 0) else 0
+    for piece, value in [("Y", 124.5), ("O", 3.5), ("W", 9), ("X", 10), ("V", 8), ("U", 7), ("R", 4), ("S", 5), ("T", 6), ("Q", 3), ("N", 5), ("P", 2), ("?", 4.5)]:
+        score[1] += state_str.count(piece)#*value
+        score[1] += state_str[:50].count(piece)
+        score[1] += 20 if flag_protec(state, 1) else 0
+
+    returns = [(score[0]-score[1])/500, (score[1]-score[0])/500]
+    return returns
+
+def is_forward(self, action, player):
+    _, pos1, _, pos2 = list(action)
+    return pos1 < pos2 if player == 0 else pos1 > pos2
+
+def prior(self, state):
+    """Returns equal probability for all actions."""
+    sum = 0.0
+    prio = []
+    player = state.current_player()
+    for action in state.legal_actions(player):
+        value = 5.0 if self.is_forward(state.action_to_string(player, action), player) else 1.0
+        sum += value
+        prio.append([action, value])
+    for i in range(len(prio)):
+        prio[i][1] = prio[i][1]/sum
+    return prio

@@ -8,6 +8,7 @@ import main
 import math
 import time
 from curses import wrapper
+from statework import stateIntoCharMatrix, print_board, printCharMatrix, flag_protec, generate_possibilities_matrix, updating_knowledge
 
 # Using the Copyright 2019 DeepMind Technologies Limited using """Monte-Carlo Tree Search algorithm for game play."""
 
@@ -27,38 +28,6 @@ class Evaluator(object):
         """Returns a probability for each legal action in the given state."""
         raise NotImplementedError
 
-
-class RandomRolloutEvaluator(Evaluator):
-    """A simple evaluator doing random rollouts.
-
-    This evaluator returns the average outcome of playing random actions from the
-    given state until the end of the game.  n_rollouts is the number of random
-    outcomes to be considered.
-    """
-
-    def __init__(self, n_rollouts=1, random_state=None):
-        self.n_rollouts = n_rollouts
-        self._random_state = random_state or np.random.RandomState()
-
-    def evaluate(self, state, id):
-        """Returns evaluation on given state."""
-        result = None
-        for _ in range(self.n_rollouts):
-            working_state = state.clone()
-        while not working_state.is_terminal():
-            action = self._random_state.choice(working_state.legal_actions())
-            working_state.apply_action(action)
-        returns = np.array(working_state.returns())
-        result = returns if result is None else result + returns
-
-        return result / self.n_rollouts
-
-    def prior(self, state):
-        """Returns equal probability for all actions."""
-        legal_actions = state.legal_actions(state.current_player())
-        return [(action, 1.0 / len(legal_actions)) for action in legal_actions]
-
-
 class CustomEvaluator(Evaluator):
     def __init__(self, n_rollouts=10, random_state=None):
         self.n_rollouts = n_rollouts
@@ -66,18 +35,23 @@ class CustomEvaluator(Evaluator):
 
     def evaluate(self, state, maximizing_player_id):
         """Returns evaluation on given state."""
-        state_str = str(state)  # state.information_state_string(maximizing_player_id) #
+        state_str = str(state)
+        # state_str = state.information_state_string(maximizing_player_id)
+
         score = [0, 0]
-        # 0's pieces (175.5 + 24.5 at start)
-        for piece, value in [("M", 24.5), ("C", 3.5), ("K", 9), ("L", 10), ("J", 8), ("I", 7), ("F", 4), ("G", 5), ("H", 6), ("E", 3), ("B", 5), ("D", 2), ("?", 4.5)]:
+        # 0's pieces (value 175.5 at start) (unkown (?)*39 = 175.5 at start too)
+        for piece, value in [("M", 124.5), ("C", 3.5), ("K", 9), ("L", 10), ("J", 8), ("I", 7), ("F", 4), ("G", 5), ("H", 6), ("E", 3), ("B", 5), ("D", 2), ("?", 4.5)]:
             score[0] += state_str.count(piece)#*value
             # make more weight to moving forward
             score[0] += state_str[-50:].count(piece)
-        # 1's pieces (175.5 = (39*4.5) + 24.5 at start if unkown)
-        for piece, value in [("Y", 24.5), ("O", 3.5), ("W", 9), ("X", 10), ("V", 8), ("U", 7), ("R", 4), ("S", 5), ("T", 6), ("Q", 3), ("N", 5), ("P", 2), ("?", 4.5)]:
+            # make more weight if flag is protected
+            score[0] += 20 if flag_protec(state, 0) else 0
+        for piece, value in [("Y", 124.5), ("O", 3.5), ("W", 9), ("X", 10), ("V", 8), ("U", 7), ("R", 4), ("S", 5), ("T", 6), ("Q", 3), ("N", 5), ("P", 2), ("?", 4.5)]:
             score[1] += state_str.count(piece)#*value
             score[1] += state_str[:50].count(piece)
-        returns = [(score[0]-score[1])/500, (score[1]-score[0])/500] # (score[maximizing_player_id] - score[1-maximizing_player_id])
+            score[1] += 20 if flag_protec(state, 1) else 0
+
+        returns = [(score[0]-score[1])/500, (score[1]-score[0])/500]
         return returns
 
     def is_forward(self, action, player):
@@ -275,8 +249,21 @@ class CustomBot(pyspiel.Bot):
         self._child_selection_fn = child_selection_fn
         self.dont_return_chance_node = dont_return_chance_node
 
-    def restart_at(self, state):
-        pass
+        self.matrix_of_possibilities = []
+        self.information = []
+
+    def init_knowledge(self, base_state):
+        nbr_piece_left = np.array([1, 6, 1, 8, 5, 4, 4, 4, 3, 2, 1, 1])
+        moved_before = np.zeros((10, 10))
+        moved_scout = np.zeros((10, 10))
+        self.information = np.array([self.player_id, nbr_piece_left, moved_before, moved_scout])
+        self.matrix_of_possibilities = generate_possibilities_matrix(base_state, self.information)
+
+
+    def update_knowledge(self, state, action):
+        current_player = state.current_player()
+        self.information = updating_knowledge(self.information, state, action)
+        self.matrix_of_possibilities = generate_possibilities_matrix(state, self.information)
 
     def step_with_policy(self, state):
         """Returns bot's policy and action at given state."""
@@ -403,7 +390,6 @@ class CustomBot(pyspiel.Bot):
             else:
                 returns = self.evaluator.evaluate(working_state, self.player_id)  # Modified here to add the playerid
                 solved = False
-                # print(returns)
 
             while visit_path:
                 # For chance nodes, walk up the tree to find the decision-maker.
@@ -445,5 +431,10 @@ class CustomBot(pyspiel.Bot):
                             solved = False
             if root.outcome is not None:
                 break
-
         return root
+
+    def restart_at(self, state):
+        pass
+
+    def __str__(self):
+        return "custom"
