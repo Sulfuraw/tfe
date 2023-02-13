@@ -1,5 +1,6 @@
 Custom knowing state
 Bot(game, 1.5, 2000, Custom)
+https://github.com/ThomasRober/tfe/commit/98e6f3b5ba13a0ce3fb8d3e7f18843045a865c25
 
 53 wins / 1 loses
 
