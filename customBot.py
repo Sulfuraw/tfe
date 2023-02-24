@@ -252,18 +252,21 @@ class CustomBot(pyspiel.Bot):
         self.matrix_of_possibilities = []
         self.information = []
 
+    def set_max_simulations(self, new_value):
+        self.max_simulations = new_value
+
     def init_knowledge(self, base_state):
         nbr_piece_left = np.array([1, 6, 1, 8, 5, 4, 4, 4, 3, 2, 1, 1])
         moved_before = np.zeros((10, 10))
         moved_scout = np.zeros((10, 10))
         self.information = np.array([self.player_id, nbr_piece_left, moved_before, moved_scout])
-        self.matrix_of_possibilities = generate_possibilities_matrix(base_state, self.information)
+        # self.matrix_of_possibilities = generate_possibilities_matrix(base_state, self.information)
 
 
     def update_knowledge(self, state, action):
         current_player = state.current_player()
         self.information = updating_knowledge(self.information, state, action)
-        self.matrix_of_possibilities = generate_possibilities_matrix(state, self.information)
+        # self.matrix_of_possibilities = generate_possibilities_matrix(state, self.information)
 
     def step_with_policy(self, state):
         """Returns bot's policy and action at given state."""

@@ -13,7 +13,7 @@ from open_spiel.python.bots import uniform_random
 import alphaBeta
 import rnadBot
 import customBot
-from statework import stateIntoCharMatrix, print_board, printCharMatrix, flag_protec, generate_possibilities_matrix, is_valid_state, generate_state
+from statework import stateIntoCharMatrix, print_board, printCharMatrix, flag_protec, generate_possibilities_matrix, is_valid_state, generate_state, compare_state
 
 # For training purposes only
 def everythingEverywhereAllAtOnce(filename, iterations):
@@ -80,6 +80,7 @@ def _play_game(game, bots):
     state = game.new_initial_state("FEBMBEFEEFBGIBHIBEDBGJDDDHCGJGDHDLIFKDDHAA__AA__AAAA__AA__AATPPWRUXPTPSVSOTPPPVSNPQNUTNUSNRQQRQNYNQR r 0") # Equal state
     history = []
     allStates = []
+    knowledge_accuracies = []
 
     for i, bot in enumerate(bots):
         if str(bot) == "custom":
@@ -91,11 +92,15 @@ def _play_game(game, bots):
         bot = bots[current_player]
 
         if str(bot) == "custom":
+            # TODO: If game advanced enough, increase max_simulations, change there with the number we're at (variable move for example)
+
             # print("\n==============================================")
             # print(state)
             # print(state.information_state_string(state.current_player()))
-            generated = generate_state(state, bot.matrix_of_possibilities, bot.information)
+            generated = generate_state(state, bot.information)
             action = bot.step(game.new_initial_state(generated))
+            knowledge_accuracies.append(compare_state(state, generated))
+            # print(compare_state(state, generated))
             # print(generated)
             # print(is_valid_state(generated))
         else:
@@ -109,11 +114,7 @@ def _play_game(game, bots):
                 bot.update_knowledge(state.clone(), action)
         history.append(action_str)
         allStates.append(stateIntoCharMatrix(state))
-
-        # print("moves:", move)
-        # printCharMatrix(stateIntoCharMatrix(state))
         move+=1
-
         state.apply_action(action)
 
     # Game is now done. Print return for each player
@@ -124,7 +125,7 @@ def _play_game(game, bots):
         " ".join(map(str, returns)), "\n# moves:", len(history))
     for bot in bots:
         bot.restart()
-    return returns, history, allStates, move
+    return returns, history, allStates, move, knowledge_accuracies
 
 def main(argv):
     game = pyspiel.load_game("yorktown")
@@ -137,12 +138,13 @@ def main(argv):
     overall_wins = [0, 0]
     game_num = 0
     moves = 0
+    start_time = time.time()
     try:
         for game_num in range(num_games):
-            returns, history, allStates, move = _play_game(game, bots)
+            start_game_time = time.time()
+            returns, history, allStates, move, knowledge_accuracies = _play_game(game, bots)
+            print("Time for this game in minute:", round(time.time()-start_game_time)//60)
             print("Game Number:", game_num)
-            if replay:
-                wrapper(print_board, allStates, bots, auto)
             saveGame("games/"+str(game_num), allStates)
             histories[" ".join(history)] += 1
             for i, v in enumerate(returns):
@@ -150,23 +152,29 @@ def main(argv):
                 if v > 0:
                     overall_wins[i] += 1
             moves += move
+            if replay:
+                wrapper(print_board, allStates, bots, auto)
     except (KeyboardInterrupt, EOFError):
         game_num -= 1
         print("Caught a KeyboardInterrupt, stopping early.")
     print("Number of games played:", game_num + 1)
-    print("Average number of moves till finish:", moves//game_num)
+    print("Average number of moves till finish:", moves//(game_num+1))
+    print("Average time till finish:", (round(time.time()-start_time)//60)//(game_num+1))
     print("Players:", player1, player2)
     print("Overall wins", overall_wins)
     print("Overall returns", overall_returns)
+    # TODO: Save in a csv, information about games and inside a game each time. 2 csv 
 
 player1 = "custom"
 player2 = "random"
-num_games = 50
+num_games = 15
 replay = False
 auto = False
 
 if __name__ == "__main__":
     app.run(main)
+    # wrapper(print_board, getGame("Custom1/3"), ["custom", "random"], auto) # 271 moves
+    # wrapper(print_board, getGame("Custom1/14"), ["custom", "random"], auto) # 1256 moves, lose
     # wrapper(print_board, getGame("FullKnown1/30"), ["custom", "random"], auto)
     # wrapper(print_board, getGame("FullKnown1/14lose"), ["custom", "random"], auto)
     # wrapper(print_board, getGame("games/0"), ["custom", "random"], auto)

@@ -63,3 +63,16 @@ def prior(self, state):
     for i in range(len(prio)):
         prio[i][1] = prio[i][1]/sum
     return prio
+
+
+
+Après Memoire:
+- Je peux sauvegarder les states couplés à des infos du bot dans un fichier au lieu de l'actuel matrice comme ça je pourrais montrer l'évolution des infos / les boards vu par l'IA, etc.
+- Pour DeepNash il me faudrait Une machine virtuel pour pouvoir run tout ça sans monopoliser mon PC, ou alors je commence à faire run le training pendant les nuits, c'est aussi possible. Mais j'ai testé et le training multithreadé et tout ce qui est possible avec TensorFlow (qui a déjà l'air implémenté) est impossible sur mon ordinateur.
+- Utiliser des states de base générer aléatoirement ? Pour l'instant ils jouent avec un state symmetrique de base avec le drapeau protéger pour obliger à découvrir et tuer les bombs avec des miners.
+- Adapter le nbr de simu et le nbr de prior au fur et a mesure
+- Comparer l'accuracy de mon algo de generation de state avec le vrai state (par piece, se tromper): Faire un graphe. montrer l'estimation de l'état au fur et a mesure. Des states 
+- Faire un etat de base avec les stats qu'on a des parties pour avoir quelque chose de realiste
+- reparer la generation d'état
+- Assigner les pieces de facon plus aleatoire
+- adapter monte carlo avec l'avancement de la partie 
