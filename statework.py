@@ -199,7 +199,6 @@ def compare_state(state1, state2):
 def generate_state(state, information):
     partial_state = state.information_state_string(state.current_player()) # str(state) if he has full info
     state_str = str(partial_state)
-    piece_left = information[1].copy()
     moved_before = information[2]
     moved_scout = information[3]
     final = ""
@@ -226,13 +225,6 @@ def generate_state(state, information):
                 else:
                     break
                 
-                # print("================")
-                # printCharMatrix(stateIntoCharMatrix(state.information_state_string(state.current_player())))
-                # printCharMatrix(stateIntoCharMatrix(final))
-                # print(moved_scout)
-                # print(str(state)[i])
-                # print(piece_left)
-                # print(proba)
                 piece_id = np.random.choice(np.arange(12), p=proba)
                 if not moved_scout[i//10][i%10]:
                     piece_left[piece_id] -= 1
@@ -252,14 +244,6 @@ def generate_state_via_matrix(state, matrix_of_possibilities, information):
     piece_left = information[1].copy()
     moved_before = information[2]
     final = ""
-
-    # print("==============================================")
-    # printCharMatrix(stateIntoCharMatrix(str(state)))
-    # print()
-    # printCharMatrix(stateIntoCharMatrix(state_str))
-    # print()
-    # print(matrix_of_possibilities[5:])
-    # print(information[1])
 
     while not is_valid_state(final):
         final = ""
@@ -347,7 +331,7 @@ def updating_knowledge(information, state, action):
                         nbr_piece_left[p] -= 1
                     moved_before[coord[3]][coord[2]] = 0
                     moved_scout[coord[3]][coord[2]] = 0
-                    return np.array([player_id, nbr_piece_left, moved_before, moved_scout]) 
+                    return [player_id, nbr_piece_left, moved_before, moved_scout]
     else:
         # Fight
         if arrival in players_piece[player_id]:
@@ -369,7 +353,7 @@ def updating_knowledge(information, state, action):
                     if full_matrix_before[coord[1]][coord[0]] == players_piece[current_player][p] and start == "?":
                         if not (p==3 and was_scout):
                             nbr_piece_left[p] -= 1
-            return np.array([player_id, nbr_piece_left, moved_before, moved_scout])
+            return [player_id, nbr_piece_left, moved_before, moved_scout]
         # Deplacement on empty space: Deplacement of moved and/or get information about moved/scout_moved
         else:
             moved_before[coord[1]][coord[0]] = 0
@@ -382,7 +366,7 @@ def updating_knowledge(information, state, action):
             if moved_scout[coord[1]][coord[0]]:
                 moved_scout[coord[1]][coord[0]] = 0
                 moved_scout[coord[3]][coord[2]] = 1
-            return np.array([player_id, nbr_piece_left, moved_before, moved_scout])
+            return [player_id, nbr_piece_left, moved_before, moved_scout]
     return information
 
 # Transform a state into a Matrix of Character inside the str(state)

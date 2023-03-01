@@ -199,8 +199,7 @@ class CustomBot(pyspiel.Bot):
                 random_state=None,
                 child_selection_fn=SearchNode.uct_value,
                 dirichlet_noise=None,
-                verbose=False,
-                dont_return_chance_node=False):
+                verbose=False):
         """Initializes a MCTS Search algorithm in the form of a bot.
 
         In multiplayer games, or non-zero-sum games, the players will play the
@@ -224,19 +223,12 @@ class CustomBot(pyspiel.Bot):
         verbose: Whether to print information about the search tree before
             returning the action. Useful for confirming the search is working
             sensibly.
-        dont_return_chance_node: If true, do not stop expanding at chance nodes.
-            Enabled for AlphaZero.
 
         Raises:
         ValueError: if the game type isn't supported.
         """
         pyspiel.Bot.__init__(self)
-        # Check that the game satisfies the conditions for this MCTS implemention.
-        game_type = game.get_type()
-        if game_type.reward_model != pyspiel.GameType.RewardModel.TERMINAL:
-            raise ValueError("Game must have terminal rewards.")
-        if game_type.dynamics != pyspiel.GameType.Dynamics.SEQUENTIAL:
-            raise ValueError("Game must have sequential turns.")
+        # Game condition: game.get_type().reward_model != pyspiel.GameType.RewardModel.TERMINAL and game.get_type().dynamics != pyspiel.GameType.Dynamics.SEQUENTIAL
 
         self._game = game
         self.uct_c = uct_c
@@ -249,9 +241,8 @@ class CustomBot(pyspiel.Bot):
         self._dirichlet_noise = dirichlet_noise
         self._random_state = random_state or np.random.RandomState()
         self._child_selection_fn = child_selection_fn
-        self.dont_return_chance_node = dont_return_chance_node
 
-        self.matrix_of_possibilities = []
+        # self.matrix_of_possibilities = []
         self.information = []
 
     def set_max_simulations(self, new_value):
@@ -261,7 +252,7 @@ class CustomBot(pyspiel.Bot):
         nbr_piece_left = np.array([1, 6, 1, 8, 5, 4, 4, 4, 3, 2, 1, 1])
         moved_before = np.zeros((10, 10))
         moved_scout = np.zeros((10, 10))
-        self.information = np.array([self.player_id, nbr_piece_left, moved_before, moved_scout])
+        self.information = [self.player_id, nbr_piece_left, moved_before, moved_scout]
         # self.matrix_of_possibilities = generate_possibilities_matrix(base_state, self.information)
 
 

@@ -77,12 +77,6 @@ def _init_bot(bot_type, game, player_id):
             return bot
     raise ValueError("Invalid bot type: %s" % bot_type)
 
-def _get_action(state, action_str):
-    for action in state.legal_actions():
-        if action_str == state.action_to_string(state.current_player(), action):
-            return action
-    return None
-
 def _play_game(game, bots, game_num):
     """Plays one game."""
     # "FEBMBEFEEFBGIBHIBEDBGJDDDHCGJGDHDLIFKDDHAA__AA__AAAA__AA__AASTQPNSQPTSUPWPVRPXPURNQONNQSNVPTNQRRTYUP r 0"  # Base state debugged
@@ -110,18 +104,11 @@ def _play_game(game, bots, game_num):
             elif move == 300:
                 bot.set_max_simulations(2000)
             
-
-            # print("\n==============================================")
-            # print(state)
-            # print(state.information_state_string(state.current_player()))
             generated = generate_state(state, bot.information)
             action = bot.step(game.new_initial_state(generated))
             # TODO: Pertinent d'avoir le nombre de "?" ou il faudrait le nombre de piece en face qui reste plutot ? Pour analyse
             data = {'move': [move], 'know_acc': [compare_state(state, generated)], 'unk_pieces': [str(state.information_state_string(state.current_player())).count("?")]}
             save_to_csv("./games/"+str(game_num)+".csv", data)
-            # print(compare_state(state, generated))
-            # print(generated)
-            # print(is_valid_state(generated))
         else:
             action = bot.step(state)
 
@@ -136,7 +123,7 @@ def _play_game(game, bots, game_num):
         move+=1
         state.apply_action(action)
 
-    # Game is now done. Print return for each player
+    # Game is now done
     returns = state.returns()
     # print("Game actions:", " ".join(history), "\nReturns:", 
     #         " ".join(map(str, returns)), "\n# moves:", len(history), "\n")
@@ -159,7 +146,7 @@ def main(argv):
     moves = 0
     start_time = time.time()
     try:
-        for game_num in range(num_games):
+        for game_num in range(10, num_games):
             start_game_time = time.time()
             returns, history, allStates, move = _play_game(game, bots, game_num)
             time_taken = round(time.time()-start_game_time)//60

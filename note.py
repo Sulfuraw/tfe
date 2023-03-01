@@ -140,8 +140,8 @@ def _play_game(game, bots, initial_actions):
     history = []
     for action_str in initial_actions:
         action = _get_action(state, action_str)
-        if action is None:
-            sys.exit("Invalid action: {}".format(action_str))
+        # if action is None:
+            # sys.exit("Invalid action: {}".format(action_str))
         history.append(action_str)
         for bot in bots:
             bot.inform_action(state, state.current_player(), action)
@@ -334,6 +334,24 @@ class RandomRolloutEvaluator(Evaluator):
 
 ###############################################################################
 
+# A mettre dans la fonction generate state
+                # print("================")
+                # printCharMatrix(stateIntoCharMatrix(state.information_state_string(state.current_player())))
+                # printCharMatrix(stateIntoCharMatrix(final))
+                # print(moved_scout)
+                # print(str(state)[i])
+                # print(piece_left)
+                # print(proba)
+
+# A mettre dans le play game dans le if(str(bot) == "custom") avec le compare(state, generated)
+            # print("\n==============================================")
+            # print(state)
+            # print(state.information_state_string(state.current_player()))
+            # print(compare_state(state, generated))
+            # print(generated)
+            # print(is_valid_state(generated))
+
+###############################################################################
 def basic_test():
     game = pyspiel.load_game("yorktown")
     bots = [
