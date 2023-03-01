@@ -5,9 +5,11 @@ import pyspiel
 import collections
 import time
 import pickle
+import os.path
 from curses import wrapper
 from absl import app
 import numpy as np
+import pandas as pd
 from open_spiel.python.bots import human
 from open_spiel.python.bots import uniform_random
 import alphaBeta
@@ -37,6 +39,13 @@ def getGame(filename):
         data = pickle.load(file)
     return data
 
+def save_to_csv(path, data):
+    df = pd.DataFrame(data)
+    if os.path.isfile(path):
+        df.to_csv(path, mode='a', index=True, header=True)
+    else:
+        df.to_csv(path, index=True, header=True)
+
 def _init_bot(bot_type, game, player_id):
     """Initializes a bot by type."""
     rng = np.random.RandomState(None)  # Seed for random
@@ -47,7 +56,7 @@ def _init_bot(bot_type, game, player_id):
     if bot_type == "ab":
         return alphaBeta.AlphaBetaBot(player_id, game)
     if bot_type == "custom":
-        return customBot.CustomBot(game, 1.5, 2000, customBot.CustomEvaluator(), player_id) # customBot.RandomRolloutEvaluator()
+        return customBot.CustomBot(game, 1.5, 100, customBot.CustomEvaluator(), player_id) # customBot.RandomRolloutEvaluator()
     if bot_type == "rnad1":
         try:
             bot = rnadBot.rnadBot().getSavedState("states/state5000.pkl")
@@ -74,13 +83,12 @@ def _get_action(state, action_str):
             return action
     return None
 
-def _play_game(game, bots):
+def _play_game(game, bots, game_num):
     """Plays one game."""
     # "FEBMBEFEEFBGIBHIBEDBGJDDDHCGJGDHDLIFKDDHAA__AA__AAAA__AA__AASTQPNSQPTSUPWPVRPXPURNQONNQSNVPTNQRRTYUP r 0"  # Base state debugged
     state = game.new_initial_state("FEBMBEFEEFBGIBHIBEDBGJDDDHCGJGDHDLIFKDDHAA__AA__AAAA__AA__AATPPWRUXPTPSVSOTPPPVSNPQNUTNUSNRQQRQNYNQR r 0") # Equal state
     history = []
     allStates = []
-    knowledge_accuracies = []
 
     for i, bot in enumerate(bots):
         if str(bot) == "custom":
@@ -92,14 +100,25 @@ def _play_game(game, bots):
         bot = bots[current_player]
 
         if str(bot) == "custom":
-            # TODO: If game advanced enough, increase max_simulations, change there with the number we're at (variable move for example)
+            # We adapt the max_simulation parameter to the advancement of the game
+            if move == 25:
+                bot.set_max_simulations(500)
+            elif move == 50:
+                bot.set_max_simulations(2000)
+            elif move == 100:
+                bot.set_max_simulations(10000)          
+            elif move == 300:
+                bot.set_max_simulations(2000)
+            
 
             # print("\n==============================================")
             # print(state)
             # print(state.information_state_string(state.current_player()))
             generated = generate_state(state, bot.information)
             action = bot.step(game.new_initial_state(generated))
-            knowledge_accuracies.append(compare_state(state, generated))
+            # TODO: Pertinent d'avoir le nombre de "?" ou il faudrait le nombre de piece en face qui reste plutot ? Pour analyse
+            data = {'move': [move], 'know_acc': [compare_state(state, generated)], 'unk_pieces': [str(state.information_state_string(state.current_player())).count("?")]}
+            save_to_csv("./games/"+str(game_num)+".csv", data)
             # print(compare_state(state, generated))
             # print(generated)
             # print(is_valid_state(generated))
@@ -125,7 +144,7 @@ def _play_game(game, bots):
         " ".join(map(str, returns)), "\n# moves:", len(history))
     for bot in bots:
         bot.restart()
-    return returns, history, allStates, move, knowledge_accuracies
+    return returns, history, allStates, move
 
 def main(argv):
     game = pyspiel.load_game("yorktown")
@@ -142,10 +161,15 @@ def main(argv):
     try:
         for game_num in range(num_games):
             start_game_time = time.time()
-            returns, history, allStates, move, knowledge_accuracies = _play_game(game, bots)
-            print("Time for this game in minute:", round(time.time()-start_game_time)//60)
+            returns, history, allStates, move = _play_game(game, bots, game_num)
+            time_taken = round(time.time()-start_game_time)//60
+            print("Time for this game in minute:", time_taken)
             print("Game Number:", game_num)
+
             saveGame("games/"+str(game_num), allStates)
+            data = {'game_num': [game_num], 'time_taken': [time_taken], 'moves': move, 'win': returns[0]}
+            save_to_csv("./games/stats"+".csv", data)
+            
             histories[" ".join(history)] += 1
             for i, v in enumerate(returns):
                 overall_returns[i] += v
@@ -162,8 +186,6 @@ def main(argv):
     print("Average time till finish:", (round(time.time()-start_time)//60)//(game_num+1))
     print("Players:", player1, player2)
     print("Overall wins", overall_wins)
-    print("Overall returns", overall_returns)
-    # TODO: Save in a csv, information about games and inside a game each time. 2 csv 
 
 player1 = "custom"
 player2 = "random"

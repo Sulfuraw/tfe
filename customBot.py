@@ -36,7 +36,6 @@ class CustomEvaluator(Evaluator):
     def evaluate(self, state, maximizing_player_id):
         """Returns evaluation on given state."""
         state_str = str(state)
-        # state_str = state.information_state_string(maximizing_player_id)
 
         score = [0, 0]
         # 0's pieces (value 175.5 at start) (unkown (?)*39 = 175.5 at start too)
@@ -60,6 +59,9 @@ class CustomEvaluator(Evaluator):
   
     def prior(self, state):
         """Returns equal probability for all actions."""
+        # TODO: Priorisé les moves qui se rapproche du drapeau ennemi !
+        # Priorisé les attaques ? 
+        # Adapt different prior au fil de la game ?
         sum = 0.0
         prio = []
         player = state.current_player()

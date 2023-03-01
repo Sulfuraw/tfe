@@ -197,7 +197,7 @@ def compare_state(state1, state2):
 # Generate a valid state, with the knowledge of our bot + the partial state
 # Information : [self.player_id, nbr_piece_left, moved_before, moved_scout]
 def generate_state(state, information):
-    partial_state = state.information_state_string(state.current_player())
+    partial_state = state.information_state_string(state.current_player()) # str(state) if he has full info
     state_str = str(partial_state)
     piece_left = information[1].copy()
     moved_before = information[2]
