@@ -2,3 +2,4 @@
 games/
 __pycache__/
 *.pyc
+rnad/__pycache__/rnad.cpython-310.pyc
