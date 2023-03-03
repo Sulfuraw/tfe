@@ -4,8 +4,7 @@ from __future__ import print_function
 
 import pyspiel
 from rnad import rnad
-import numpy as np
-import pickle5 as pickle # Save state
+import pickle5 as pickle
 
 class rnadBot(pyspiel.Bot):
     # A state in str:
@@ -21,7 +20,7 @@ class rnadBot(pyspiel.Bot):
     # PTNQRRTYUP r 0
 
     def __init__(self):
-        """Initializes a uniform-random bot.
+        """Initializes a bot based on the rnad training.
 
         Args:
         player_id: The integer id of the player for this bot, e.g. `0` if acting

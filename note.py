@@ -16,7 +16,8 @@ import alphaBeta
 import rnadBot
 import customBot
 from main import _init_bot
-from statework import stateIntoCharMatrix, print_board, printCharMatrix, flag_protec, generate_possibilities_matrix, is_valid_state, generate_state
+from statework import *
+import pandas as pd
 
 def game_list(_):
     games_list = pyspiel.registered_games()
@@ -255,7 +256,7 @@ class CustomBot(pyspiel.Bot):
         policy = []
         minimum_pain = [-1000, 0]
         place=0
-        # wrapper(main.print_board, [main.stateIntoCharMatrix(state)], ["custom", "random"])
+        # wrapper(main.print_board, [main.stateIntoCharMatrix(state)], ["customBot", "random"])
         for action in state.legal_actions():
             child_state = state.clone()
             child_state.apply_action(action)
@@ -310,7 +311,7 @@ class RandomRolloutEvaluator(Evaluator):
     outcomes to be considered.
     """
 
-    def __init__(self, n_rollouts=1, random_state=None):
+    def __init__(self, n_rollouts=5, random_state=None):
         self.n_rollouts = n_rollouts
         self._random_state = random_state or np.random.RandomState()
 
@@ -319,11 +320,11 @@ class RandomRolloutEvaluator(Evaluator):
         result = None
         for _ in range(self.n_rollouts):
             working_state = state.clone()
-        while not working_state.is_terminal():
-            action = self._random_state.choice(working_state.legal_actions())
-            working_state.apply_action(action)
-        returns = np.array(working_state.returns())
-        result = returns if result is None else result + returns
+            while not working_state.is_terminal():
+                action = self._random_state.choice(working_state.legal_actions())
+                working_state.apply_action(action)
+            returns = np.array(working_state.returns())
+            result = returns if result is None else result + returns
 
         return result / self.n_rollouts
 
@@ -343,7 +344,7 @@ class RandomRolloutEvaluator(Evaluator):
                 # print(piece_left)
                 # print(proba)
 
-# A mettre dans le play game dans le if(str(bot) == "custom") avec le compare(state, generated)
+# A mettre dans le play game dans le if(str(bot) == "customBot") avec le compare(state, generated)
             # print("\n==============================================")
             # print(state)
             # print(state.information_state_string(state.current_player()))
@@ -351,29 +352,7 @@ class RandomRolloutEvaluator(Evaluator):
             # print(generated)
             # print(is_valid_state(generated))
 
-###############################################################################
-def basic_test():
-    game = pyspiel.load_game("yorktown")
-    bots = [
-        _init_bot(player1, game, 0),
-        _init_bot(player2, game, 1),
-    ]
-    state = game.new_initial_state("FEBMBEFEEFBGIBHIBEDBGJDDDHCGJGDHDLIFKDDHAA__AA__AAAA__AA__AATPPWRUXPTPSVSOTPPPVSNPQNUTNUSNRQQRQNYNQR r 0") # Equal state
-    
-    for i, bot in enumerate(bots):
-        if str(bot) == "custom":
-            bot.init_knowledge(state)
-    
-    history = []
-    allStates = []
-    allStates.append(stateIntoCharMatrix(state))
-
-    #while not state.is_terminal():
-    for n in range(10):
-        current_player = state.current_player()
-        bot = bots[current_player]
-
-        if str(bot) == "custom":
+# Pareil dans le play
             # print("\n==============================================")
             # print("move number: " + str(n))
             # printCharMatrix(stateIntoCharMatrix(state))
@@ -385,22 +364,111 @@ def basic_test():
             # print(bot.information[2])
             # print("scout:")
             # print(bot.information[3])
-            generated = generate_state(state, bot.matrix_of_possibilities, bot.information[1])
-            action = bot.step(game.new_initial_state(generated))
             # print(generated)
             # print(is_valid_state(generated))
+
+# printCharMatrix(stateIntoCharMatrix(state.information_state_string(maximizing_player_id)))
+
+# Generate the matrix of possibilites / probabilities used for piece generation in the generate_state
+def generate_possibilities_matrix(state, information):
+    player_id, nbr_piece_left, moved_before, moved_scout = information
+    matrix = stateIntoCharMatrix(state.information_state_string(player_id))
+    matrix_of_possibilities = np.zeros((10, 10, 12))
+    for i in range(len(matrix)):
+        for j in range(len(matrix[i])):
+            if matrix[i][j] == "?":
+                if moved_scout[i][j]:
+                    only_one_proba = [0.0]*12
+                    only_one_proba[3] = 1.0
+                    matrix_of_possibilities[i:i+1, j:j+1] = only_one_proba
+                elif moved_before[i][j]:
+                    matrix_of_possibilities[i:i+1, j:j+1] = moved_piece(nbr_piece_left)
+                else:
+                    matrix_of_possibilities[i:i+1, j:j+1] = no_info_piece(nbr_piece_left)
+            # Only need information of proba of ennemy
+            elif matrix[i][j] in players_piece[1-player_id]:
+                for p in range(len(players_piece[1-player_id])):
+                    if matrix[i][j] == players_piece[1-player_id][p]:
+                        only_one_proba = [0.0]*12
+                        only_one_proba[p] = 1.0
+                        matrix_of_possibilities[i:i+1, j:j+1] = only_one_proba
+    return matrix_of_possibilities
+
+# Generate a valid state, with the knowledge of our bot + the partial state
+def generate_state_via_matrix(state, matrix_of_possibilities, information):
+    partial_state = state.information_state_string(state.current_player())
+    state_str = str(partial_state)
+    piece_left = information[1].copy()
+    moved_before = information[2]
+    final = ""
+
+    while not is_valid_state(final):
+        final = ""
+        done = set()
+        i = 0
+        max_try = 0
+        while i < len(state_str):
+            if state_str[i] == "?" and max_try < 1000:
+                # If the number of possible places for unmoved pieces is near the real number of this type of piece,
+                # We need to increase their probability way higher
+                if (state_str.count("?") - np.sum(moved_before) < piece_left[0] + piece_left[1] + 2) and matrix_of_possibilities[i//10][i%10][0] > 0:
+                    flag = information[1][0]
+                    bomb = information[1][1]
+                    piece_id = np.random.choice(np.arange(12), p=[flag/(flag+bomb), bomb/(flag+bomb), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+                else:
+                    piece_id = np.random.choice(np.arange(12), p=matrix_of_possibilities[i//10][i%10])
+                # When a piece has been generated its maxinum number of time don't allow it to regenerate again, we reroll in case it happen
+                if piece_id not in done:
+                    piece_left[piece_id] -= 1
+                    if piece_left[piece_id] == 0:
+                        done.add(piece_id)
+                    piece = players_piece[1-state.current_player()][piece_id]
+                    final += piece
+                    i += 1
+                else:
+                    max_try += 1
+            else:
+                piece = state_str[i]
+                final += piece
+                i += 1
+    return final
+
+###############################################################################
+def basic_test():
+    game = pyspiel.load_game("yorktown")
+    bots = [
+        _init_bot(player1, game, 0),
+        _init_bot(player2, game, 1),
+    ]
+    state = game.new_initial_state("FEBMBEFEEFBGIBHIBEDBGJDDDHCGJGDHDLIFKDDHAA__AA__AAAA__AA__AATPPWRUXPTPSVSOTPPPVSNPQNUTNUSNRQQRQNYNQR r 0") # Equal state
+    
+    for i, bot in enumerate(bots):
+        if str(bot) == "customBot":
+            bot.init_knowledge(state)
+    
+    history = []
+    allStates = []
+    allStates.append(stateIntoCharMatrix(state))
+
+    #while not state.is_terminal():
+    for n in range(10):
+        current_player = state.current_player()
+        bot = bots[current_player]
+
+        if str(bot) == "customBot":
+            generated = generate_state(state, bot.information)
+            action = bot.step(game.new_initial_state(generated))
         else:
             action = bot.step(state)
         action_str = state.action_to_string(current_player, action)
         for i, bot in enumerate(bots):
             if i != current_player:
                 bot.inform_action(state, current_player, action)
-            if str(bot) == "custom":
+            if str(bot) == "customBot":
                 bot.update_knowledge(state.clone(), action)
         history.append(action_str)
         state.apply_action(action)
         allStates.append(stateIntoCharMatrix(state))
-        # printCharMatrix(stateIntoCharMatrix(state.information_state_string(maximizing_player_id)))
 
     # Game is now done. Print return for each player
     returns = state.returns()
@@ -411,14 +479,30 @@ def basic_test():
     wrapper(print_board, allStates, bots, auto)
     return returns, history, allStates
 
-player1 = "custom"
+player1 = "customBot"
 player2 = "random"
 num_games = 50
 replay = False
 auto = False
+
+from matplotlib import pyplot as plt
+import tkinter
+import matplotlib
+matplotlib.use('TkAgg')
 
 players_piece = [["M", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L"],
                  ["Y", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X"]]
 # It is:         [Fl,  Bo,   Sp,  Sc,  Mi,  Sg,  Lt,  Cp,  Mj,  Co,  Ge,  Ms]
 # Nbr of each:   [1,   6,    1,   8,   5,   4,   4,   4,   3,   2,   1,   1]
 # basic_test()
+
+# printCharMatrix(stateIntoCharMatrix("FEBMBEFEEFBGIBHIBEDBGJDDDHCGJGDHDLIFKDDHAA__AA__AAAA__AA__AATPPWRUXPTPSVSOTPPPVSNPQNUTNUSNRQQRQNYNQR r 0"))
+
+df = pd.read_csv('games/0.csv')
+x = df["move"]
+y = df["know_acc"]
+plt.plot(x, y)
+plt.xlabel("Number of moves")
+plt.ylabel("knowledge accuracy")
+plt.ylim(0.5, 1.0)
+plt.show()

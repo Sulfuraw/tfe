@@ -727,7 +727,7 @@ class RNaDSolver(policy_lib.Policy):
 
     # Create a game and an example of a state.
     self._game = pyspiel.load_game(self.config.game_name)
-    self._ex_state = self._play_chance(self._game.new_initial_state())
+    self._ex_state = self._play_chance(self._game.new_initial_state("FEBMBEFEEFBGIBHIBEDBGJDDDHCGJGDHDLIFKDDHAA__AA__AAAA__AA__AATPPWRUXPTPSVSOTPPPVSNPQNUTNUSNRQQRQNYNQR r 0")) # TODO:MODIFIED HERE: Equal state
 
     # The network.
     def network(
@@ -1016,7 +1016,7 @@ class RNaDSolver(policy_lib.Policy):
 
   def collect_batch_trajectory(self) -> TimeStep:
     states = [
-        self._play_chance(self._game.new_initial_state())
+        self._play_chance(self._game.new_initial_state("FEBMBEFEEFBGIBHIBEDBGJDDDHCGJGDHDLIFKDDHAA__AA__AAAA__AA__AATPPWRUXPTPSVSOTPPPVSNPQNUTNUSNRQQRQNYNQR r 0")) # TODO:MODIFIED HERE: Equal state
         for _ in range(self.config.batch_size)
     ]
     timesteps = []

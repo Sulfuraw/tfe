@@ -129,12 +129,12 @@ matrix_of_stats = [
     5.00622259e-02,1.43267749e-02,5.85219865e-03,4.26691952e-03]]
 ]
 
-# Proba if we have no info
 def no_info_piece(nbr_piece_left):
+    """Proba if we have no info"""
     return nbr_piece_left/np.sum(nbr_piece_left)
 
-# Proba if we know this piece moved before
 def moved_piece(nbr_piece_left):
+    """Proba if we know this piece moved before"""
     proba = np.array([0.0]*12)
     proba[2:] = nbr_piece_left[2:]/np.sum(nbr_piece_left[2:])
     return proba
@@ -153,8 +153,8 @@ def action_to_coord(action_str):
         returns.append(rocols[pos[i]])
     return returns
 
-# Verify that the state_str is a valid state, to be used for our generate_state
 def is_valid_state(state_str):
+    """Verify that the state_str is a valid state, to be used for our generate_state"""
     return (state_str.count("M") == 1 
         and state_str.count("Y") == 1
         and 0 <= state_str.count("B") <= 6
@@ -183,8 +183,9 @@ def is_valid_state(state_str):
         and len(state_str) >= 104)
 
 def compare_state(state1, state2):
-    str_state1 = str(state1).upper()
-    str_state2 = str(state2).upper()
+    """Check the accuracy for the pieces (ally & ennemy) by comparing the two state piece by piece"""
+    str_state1 = str(state1).upper()[:100]
+    str_state2 = str(state2).upper()[:100]
     total = 0
     good = 0
     for i in range(len(str_state1)):
@@ -194,9 +195,11 @@ def compare_state(state1, state2):
                 good += 1
     return good/total
 
-# Generate a valid state, with the knowledge of our bot + the partial state
-# Information : [self.player_id, nbr_piece_left, moved_before, moved_scout]
 def generate_state(state, information):
+    """
+        Generate a valid state, with the knowledge of our bot + the partial state
+        Information : [self.player_id, nbr_piece_left, moved_before, moved_scout]
+    """
     partial_state = state.information_state_string(state.current_player()) # str(state) if he has full info
     state_str = str(partial_state)
     moved_before = information[2]
@@ -213,9 +216,7 @@ def generate_state(state, information):
                     proba = [0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0]
                 elif not moved_before[i//10][i%10]:
                     proba = no_info_piece(piece_left)
-                    # If the number of possible places for unmoved pieces is near the real number of this type of piece,
-                    # We need to increase their probability the only ones
-                    # It is really necessary ?
+                    # TODO: Necessary ? Force Flag/Bomb if too few can be
                     if (state_str.count("?") - np.sum(moved_before)) < (information[1][0] + information[1][1] + 2) and np.sum(piece_left[:2]) > 0:
                         flag = piece_left[0]
                         bomb = piece_left[1]
@@ -237,72 +238,12 @@ def generate_state(state, information):
                 i += 1
     return final
 
-# Generate a valid state, with the knowledge of our bot + the partial state
-def generate_state_via_matrix(state, matrix_of_possibilities, information):
-    partial_state = state.information_state_string(state.current_player())
-    state_str = str(partial_state)
-    piece_left = information[1].copy()
-    moved_before = information[2]
-    final = ""
-
-    while not is_valid_state(final):
-        final = ""
-        done = set()
-        i = 0
-        max_try = 0
-        while i < len(state_str):
-            if state_str[i] == "?" and max_try < 1000:
-                # If the number of possible places for unmoved pieces is near the real number of this type of piece,
-                # We need to increase their probability way higher
-                if (state_str.count("?") - np.sum(moved_before) < piece_left[0] + piece_left[1] + 2) and matrix_of_possibilities[i//10][i%10][0] > 0:
-                    flag = information[1][0]
-                    bomb = information[1][1]
-                    piece_id = np.random.choice(np.arange(12), p=[flag/(flag+bomb), bomb/(flag+bomb), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
-                else:
-                    piece_id = np.random.choice(np.arange(12), p=matrix_of_possibilities[i//10][i%10])
-                # When a piece has been generated its maxinum number of time don't allow it to regenerate again, we reroll in case it happen
-                if piece_id not in done:
-                    piece_left[piece_id] -= 1
-                    if piece_left[piece_id] == 0:
-                        done.add(piece_id)
-                    piece = players_piece[1-state.current_player()][piece_id]
-                    final += piece
-                    i += 1
-                else:
-                    max_try += 1
-            else:
-                piece = state_str[i]
-                final += piece
-                i += 1
-    return final
-
-# Generate the matrix of possibilites / probabilities used for piece generation in the generate_state
-def generate_possibilities_matrix(state, information):
-    player_id, nbr_piece_left, moved_before, moved_scout = information
-    matrix = stateIntoCharMatrix(state.information_state_string(player_id))
-    matrix_of_possibilities = np.zeros((10, 10, 12))
-    for i in range(len(matrix)):
-        for j in range(len(matrix[i])):
-            if matrix[i][j] == "?":
-                if moved_scout[i][j]:
-                    only_one_proba = [0.0]*12
-                    only_one_proba[3] = 1.0
-                    matrix_of_possibilities[i:i+1, j:j+1] = only_one_proba
-                elif moved_before[i][j]:
-                    matrix_of_possibilities[i:i+1, j:j+1] = moved_piece(nbr_piece_left)
-                else:
-                    matrix_of_possibilities[i:i+1, j:j+1] = no_info_piece(nbr_piece_left)
-            # Only need information of proba of ennemy
-            elif matrix[i][j] in players_piece[1-player_id]:
-                for p in range(len(players_piece[1-player_id])):
-                    if matrix[i][j] == players_piece[1-player_id][p]:
-                        only_one_proba = [0.0]*12
-                        only_one_proba[p] = 1.0
-                        matrix_of_possibilities[i:i+1, j:j+1] = only_one_proba
-    return matrix_of_possibilities
-
-# Each move a player does can affect the information / knowledge that our bot has
 def updating_knowledge(information, state, action):
+    """
+        Each move a player does can affect the information / knowledge that our bot has
+        Here we update the variable information
+        Information : [self.player_id, nbr_piece_left, moved_before, moved_scout]
+    """
     player_id, nbr_piece_left, moved_before, moved_scout = information
     current_player = state.current_player()
 
@@ -319,8 +260,6 @@ def updating_knowledge(information, state, action):
 
     if current_player == player_id:
         # Fight
-        # if arrival in players_piece[1-player_id]: # Isn't needed because if that's the case, we know it and deleted info
-        # About it already
         if arrival == "?":
             # Either win or lose the fight, it will result in the same operation
             # We -1 the count and generate_possibilities_matrix will do the work thanks to information_state_string
@@ -369,8 +308,8 @@ def updating_knowledge(information, state, action):
             return [player_id, nbr_piece_left, moved_before, moved_scout]
     return information
 
-# Transform a state into a Matrix of Character inside the str(state)
 def stateIntoCharMatrix(state):
+    """Transform a state into a Matrix of Character inside the str(state)"""
     stat = str(state).upper().split(" ")[0]
     stat = ' '.join(stat)
     statInLines = []
@@ -378,13 +317,15 @@ def stateIntoCharMatrix(state):
         statInLines.append(stat[i:i+20].rstrip().split(" "))
     return statInLines
 
-# Tools for flag_protec
-# TODO: Add the coord of Rivers in the middle as invalid
 def is_valid_coord(pos):
+    """Tools to check if a position is playable (in board and not a river)"""
+    for pos_bis in [[4, 2], [4, 3], [5, 2], [5, 3], [4, 6], [4, 7], [5, 6], [5, 7]]:
+        if pos == pos_bis:
+            return False
     return (0 <= pos[0] < 10) and (0 <= pos[1] < 10)
 
-# Check that the flag is protected all around him (4 positions)
 def flag_protec(state, player):
+    """Check that the flag is protected all around him (4 positions)"""
     matrix = stateIntoCharMatrix(state)
     coord = [0, 0]
     for i in range(10):
@@ -398,8 +339,8 @@ def flag_protec(state, player):
             protected = protected and (matrix[pos[0]][pos[1]] in players_piece[player])
     return protected 
     
-# Print device for the matrix of character generated here: stateIntoCharMatrix(state)
 def printCharMatrix(charMatrix):
+    """Print device for the matrix of character generated here: stateIntoCharMatrix(state)"""
     final = ""
     for line in charMatrix:
         for char in line:
@@ -415,6 +356,7 @@ def printCharMatrix(charMatrix):
 # wrapper(print_board, getGame("games/0"), ["rnad", "random"])
 # To print only one state simply put it inside [] as states arg
 def print_board(stdscr, states, players, auto):
+    """Special printer using an alternative show, using wrapper too"""
     curses.init_pair(1, curses.COLOR_RED, curses.COLOR_BLACK)
     curses.init_pair(4, curses.COLOR_BLUE, curses.COLOR_BLACK)
     curses.init_pair(7, curses.COLOR_WHITE, curses.COLOR_BLACK)

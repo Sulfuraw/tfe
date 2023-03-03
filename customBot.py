@@ -1,17 +1,13 @@
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
-
 import pyspiel
 import numpy as np
-import main
 import math
 import time
-from curses import wrapper
-from statework import stateIntoCharMatrix, print_board, printCharMatrix, flag_protec, generate_possibilities_matrix, updating_knowledge
+from statework import *
 
-# Using the Copyright 2019 DeepMind Technologies Limited using """Monte-Carlo Tree Search algorithm for game play."""
-
+# Using the Copyright 2019 DeepMind Technologies Limited using """Monte-Carlo Tree Search algorithm for game play"""
 class Evaluator(object):
     """Abstract class representing an evaluation function for a game.
 
@@ -29,11 +25,16 @@ class Evaluator(object):
         raise NotImplementedError
 
 class CustomEvaluator(Evaluator):
-    def __init__(self, n_rollouts=10, random_state=None):
-        self.n_rollouts = n_rollouts
-        self._random_state = random_state or np.random.RandomState()
+    # def __init__(self):
 
-    def evaluate(self, state, maximizing_player_id):
+    # TODO: Une fonction qui va retourner les poids de chaque piece, de 
+    # scout à marshall c'est linéaire avec une multiplication du nombre de piece 
+    # qu'ils peuvent tuer. Exception sur le flag qui a une value enorme
+    #                                sur les bombs qui tue tout
+    #                                sur les miners si il reste au moins trois bombes
+    # On peut faire que le weight to moving forward change avec le temps, on doit aller de plus en plus loin
+
+    def evaluate(self, state):
         """Returns evaluation on given state."""
         state_str = str(state)
 
@@ -51,22 +52,39 @@ class CustomEvaluator(Evaluator):
             score[1] += 20 if flag_protec(state, 1) else 0
 
         returns = [(score[0]-score[1])/500, (score[1]-score[0])/500]
+        # Print for debug
+        if returns[0] > 1 or returns[0] < -1 or returns[1] > 1 or returns[1] < -1:
+            print("==============================")
+            print("Here, the returns were strange !:", returns, "\n")
+            print(state_str)
         return returns
 
     def is_forward(self, action, player):
         _, pos1, _, pos2 = list(action)
         return pos1 < pos2 if player == 0 else pos1 > pos2
+    
+    def toward_flag(self, state, action, player):
+        flag_str_pos = str(state).find(players_piece[1-player][0])
+        flag = [flag_str_pos//10, flag_str_pos%10]
+        coord = action_to_coord(action)
+        man_distance_before = abs(flag[0] - coord[1]) + abs(flag[1] - coord[0])
+        man_distance_after = abs(flag[0] - coord[3]) + abs(flag[1] - coord[2])
+        return man_distance_before < man_distance_after, 21-man_distance_after
   
     def prior(self, state):
         """Returns equal probability for all actions."""
-        # TODO: Priorisé les moves qui se rapproche du drapeau ennemi !
+        # TODO:
         # Priorisé les attaques ? 
         # Adapt different prior au fil de la game ?
         sum = 0.0
         prio = []
         player = state.current_player()
         for action in state.legal_actions(player):
-            value = 5.0 if self.is_forward(state.action_to_string(player, action), player) else 1.0
+            # Priorize moving forward
+            # value = 3.0 if self.is_forward(state.action_to_string(player, action), player) else 1.0
+            # Priorize moving toward the ennemy flag
+            toward_flag = self.toward_flag(state, state.action_to_string(player, action), player)
+            value = toward_flag[1] if toward_flag[0] else 1.0
             sum += value
             prio.append([action, value])
         for i in range(len(prio)):
@@ -248,16 +266,13 @@ class CustomBot(pyspiel.Bot):
     def set_max_simulations(self, new_value):
         self.max_simulations = new_value
 
-    def init_knowledge(self, base_state):
+    def init_knowledge(self):
         nbr_piece_left = np.array([1, 6, 1, 8, 5, 4, 4, 4, 3, 2, 1, 1])
         moved_before = np.zeros((10, 10))
         moved_scout = np.zeros((10, 10))
         self.information = [self.player_id, nbr_piece_left, moved_before, moved_scout]
-        # self.matrix_of_possibilities = generate_possibilities_matrix(base_state, self.information)
-
 
     def update_knowledge(self, state, action):
-        current_player = state.current_player()
         self.information = updating_knowledge(self.information, state, action)
         # self.matrix_of_possibilities = generate_possibilities_matrix(state, self.information)
 
@@ -384,7 +399,7 @@ class CustomBot(pyspiel.Bot):
                 visit_path[-1].outcome = returns
                 solved = self.solve
             else:
-                returns = self.evaluator.evaluate(working_state, self.player_id)  # Modified here to add the playerid
+                returns = self.evaluator.evaluate(working_state)
                 solved = False
 
             while visit_path:
@@ -400,31 +415,20 @@ class CustomBot(pyspiel.Bot):
 
                 if solved and node.children:
                     player = node.children[0].player
-                    if player == pyspiel.PlayerId.CHANCE:
-                        # Only back up chance nodes if all have the same outcome.
-                        # An alternative would be to back up the weighted average of
-                        # outcomes if all children are solved, but that is less clear.
-                        outcome = node.children[0].outcome
-                        if (outcome is not None and
-                            all(np.array_equal(c.outcome, outcome) for c in node.children)):
-                            node.outcome = outcome
-                        else:
-                            solved = False
+                    # If any have max utility (won?), or all children are solved,
+                    # choose the one best for the player choosing.
+                    best = None
+                    all_solved = True
+                    for child in node.children:
+                        if child.outcome is None:
+                            all_solved = False
+                        elif best is None or child.outcome[player] > best.outcome[player]:
+                            best = child
+                    if (best is not None and
+                        (all_solved or best.outcome[player] == self.max_utility)):
+                        node.outcome = best.outcome
                     else:
-                        # If any have max utility (won?), or all children are solved,
-                        # choose the one best for the player choosing.
-                        best = None
-                        all_solved = True
-                        for child in node.children:
-                            if child.outcome is None:
-                                all_solved = False
-                            elif best is None or child.outcome[player] > best.outcome[player]:
-                                best = child
-                        if (best is not None and
-                            (all_solved or best.outcome[player] == self.max_utility)):
-                            node.outcome = best.outcome
-                        else:
-                            solved = False
+                        solved = False
             if root.outcome is not None:
                 break
         return root
@@ -433,4 +437,4 @@ class CustomBot(pyspiel.Bot):
         pass
 
     def __str__(self):
-        return "custom"
+        return "customBot"
