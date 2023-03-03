@@ -33,6 +33,7 @@ class CustomEvaluator(Evaluator):
     #                                sur les bombs qui tue tout
     #                                sur les miners si il reste au moins trois bombes
     # On peut faire que le weight to moving forward change avec le temps, on doit aller de plus en plus loin
+    # Nombre de piece restante que tu peux battre
 
     def evaluate(self, state):
         """Returns evaluation on given state."""
@@ -76,6 +77,9 @@ class CustomEvaluator(Evaluator):
         # TODO:
         # Priorisé les attaques ? 
         # Adapt different prior au fil de la game ?
+        # (alpha)*P(avancer vers le flag) + (1-alpha)*P(faire un combat)
+        # Mettre des proba en moins si le coup fait perdre
+        # Pondéré les choix avec les probabilités et pas que les pieces qu'on a estimé.
         sum = 0.0
         prio = []
         player = state.current_player()

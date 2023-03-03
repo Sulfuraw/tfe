@@ -100,7 +100,7 @@ def _play_game(game, bots, game_num):
             generated = generate_state(state, bot.information)
             # Test the generate time for anomaly
             if time.time()-start > 2:
-                print("Time for generate", time.time()-start)
+                print("Time for generate was", round(time.time()-start, 2))
             action = bot.step(game.new_initial_state(generated))
             
             # TODO: Pertinent d'avoir le nombre de "?" ou il faudrait le nombre de piece en face qui 
@@ -182,7 +182,7 @@ replay = False
 auto = False
 
 if __name__ == "__main__":
-    app.run(main) 
+    # app.run(main) 
     # wrapper(print_board, getGame("Custom1/3"), ["customBot", "random"], auto) # 271 moves
     # wrapper(print_board, getGame("Custom1/14"), ["customBot", "random"], auto) # 1256 moves, lose
     # wrapper(print_board, getGame("FullKnown1/30"), ["customBot", "random"], auto)
@@ -195,4 +195,5 @@ if __name__ == "__main__":
 
     # wrapper(print_board, getGame("games/0"), ["customBot", "random"], auto)
 
-    # everythingEverywhereAllAtOnce("states/state.pkl", 1000) # 6510, 3sec/step
+    everythingEverywhereAllAtOnce("states/state.pkl", 500) # 14000, 3sec/step
+    

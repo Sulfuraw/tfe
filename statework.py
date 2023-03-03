@@ -207,6 +207,8 @@ def generate_state(state, information):
     final = ""
 
     while not is_valid_state(final):
+        # Conceptuellement elle doit pas etre là cette boucle.
+        # Commencer par assigner les pieces qui ont déjà bouger.
         final = ""
         i = 0
         piece_left = information[1].copy()
