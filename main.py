@@ -47,9 +47,9 @@ def save_to_csv(path, data):
     """Save stats in a file / append stats to this file"""
     df = pd.DataFrame(data)
     if os.path.isfile(path):
-        df.to_csv(path, mode='a', index=True, header=False)
+        df.to_csv(path, mode='a', index=False, header=False)
     else:
-        df.to_csv(path, index=True, header=True)
+        df.to_csv(path, index=False, header=True)
 
 def _init_bot(bot_type, game, player_id):
     """Initializes a bot by type."""
@@ -76,7 +76,8 @@ def _init_bot(bot_type, game, player_id):
 def _play_game(game, bots, game_num):
     """Plays one game."""
     # "FEBMBEFEEFBGIBHIBEDBGJDDDHCGJGDHDLIFKDDHAA__AA__AAAA__AA__AASTQPNSQPTSUPWPVRPXPURNQONNQSNVPTNQRRTYUP r 0"  # Base state debugged
-    state = game.new_initial_state("FEBMBEFEEFBGIBHIBEDBGJDDDHCGJGDHDLIFKDDHAA__AA__AAAA__AA__AATPPWRUXPTPSVSOTPPPVSNPQNUTNUSNRQQRQNYNQR r 0") # Equal state
+    # state = game.new_initial_state("FEBMBEFEEFBGIBHIBEDBGJDDDHCGJGDHDLIFKDDHAA__AA__AAAA__AA__AATPPWRUXPTPSVSOTPPPVSNPQNUTNUSNRQQRQNYNQR r 0") # Equal state
+    state = game.new_initial_state("FDBMBEFEEFBGIBHIBEDBGJDDDHCGJGDHHLIFKDDAAA__AA__AAAA__AA__AAAAAEAAAAAAAAAAAAAAAAAAAAAANUSNRQQRQNYNQR r 205") # Test avec un miner (E) plus devant seul devant les mines du flag
     history = []
     allStates = []
 
@@ -90,11 +91,11 @@ def _play_game(game, bots, game_num):
         bot = bots[current_player]
 
         if str(bot) == "customBot":
-            # We adapt the max_simulation parameter to the advancement of the game: 2000 -> 1.0/step to 2s/step, grosse moyenne à 1.3s/step
-            if move == 0 or move==1:
-                bot.set_max_simulations(100)
-            if move == 50 or move == 51:
-                bot.set_max_simulations(2000)
+            # We adapt the max_simulation parameter to the advancement of the game:
+            # if move == 0 or move==1:
+            #     bot.set_max_simulations(100)
+            # if move == 50 or move == 51:
+            #     bot.set_max_simulations(2000)
 
             start = time.time()
             generated = generate_state(state, bot.information)
@@ -102,13 +103,8 @@ def _play_game(game, bots, game_num):
             if time.time()-start > 2:
                 print("Time for generate was", round(time.time()-start, 2))
             action = bot.step(game.new_initial_state(generated))
-            
-            # TODO: Pertinent d'avoir le nombre de "?" ou il faudrait le nombre de piece en face qui 
-            # reste plutot ? Pour analyse, sum des ? et des pieces ennemies
-            # Et rajouter le nombre de piece à nous qu'il reste aussi
-            # peut etre même la fonction evaluate sur le vrai state ou le partial state peut être interessant ?????
-            data = {'move': [move], 'know_acc': [round(compare_state(state, generated), 2)], 'unk_pieces': [str(state.information_state_string(state.current_player())).count("?")]}
-            save_to_csv("./games/"+str(game_num)+".csv", data)
+            print("time for generate and play a move:", time.time()-start)
+            save_to_csv("./games/"+str(game_num)+".csv", data_for_games(move, state, generated, customBot.CustomEvaluator()))
         else:
             action = bot.step(state)
 
@@ -177,12 +173,12 @@ def main(argv):
 
 player1 = "customBot"
 player2 = "random"
-num_games = 10
+num_games = 1
 replay = False
 auto = False
 
 if __name__ == "__main__":
-    # app.run(main) 
+    app.run(main)
     # wrapper(print_board, getGame("Custom1/3"), ["customBot", "random"], auto) # 271 moves
     # wrapper(print_board, getGame("Custom1/14"), ["customBot", "random"], auto) # 1256 moves, lose
     # wrapper(print_board, getGame("FullKnown1/30"), ["customBot", "random"], auto)
@@ -192,8 +188,8 @@ if __name__ == "__main__":
     # wrapper(print_board, getGame("Custom4/4"), ["customBot", "random"], auto) # (is_toward_flag only), 3 et 4
     # wrapper(print_board, getGame("Custom5/1"), ["customBot", "random"], auto) # (toward_flag modified only), 0 et 1
     # wrapper(print_board, getGame("Custom6/9"), ["customBot", "random"], auto) # (re que 2000 en max_iteration et toward_flag), 9 et 5
+    
+    wrapper(print_board, getGame("games/023"), ["customBot", "random"], auto)
 
-    # wrapper(print_board, getGame("games/0"), ["customBot", "random"], auto)
-
-    everythingEverywhereAllAtOnce("states/state.pkl", 500) # 14000, 3sec/step
+    # everythingEverywhereAllAtOnce("states/state.pkl", 1000) # 24000, 3sec/step
     

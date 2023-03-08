@@ -100,78 +100,9 @@ def example_api_of_games(_):
     print(x)
     return "example finished"
 
-def gameTesting():
-    game = pyspiel.load_game("yorktown")
-    state = game.new_initial_state()
-    print("Initial state:\n{}".format(state))
-    for i in range(10):
-        print(state.legal_actions())
-        print(state.legal_actions()[0], state.action_to_string(state.current_player(), state.legal_actions()[0]))
-        state.apply_action(state.legal_actions()[0])
-    print(state)
-    print(state.information_state_string())
-    state.apply_action(state.legal_actions()[0])
-    print(state.information_state_string())
-    print(state.history())
-    # Seems unusable
-    # print(state.information_state_tensor())
-    # Not implemented
-    # print(state.observation_string())
-    # print(state.observation_tensor())
-
-def evaluatebot():
-    # solver = rnad.RNaDSolver(rnad.RNaDConfig(game_name="yorktown"))
-    # result = pyspiel.evaluate_bots(game.new_initial_state(), bots, seed=0)
-    return 
-
-################################################################################################
-# Old Ones
-def _get_action(state, action_str):
-    for action in state.legal_actions():
-        if action_str == state.action_to_string(state.current_player(), action):
-            return action
-    return None
-
-def _play_game(game, bots, initial_actions):
-    """Plays one game."""
-    allStates = []
-    # "FEBMBEFEEFBGIBHIBEDBGJDDDHCGJGDHDLIFKDDHAA__AA__AAAA__AA__AASTQPNSQPTSUPWPVRPXPURNQONNQSNVPTNQRRTYUP r 0"  # Base state debugged
-    state = game.new_initial_state("FEBMBEFEEFBGIBHIBEDBGJDDDHCGJGDHDLIFKDDHAA__AA__AAAA__AA__AATPPWRUXPTPSVSOTPPPVSNPQNUTNUSNRQQRQNYNQR r 0") # Equal state
-    allStates.append(stateIntoCharMatrix(state))
-    history = []
-    for action_str in initial_actions:
-        action = _get_action(state, action_str)
-        # if action is None:
-            # sys.exit("Invalid action: {}".format(action_str))
-        history.append(action_str)
-        for bot in bots:
-            bot.inform_action(state, state.current_player(), action)
-        state.apply_action(action)
-        allStates.append(stateIntoCharMatrix(state))
-
-    while not state.is_terminal():
-        current_player = state.current_player()
-        bot = bots[current_player]
-        action = bot.step(state)
-        action_str = state.action_to_string(current_player, action)
-        for i, bot in enumerate(bots):
-            if i != current_player:
-                bot.inform_action(state, current_player, action)
-        history.append(action_str)
-        state.apply_action(action)
-        allStates.append(stateIntoCharMatrix(state))
-
-    # Game is now done. Print return for each player
-    returns = state.returns()
-    print("Returns:", " ".join(map(str, returns)), ", Game actions:",
-        " ".join(history))
-    print("Number of moves played:", len(history))
-    for bot in bots:
-        bot.restart()
-    return returns, history, allStates
-
 #########################################################################################
 
+# The customBot before it started looking like something
 class CustomBot(pyspiel.Bot):
     # A state in str:
     # FEBMBEFEEF
@@ -287,6 +218,7 @@ class CustomBot(pyspiel.Bot):
 
 ###############################################################################
 
+# Base Evaluator
 class Evaluator(object):
     """Abstract class representing an evaluation function for a game.
 
@@ -333,12 +265,31 @@ class RandomRolloutEvaluator(Evaluator):
         legal_actions = state.legal_actions(state.current_player())
         return [(action, 1.0 / len(legal_actions)) for action in legal_actions]
 
-###############################################################################
+#####################################################################################################
 
+# Print a graph 
+import pandas as pd
+from matplotlib import pyplot as plt
+import matplotlib
+matplotlib.use('TkAgg')
+def graph():
+    df = pd.read_csv('games/0.csv')
+    x = df["move"]
+    y = df["unknow_acc"]
+    plt.plot(x, y)
+    plt.xlabel("Number of moves")
+    plt.ylabel("knowledge accuracy")
+    plt.ylim(0.0, 1.0)
+    plt.show()
+
+#####################################################################################################
+
+# # Debugging asset, printing things for debug
+ 
 # A mettre dans la fonction generate state
                 # print("================")
-                # printCharMatrix(stateIntoCharMatrix(state.information_state_string(state.current_player())))
-                # printCharMatrix(stateIntoCharMatrix(final))
+                # printCharMatrix(state.information_state_string(state.current_player()))
+                # printCharMatrix(final)
                 # print(moved_scout)
                 # print(str(state)[i])
                 # print(piece_left)
@@ -355,9 +306,9 @@ class RandomRolloutEvaluator(Evaluator):
 # Pareil dans le play
             # print("\n==============================================")
             # print("move number: " + str(n))
-            # printCharMatrix(stateIntoCharMatrix(state))
+            # printCharMatrix(state)
             # print()
-            # printCharMatrix(stateIntoCharMatrix(state.information_state_string(state.current_player())))
+            # printCharMatrix(state.information_state_string(state.current_player()))
             # print("Pieces_left:")
             # print(bot.information[1])
             # print("moved:")
@@ -367,10 +318,13 @@ class RandomRolloutEvaluator(Evaluator):
             # print(generated)
             # print(is_valid_state(generated))
 
-# printCharMatrix(stateIntoCharMatrix(state.information_state_string(maximizing_player_id)))
+# printCharMatrix(state.information_state_string(maximizing_player_id))
+
+###############################################################################
 
 # Generate the matrix of possibilites / probabilities used for piece generation in the generate_state
 def generate_possibilities_matrix(state, information):
+    players_piece = players_pieces
     player_id, nbr_piece_left, moved_before, moved_scout = information
     matrix = stateIntoCharMatrix(state.information_state_string(player_id))
     matrix_of_possibilities = np.zeros((10, 10, 12))
@@ -396,6 +350,7 @@ def generate_possibilities_matrix(state, information):
 
 # Generate a valid state, with the knowledge of our bot + the partial state
 def generate_state_via_matrix(state, matrix_of_possibilities, information):
+    players_piece = players_pieces()
     partial_state = state.information_state_string(state.current_player())
     state_str = str(partial_state)
     piece_left = information[1].copy()
@@ -484,25 +439,19 @@ player2 = "random"
 num_games = 50
 replay = False
 auto = False
-
-from matplotlib import pyplot as plt
-import tkinter
-import matplotlib
-matplotlib.use('TkAgg')
-
-players_piece = [["M", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L"],
-                 ["Y", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X"]]
-# It is:         [Fl,  Bo,   Sp,  Sc,  Mi,  Sg,  Lt,  Cp,  Mj,  Co,  Ge,  Ms]
-# Nbr of each:   [1,   6,    1,   8,   5,   4,   4,   4,   3,   2,   1,   1]
 # basic_test()
 
-# printCharMatrix(stateIntoCharMatrix("FEBMBEFEEFBGIBHIBEDBGJDDDHCGJGDHDLIFKDDHAA__AA__AAAA__AA__AATPPWRUXPTPSVSOTPPPVSNPQNUTNUSNRQQRQNYNQR r 0"))
+pieces = [["M", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L"],
+              ["Y", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X"]]
+    # It is:  [Fl,  Bo,   Sp,  Sc,  Mi,  Sg,  Lt,  Cp,  Mj,  Co,  Ge,  Ms]
+    # Nbr     [1,   6,    1,   8,   5,   4,   4,   4,   3,   2,   1,   1]
 
-df = pd.read_csv('games/0.csv')
-x = df["move"]
-y = df["know_acc"]
-plt.plot(x, y)
-plt.xlabel("Number of moves")
-plt.ylabel("knowledge accuracy")
-plt.ylim(0.5, 1.0)
-plt.show()
+# print(len("FDBMBEFEEFBGIBHIBEDBGJDDDHCGJGDHHLIFKDDEAA__AA__AAAA__AA__AAAAAAAAAAAAAAAAAAAAAAAAAAAENUSNRQQRQNYNQR r 0"))
+# print(len("FEBMBEFEEFBGIBHIBEDBGJDDDHCGJGDHDLIFKDDHAA__AA__AAAA__AA__AATPPWRUXPTPSVSOTPPPVSNPQNUTNUSNRQQRQNYNQR r 1"))
+
+state = pyspiel.load_game("yorktown").new_initial_state("FDBMBEFEEFBGIBHIBEDBGJDDDHCGJGDHHLIFKDDAAA__AA__AAAA__AA__AAAAAEAAAAAAAAAAAAAAAAAAAAAANUSNRQQRQNYNQR r 205")
+
+t = customBot.CustomEvaluator().prior(state)
+for i in range(len(t)):
+    print(state.action_to_string(t[i][0]), t[i][1])
+print()

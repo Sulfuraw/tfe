@@ -1,10 +1,17 @@
 import curses
 import numpy as np
 
-players_piece = [["M", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L"],
-                 ["Y", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X"]]
-# It is:         [Fl,  Bo,   Sp,  Sc,  Mi,  Sg,  Lt,  Cp,  Mj,  Co,  Ge,  Ms]
-# Nbr of each:   [1,   6,    1,   8,   5,   4,   4,   4,   3,   2,   1,   1]
+def players_pieces():
+    pieces = [["M", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L"],
+              ["Y", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X"]]
+    # It is:  [Fl,  Bo,   Sp,  Sc,  Mi,  Sg,  Lt,  Cp,  Mj,  Co,  Ge,  Ms]
+    # Nbr     [1,   6,    1,   8,   5,   4,   4,   4,   3,   2,   1,   1]
+    return pieces
+
+def pieces_to_index():
+    # In the form [index_of_piece, id_of_player]
+    return {"M":[0, 0], "B":[1, 0], "C":[2, 0], "D":[3, 0], "E":[4, 0], "F":[5, 0], "G":[6, 0], "H":[7, 0], "I":[8, 0], "J":[9, 0], "K":[10, 0], "L":[11, 0],
+            "Y":[0, 1], "N":[1, 1], "O":[2, 1], "P":[3, 1], "Q":[4, 1], "R":[5, 1], "S":[6, 1], "T":[7, 1], "U":[8, 1], "V":[9, 1], "W":[10, 1], "X":[11, 1]}
 
 matrix_of_stats = [
     [[9.21091620e-02,1.48408795e-01,3.58539765e-03,1.93729999e-01,
@@ -182,33 +189,22 @@ def is_valid_state(state_str):
         and state_str.count("?") == 0
         and len(state_str) >= 104)
 
-def compare_state(state1, state2):
-    """Check the accuracy for the pieces (ally & ennemy) by comparing the two state piece by piece"""
-    str_state1 = str(state1).upper()[:100]
-    str_state2 = str(state2).upper()[:100]
-    total = 0
-    good = 0
-    for i in range(len(str_state1)):
-        if str_state1[i] != "_" and str_state1[i] != "A":
-            total += 1
-            if str_state1[i] == str_state2[i]:
-                good += 1
-    return good/total
-
 def generate_state(state, information):
     """
         Generate a valid state, with the knowledge of our bot + the partial state
         Information : [self.player_id, nbr_piece_left, moved_before, moved_scout]
     """
-    partial_state = state.information_state_string(state.current_player()) # str(state) if he has full info
-    state_str = str(partial_state)
+    partial_state = state.information_state_string(state.current_player())
+    state_str = str(state)           # This line for full info    
+    # state_str = str(partial_state) # This line for partial info
     moved_before = information[2]
     moved_scout = information[3]
     final = ""
+    players_piece = players_pieces()
 
     while not is_valid_state(final):
-        # Conceptuellement elle doit pas etre là cette boucle.
-        # Commencer par assigner les pieces qui ont déjà bouger.
+        # TODO: Conceptuellement elle doit pas etre là cette boucle.
+        # Commencer par assigner les pieces qui ont déjà bouger avant celle qui ont jamais bougé, débile...
         final = ""
         i = 0
         piece_left = information[1].copy()
@@ -218,14 +214,16 @@ def generate_state(state, information):
                     proba = [0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0]
                 elif not moved_before[i//10][i%10]:
                     proba = no_info_piece(piece_left)
-                    # TODO: Necessary ? Force Flag/Bomb if too few can be
+                    # Force Flag/Bomb if too few can be
                     if (state_str.count("?") - np.sum(moved_before)) < (information[1][0] + information[1][1] + 2) and np.sum(piece_left[:2]) > 0:
+                        #print("This condition was used")
                         flag = piece_left[0]
                         bomb = piece_left[1]
                         proba = [flag/(flag+bomb), bomb/(flag+bomb), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
                 elif np.sum(piece_left[2:]) > 0:
                     proba = moved_piece(piece_left)
                 else:
+                    # print("Error in the generation of a state, retrying...", i)
                     break
                 
                 piece_id = np.random.choice(np.arange(12), p=proba)
@@ -247,6 +245,7 @@ def updating_knowledge(information, state, action):
         Information : [self.player_id, nbr_piece_left, moved_before, moved_scout]
     """
     player_id, nbr_piece_left, moved_before, moved_scout = information
+    players_piece = players_pieces()
     current_player = state.current_player()
 
     coord = action_to_coord(state.action_to_string(current_player, action))
@@ -310,14 +309,62 @@ def updating_knowledge(information, state, action):
             return [player_id, nbr_piece_left, moved_before, moved_scout]
     return information
 
-def stateIntoCharMatrix(state):
-    """Transform a state into a Matrix of Character inside the str(state)"""
-    stat = str(state).upper().split(" ")[0]
-    stat = ' '.join(stat)
-    statInLines = []
-    for i in range(0, len(stat), 20):
-        statInLines.append(stat[i:i+20].rstrip().split(" "))
-    return statInLines
+def unknown_acc(state, state2):
+    """Check the accuracy for the pieces unknown by comparing the two state piece-wise"""
+    str_partial = str(state.information_state_string(state.current_player()))
+    str_state1 = str(state).upper()[:100]
+    str_state2 = str(state2).upper()[:100]
+    total = 0
+    good = 0
+    for i in range(len(str_state1)):
+        if str_partial[i] == "?":
+            total += 1
+            if str_state1[i] == str_state2[i]:
+                good += 1
+    return good/total
+
+def global_accuracy_state(state1, state2):
+    """Check the accuracy for the pieces (ally & ennemy) by comparing the two state piece-wise"""
+    str_state1 = str(state1).upper()[:100]
+    str_state2 = str(state2).upper()[:100]
+    total = 0
+    good = 0
+    for i in range(len(str_state1)):
+        if str_state1[i] != "_" and str_state1[i] != "A":
+            total += 1
+            if str_state1[i] == str_state2[i]:
+                good += 1
+    return good/total
+
+def data_for_games(move, state, generated, evaluator):
+    """
+        Prepare the data to be saved for a move in a single game
+        Move: The number of the move we're at
+        Eval_real: The evaluate function used on the real state
+        Eval_generated: The evaluate function used on the generated state
+        Unknow_acc: The accuracy of prediction of generated regarding the unknown pieces only ("?")
+        Unk_pieces: The number of ("?")
+        Our_pieces: The number of pieces we have still
+        Ennemy_pieces: The number of pieces the ennemy has still ("?" and known pieces)
+    """
+    players_piece = players_pieces()
+    eval_real = round(evaluator.evaluate(state)[state.current_player()], 4)
+    eval_generated = 0 #round(evaluator.evaluate(generated)[state.current_player()], 4)
+    unknow_acc = round(unknown_acc(state, generated), 2)
+    unk_pieces = str(state.information_state_string(state.current_player())).count("?")
+    our_pieces = 0
+    ennemy_pieces = 0
+    for i in str(generated[:100]).upper():
+        if i in players_piece[state.current_player()]:
+            our_pieces += 1
+        if i in players_piece[1-state.current_player()]:
+            ennemy_pieces += 1
+    print("====================================")
+    print("move:", move)
+    print("state:")
+    printCharMatrix(state)
+    print("evaluate:", eval_real)
+    return {'move': [move], 'eval_real': [eval_real], 'eval_generated': [eval_generated], 'unknow_acc': [unknow_acc], 'unk_pieces': [unk_pieces], 'our_pieces': [our_pieces], 'ennemy_pieces': [ennemy_pieces]}
 
 def is_valid_coord(pos):
     """Tools to check if a position is playable (in board and not a river)"""
@@ -328,6 +375,7 @@ def is_valid_coord(pos):
 
 def flag_protec(state, player):
     """Check that the flag is protected all around him (4 positions)"""
+    players_piece = players_pieces()
     matrix = stateIntoCharMatrix(state)
     coord = [0, 0]
     for i in range(10):
@@ -341,8 +389,18 @@ def flag_protec(state, player):
             protected = protected and (matrix[pos[0]][pos[1]] in players_piece[player])
     return protected 
     
-def printCharMatrix(charMatrix):
+def stateIntoCharMatrix(state):
+    """Transform a state into a Matrix of Character inside the str(state)"""
+    stat = str(state).upper().split(" ")[0]
+    stat = ' '.join(stat)
+    statInLines = []
+    for i in range(0, len(stat), 20):
+        statInLines.append(stat[i:i+20].rstrip().split(" "))
+    return statInLines
+
+def printCharMatrix(state):
     """Print device for the matrix of character generated here: stateIntoCharMatrix(state)"""
+    charMatrix = stateIntoCharMatrix(state)
     final = ""
     for line in charMatrix:
         for char in line:

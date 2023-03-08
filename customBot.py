@@ -7,85 +7,148 @@ import math
 import time
 from statework import *
 
-# Using the Copyright 2019 DeepMind Technologies Limited using """Monte-Carlo Tree Search algorithm for game play"""
-class Evaluator(object):
-    """Abstract class representing an evaluation function for a game.
+# Using the Copyright 2019 DeepMind Technologies Limited using modified version of """Monte-Carlo Tree Search algorithm for game play"""
+class CustomEvaluator():
+    def __init__(self):
+        self.piece_to_index = pieces_to_index()
+        self.player_pieces = players_pieces()
 
-    The evaluation function takes in an intermediate state in the game and returns
-    an evaluation of that state, which should correlate with chances of winning
-    the game. It returns the evaluation from all player's perspectives.
-    """
+    # It is:  [Fl,  Bo,   Sp,  Sc,  Mi,  Sg,  Lt,  Cp,  Mj,  Co,  Ge,  Ms]
+    # Nbr     [1,   6,    1,   8,   5,   4,   4,   4,   3,   2,   1,   1]
+    # TODO: Changé ça en version avec une version [0.1] de base et chaque range au dessus si ya des pieces ennemies de ce rang on fait rang[i-1]*1.45, range[i-1] sinon
+    def value_for_piece(self, ennemy_nbr_pieces):
+        value = np.array([0]*12)
+        for i in range(3, 12):
+            value[i] = np.sum(ennemy_nbr_pieces[2:(i+1)])+2
+        value[0] = 100.0
+        value[1] = np.sum(ennemy_nbr_pieces[2:]) if ennemy_nbr_pieces[4] == 0 else (np.sum(ennemy_nbr_pieces[2:]) - ennemy_nbr_pieces[4])*0.8
+        value[2] = 9.0 if ennemy_nbr_pieces[11] else 1.0
+        value[4] += ennemy_nbr_pieces[1]
+        value = value / np.max(value[1:])
+        returns = []
+        for i in range(12):
+            returns.append((i, value[i]))
+        return returns
 
-    def evaluate(self, state):
-        """Returns evaluation on given state."""
-        raise NotImplementedError
-
-    def prior(self, state):
-        """Returns a probability for each legal action in the given state."""
-        raise NotImplementedError
-
-class CustomEvaluator(Evaluator):
-    # def __init__(self):
-
-    # TODO: Une fonction qui va retourner les poids de chaque piece, de 
-    # scout à marshall c'est linéaire avec une multiplication du nombre de piece 
-    # qu'ils peuvent tuer. Exception sur le flag qui a une value enorme
-    #                                sur les bombs qui tue tout
-    #                                sur les miners si il reste au moins trois bombes
-    # On peut faire que le weight to moving forward change avec le temps, on doit aller de plus en plus loin
-    # Nombre de piece restante que tu peux battre
-
-    def evaluate(self, state):
+    def evaluate_state(self, state, move_of_state):
         """Returns evaluation on given state."""
         state_str = str(state)
 
-        score = [0, 0]
-        # 0's pieces (value 175.5 at start) (unkown (?)*39 = 175.5 at start too)
-        for piece, value in [("M", 124.5), ("C", 3.5), ("K", 9), ("L", 10), ("J", 8), ("I", 7), ("F", 4), ("G", 5), ("H", 6), ("E", 3), ("B", 5), ("D", 2), ("?", 4.5)]:
-            score[0] += state_str.count(piece)#*value
-            # make more weight to moving forward
-            score[0] += state_str[-50:].count(piece)
-            # make more weight if flag is protected
-            score[0] += 20 if flag_protec(state, 0) else 0
-        for piece, value in [("Y", 124.5), ("O", 3.5), ("W", 9), ("X", 10), ("V", 8), ("U", 7), ("R", 4), ("S", 5), ("T", 6), ("Q", 3), ("N", 5), ("P", 2), ("?", 4.5)]:
-            score[1] += state_str.count(piece)#*value
-            score[1] += state_str[:50].count(piece)
-            score[1] += 20 if flag_protec(state, 1) else 0
+        nbr_pieces = [[0]*12, [0]*12]
+        for piece in state_str[:100].upper():
+            if piece not in ["A", "_"]:
+                i, player = self.piece_to_index[piece]
+                nbr_pieces[player][i] += 1
 
-        returns = [(score[0]-score[1])/500, (score[1]-score[0])/500]
+        score = [0, 0]
+        for player in [0, 1]:
+            for piece_id, value in self.value_for_piece(nbr_pieces[1-player]):
+                # if move_of_state < 200:
+                #     score[player] += nbr_pieces[player][piece_id]*value
+                # else:
+                #     score[player] += nbr_pieces[player][piece_id]
+                score[player] += nbr_pieces[player][piece_id]*value
+
+                # make more weight if flag is protected
+                score[player] += 1 if flag_protec(state, player) else 0
+
+                # # make more weight having pieces on the other part of the board, go forward
+                # for move, adv, div in [(25, 50, 20), (75, 40, 20), (200, 30, 10)]:
+                #     if move_of_state > move:
+                #         if player: # player = 1
+                #             score[player] += state_str[:adv].count(self.player_pieces[player][piece_id])/div
+                #         else:
+                #             score[player] += state_str[-adv:].count(self.player_pieces[player][piece_id])/div
+                score[player] += (state_str[:40].count(self.player_pieces[player][piece_id]) if player else state_str[-40:].count(self.player_pieces[player][piece_id]))/20
+
+            # TODO: Moyen more weight to miner to go for mines
+            if player:
+                score[player] += 10.0 if self.player_pieces[player][4] in state_str[:30] else 0.0
+            else:
+                score[player] += 10.0 if self.player_pieces[player][4] in state_str[-30:] else 0.0
+        returns = [0, 0]
+        for player in [0, 1]:
+            returns[player] = ((score[player] - np.sum(nbr_pieces[1-player])/2)-0)/(100-0)   # Re-range with (x - min)/(max-min) with max = 50 min = 0
+        
         # Print for debug
         if returns[0] > 1 or returns[0] < -1 or returns[1] > 1 or returns[1] < -1:
             print("==============================")
-            print("Here, the returns were strange !:", returns, "\n")
-            print(state_str)
+            print("Here, the returns were strange:", returns, "\n")
+            # print(state_str)
         return returns
+
+    # Problème déjà vu à revérif : 
+    # Value des pièces moins dépendantes des pièces en face
+    # Plus rentable de ne pas tuer la pièce car elle fait perdre du poids à chacune de nos pièces
+    # Plus rentable de suicider une pièce plutot qu'utiliser une pièce plus grande
+    # Attention à pas suicider nos pièces sur des cibles qu'on connait
+
+    # Rajouter un evaluate dans le cas où 80% des pieces qu'ils restent ont jamais bougé: On fait avancer des miners vers
+    # Pour ca adapter le prior ? / ou dans l'évaluate ???
+    
+
+    def evaluate(self, state):
+        """Returns evaluation on given state."""
+        result = None
+        n_rollouts = 10
+        n_moves_before = 20
+        move_of_state = int(str(state)[103-len(str(state)):])
+        # print("==================================")
+        for _ in range(n_rollouts):
+            working_state = state.clone()
+            i = 0
+            while not working_state.is_terminal() and i < n_moves_before:
+                # TODO: Comparer random ou utilisé le prior. Là on fait que quand c'est notre tour, on le use, et l'autre joue aléatoire
+                if (i%2) == 0:
+                    legal_actions = self.prior(working_state)
+                    actions = []
+                    proba = []
+                    for action, prior in legal_actions:
+                        actions.append(action)
+                        proba.append(prior)
+                    
+                    # Transform to delete value below treshold and really prioritize even more
+                    proba = np.array(proba)
+                    if np.max(proba) > 0.05:
+                        proba[proba <= 0.05] = 0
+                        proba = proba/np.sum(proba)
+
+                    action = np.random.choice(actions, p=proba)
+                else:
+                    action = np.random.choice(working_state.legal_actions())
+                working_state.apply_action(action)
+                i += 1
+            # TODO: Vérif *5 good or not
+            # printCharMatrix(working_state)
+            if working_state.is_terminal():
+                print("yoooooo")
+            returns = np.array(working_state.returns())*5 if working_state.is_terminal() else np.array(self.evaluate_state(working_state, move_of_state+i))
+            result = returns if result is None else result + returns
+        return result / n_rollouts
 
     def is_forward(self, action, player):
         _, pos1, _, pos2 = list(action)
         return pos1 < pos2 if player == 0 else pos1 > pos2
     
     def toward_flag(self, state, action, player):
-        flag_str_pos = str(state).find(players_piece[1-player][0])
+        flag_str_pos = str(state).find(players_pieces()[1-player][0])
         flag = [flag_str_pos//10, flag_str_pos%10]
         coord = action_to_coord(action)
         man_distance_before = abs(flag[0] - coord[1]) + abs(flag[1] - coord[0])
         man_distance_after = abs(flag[0] - coord[3]) + abs(flag[1] - coord[2])
-        return man_distance_before < man_distance_after, 21-man_distance_after
+        return man_distance_before > man_distance_after, 21-man_distance_after
   
     def prior(self, state):
-        """Returns equal probability for all actions."""
+        """Returns probability for each actions"""
         # TODO:
-        # Priorisé les attaques ? 
-        # Adapt different prior au fil de la game ?
+        # Priorisé les attaques qu'on a bcp de chance de gagné
         # (alpha)*P(avancer vers le flag) + (1-alpha)*P(faire un combat)
-        # Mettre des proba en moins si le coup fait perdre
-        # Pondéré les choix avec les probabilités et pas que les pieces qu'on a estimé.
+        # Diminué proba si le coup fait perdre directement une pièce
+        # Utilisé les probabilités des pièces à un endroit X et pas uniquement les pièces générée
         sum = 0.0
         prio = []
         player = state.current_player()
         for action in state.legal_actions(player):
-            # Priorize moving forward
-            # value = 3.0 if self.is_forward(state.action_to_string(player, action), player) else 1.0
             # Priorize moving toward the ennemy flag
             toward_flag = self.toward_flag(state, state.action_to_string(player, action), player)
             value = toward_flag[1] if toward_flag[0] else 1.0
@@ -247,10 +310,10 @@ class CustomBot(pyspiel.Bot):
             sensibly.
 
         Raises:
-        ValueError: if the game type isn't supported.
+        ValueError: if the game type isn't supported:
+        game.get_type().reward_model != pyspiel.GameType.RewardModel.TERMINAL and game.get_type().dynamics != pyspiel.GameType.Dynamics.SEQUENTIAL
         """
         pyspiel.Bot.__init__(self)
-        # Game condition: game.get_type().reward_model != pyspiel.GameType.RewardModel.TERMINAL and game.get_type().dynamics != pyspiel.GameType.Dynamics.SEQUENTIAL
 
         self._game = game
         self.uct_c = uct_c
