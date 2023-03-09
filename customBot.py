@@ -15,7 +15,7 @@ class CustomEvaluator():
 
     # It is:  [Fl,  Bo,   Sp,  Sc,  Mi,  Sg,  Lt,  Cp,  Mj,  Co,  Ge,  Ms]
     # Nbr     [1,   6,    1,   8,   5,   4,   4,   4,   3,   2,   1,   1]
-    # TODO: Changé ça en version avec une version [0.1] de base et chaque range au dessus si ya des pieces ennemies de ce rang on fait rang[i-1]*1.45, range[i-1] sinon
+    # TODO: Changé ça en version avec une version [0.1]*12 de base et chaque range au dessus si ya des pieces ennemies de ce rang on fait rang[i-1]*1.45, range[i-1] sinon
     def value_for_piece(self, ennemy_nbr_pieces):
         value = np.array([0]*12)
         for i in range(3, 12):
@@ -43,74 +43,49 @@ class CustomEvaluator():
         score = [0, 0]
         for player in [0, 1]:
             for piece_id, value in self.value_for_piece(nbr_pieces[1-player]):
-                # if move_of_state < 200:
-                #     score[player] += nbr_pieces[player][piece_id]*value
-                # else:
-                #     score[player] += nbr_pieces[player][piece_id]
                 score[player] += nbr_pieces[player][piece_id]*value
 
                 # make more weight if flag is protected
                 score[player] += 1 if flag_protec(state, player) else 0
 
                 # # make more weight having pieces on the other part of the board, go forward
-                # for move, adv, div in [(25, 50, 20), (75, 40, 20), (200, 30, 10)]:
-                #     if move_of_state > move:
-                #         if player: # player = 1
-                #             score[player] += state_str[:adv].count(self.player_pieces[player][piece_id])/div
-                #         else:
-                #             score[player] += state_str[-adv:].count(self.player_pieces[player][piece_id])/div
                 score[player] += (state_str[:40].count(self.player_pieces[player][piece_id]) if player else state_str[-40:].count(self.player_pieces[player][piece_id]))/20
 
-            # TODO: Moyen more weight to miner to go for mines
+            # TODO: Make more weight to miner to go attack in search of bombs
             if player:
-                score[player] += 10.0 if self.player_pieces[player][4] in state_str[:30] else 0.0
+                score[player] += 3.0 if self.player_pieces[player][4] in state_str[:50] else 0.0
             else:
-                score[player] += 10.0 if self.player_pieces[player][4] in state_str[-30:] else 0.0
+                score[player] += 3.0 if self.player_pieces[player][4] in state_str[-50:] else 0.0
         returns = [0, 0]
         for player in [0, 1]:
-            returns[player] = ((score[player] - np.sum(nbr_pieces[1-player])/2)-0)/(100-0)   # Re-range with (x - min)/(max-min) with max = 50 min = 0
-        
+            returns[player] = ((score[player] - np.sum(nbr_pieces[1-player])/2)-15)/(35-15)   # Re-range with (x - min)/(max-min) with max = 50 min = 0
         # Print for debug
         if returns[0] > 1 or returns[0] < -1 or returns[1] > 1 or returns[1] < -1:
             print("==============================")
             print("Here, the returns were strange:", returns, "\n")
-            # print(state_str)
-        return returns
+            print(state_str)
+        return returns    
 
-    # Problème déjà vu à revérif : 
-    # Value des pièces moins dépendantes des pièces en face
-    # Plus rentable de ne pas tuer la pièce car elle fait perdre du poids à chacune de nos pièces
-    # Plus rentable de suicider une pièce plutot qu'utiliser une pièce plus grande
-    # Attention à pas suicider nos pièces sur des cibles qu'on connait
-
-    # Rajouter un evaluate dans le cas où 80% des pieces qu'ils restent ont jamais bougé: On fait avancer des miners vers
-    # Pour ca adapter le prior ? / ou dans l'évaluate ???
-    
-
+    # TODO: Test with different n_moves_before with advancement of the game
     def evaluate(self, state):
         """Returns evaluation on given state."""
         result = None
-        n_rollouts = 10
-        n_moves_before = 20
+        n_rollouts = 9
+        n_moves_before = 30
         move_of_state = int(str(state)[103-len(str(state)):])
-        # print("==================================")
         for _ in range(n_rollouts):
             working_state = state.clone()
             i = 0
             while not working_state.is_terminal() and i < n_moves_before:
-                # TODO: Comparer random ou utilisé le prior. Là on fait que quand c'est notre tour, on le use, et l'autre joue aléatoire
+                # We simulate our moves with prior and simulate ennemy move randomly.
                 if (i%2) == 0:
                     legal_actions = self.prior(working_state)
-                    actions = []
-                    proba = []
-                    for action, prior in legal_actions:
-                        actions.append(action)
-                        proba.append(prior)
-                    
-                    # Transform to delete value below treshold and really prioritize even more
+                    actions, proba = list(zip(*legal_actions))
+
+                    # Transform proba to delete values below a treshold and help converge the results
                     proba = np.array(proba)
-                    if np.max(proba) > 0.05:
-                        proba[proba <= 0.05] = 0
+                    if np.max(proba) > 0.045 and (move_of_state+i) > 125:
+                        proba[proba <= 0.045] = 0
                         proba = proba/np.sum(proba)
 
                     action = np.random.choice(actions, p=proba)
@@ -118,10 +93,7 @@ class CustomEvaluator():
                     action = np.random.choice(working_state.legal_actions())
                 working_state.apply_action(action)
                 i += 1
-            # TODO: Vérif *5 good or not
-            # printCharMatrix(working_state)
-            if working_state.is_terminal():
-                print("yoooooo")
+            # We sum the returns with terminal*5 if the last state is terminal, the evaluation of the state if it's not
             returns = np.array(working_state.returns())*5 if working_state.is_terminal() else np.array(self.evaluate_state(working_state, move_of_state+i))
             result = returns if result is None else result + returns
         return result / n_rollouts
@@ -130,28 +102,43 @@ class CustomEvaluator():
         _, pos1, _, pos2 = list(action)
         return pos1 < pos2 if player == 0 else pos1 > pos2
     
-    def toward_flag(self, state, action, player):
+    def toward_flag(self, state, player, coord):
         flag_str_pos = str(state).find(players_pieces()[1-player][0])
         flag = [flag_str_pos//10, flag_str_pos%10]
-        coord = action_to_coord(action)
         man_distance_before = abs(flag[0] - coord[1]) + abs(flag[1] - coord[0])
         man_distance_after = abs(flag[0] - coord[3]) + abs(flag[1] - coord[2])
-        return man_distance_before > man_distance_after, 21-man_distance_after
-  
+        # Categories the weight
+        value = 21-man_distance_after
+        if value < 11: value = 10
+        elif value < 16: value = 15
+        else: value = 20
+        return man_distance_before > man_distance_after, value
+
     def prior(self, state):
         """Returns probability for each actions"""
         # TODO:
-        # Priorisé les attaques qu'on a bcp de chance de gagné
-        # (alpha)*P(avancer vers le flag) + (1-alpha)*P(faire un combat)
-        # Diminué proba si le coup fait perdre directement une pièce
-        # Utilisé les probabilités des pièces à un endroit X et pas uniquement les pièces générée
+        # Utilisé les probabilités de pièce à un endroit [x,y] et pas uniquement la pièce générée
         sum = 0.0
         prio = []
         player = state.current_player()
+        state_str = str(state).upper()
         for action in state.legal_actions(player):
+            coord = action_to_coord(state.action_to_string(player, action))
             # Priorize moving toward the ennemy flag
-            toward_flag = self.toward_flag(state, state.action_to_string(player, action), player)
+            toward_flag = self.toward_flag(state, player, coord)
             value = toward_flag[1] if toward_flag[0] else 1.0
+
+            # # Prioritize winning attacks / penalize loosing ones
+            arrival = state_str[coord[3]*10 + coord[2]]
+            # Fight
+            if arrival != "A":
+                start = state_str[coord[1]*10 + coord[0]]
+                clone = state.clone()
+                clone.apply_action(action)
+                clone_str = str(clone).upper()
+                arrival_after = clone_str[coord[3]*10 + coord[2]]
+                value = (value + 15) if (start == arrival_after) else (value//3)
+
             sum += value
             prio.append([action, value])
         for i in range(len(prio)):
@@ -341,7 +328,6 @@ class CustomBot(pyspiel.Bot):
 
     def update_knowledge(self, state, action):
         self.information = updating_knowledge(self.information, state, action)
-        # self.matrix_of_possibilities = generate_possibilities_matrix(state, self.information)
 
     def step_with_policy(self, state):
         """Returns bot's policy and action at given state."""

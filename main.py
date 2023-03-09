@@ -61,7 +61,7 @@ def _init_bot(bot_type, game, player_id):
     if bot_type == "ab":
         return alphaBeta.AlphaBetaBot(player_id, game)
     if bot_type == "customBot":
-        return customBot.CustomBot(game, 1.5, 100, customBot.CustomEvaluator(), player_id) # customBot.RandomRolloutEvaluator()
+        return customBot.CustomBot(game, 1.5, 75, customBot.CustomEvaluator(), player_id)
     if bot_type == "rnadBot":
         try:
             bot = rnadBot.rnadBot().getSavedState("states/state5000.pkl")
@@ -76,8 +76,8 @@ def _init_bot(bot_type, game, player_id):
 def _play_game(game, bots, game_num):
     """Plays one game."""
     # "FEBMBEFEEFBGIBHIBEDBGJDDDHCGJGDHDLIFKDDHAA__AA__AAAA__AA__AASTQPNSQPTSUPWPVRPXPURNQONNQSNVPTNQRRTYUP r 0"  # Base state debugged
-    # state = game.new_initial_state("FEBMBEFEEFBGIBHIBEDBGJDDDHCGJGDHDLIFKDDHAA__AA__AAAA__AA__AATPPWRUXPTPSVSOTPPPVSNPQNUTNUSNRQQRQNYNQR r 0") # Equal state
-    state = game.new_initial_state("FDBMBEFEEFBGIBHIBEDBGJDDDHCGJGDHHLIFKDDAAA__AA__AAAA__AA__AAAAAEAAAAAAAAAAAAAAAAAAAAAANUSNRQQRQNYNQR r 205") # Test avec un miner (E) plus devant seul devant les mines du flag
+    state = game.new_initial_state("FEBMBEFEEFBGIBHIBEDBGJDDDHCGJGDHDLIFKDDHAA__AA__AAAA__AA__AATPPWRUXPTPSVSOTPPPVSNPQNUTNUSNRQQRQNYNQR r 0") # Equal state
+    # state = game.new_initial_state("FDBMBEFEEFBGIBHIBEDBGJDDDHCGJGDHHLIFKDDEAA__AA__AAAA__AA__AAAAAAAAAAAAAAAAAAAAAAAAAAAANUSNRQQRQNYNQR r 205") # Test avec un miner (E) plus devant seul devant les mines du flag
     history = []
     allStates = []
 
@@ -98,11 +98,11 @@ def _play_game(game, bots, game_num):
             #     bot.set_max_simulations(2000)
 
             start = time.time()
-            generated = generate_state(state, bot.information)
+            generated = game.new_initial_state(generate_state(state, bot.information))
             # Test the generate time for anomaly
             if time.time()-start > 2:
                 print("Time for generate was", round(time.time()-start, 2))
-            action = bot.step(game.new_initial_state(generated))
+            action = bot.step(generated)
             print("time for generate and play a move:", time.time()-start)
             save_to_csv("./games/"+str(game_num)+".csv", data_for_games(move, state, generated, customBot.CustomEvaluator()))
         else:
@@ -173,23 +173,18 @@ def main(argv):
 
 player1 = "customBot"
 player2 = "random"
-num_games = 1
+num_games = 5
 replay = False
 auto = False
 
 if __name__ == "__main__":
-    app.run(main)
+    # app.run(main)
     # wrapper(print_board, getGame("Custom1/3"), ["customBot", "random"], auto) # 271 moves
     # wrapper(print_board, getGame("Custom1/14"), ["customBot", "random"], auto) # 1256 moves, lose
     # wrapper(print_board, getGame("FullKnown1/30"), ["customBot", "random"], auto)
     # wrapper(print_board, getGame("FullKnown1/14lose"), ["customBot", "random"], auto)
-
-    # wrapper(print_board, getGame("Custom3/9"), ["customBot", "random"], auto) #(double prior)
-    # wrapper(print_board, getGame("Custom4/4"), ["customBot", "random"], auto) # (is_toward_flag only), 3 et 4
-    # wrapper(print_board, getGame("Custom5/1"), ["customBot", "random"], auto) # (toward_flag modified only), 0 et 1
-    # wrapper(print_board, getGame("Custom6/9"), ["customBot", "random"], auto) # (re que 2000 en max_iteration et toward_flag), 9 et 5
     
-    wrapper(print_board, getGame("games/023"), ["customBot", "random"], auto)
+    wrapper(print_board, getGame("games/2"), ["customBot", "random"], auto)
 
-    # everythingEverywhereAllAtOnce("states/state.pkl", 1000) # 24000, 3sec/step
+    # everythingEverywhereAllAtOnce("states/state.pkl", 1000) # 34000, 3sec/step
     

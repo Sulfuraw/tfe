@@ -195,8 +195,8 @@ def generate_state(state, information):
         Information : [self.player_id, nbr_piece_left, moved_before, moved_scout]
     """
     partial_state = state.information_state_string(state.current_player())
-    state_str = str(state)           # This line for full info    
-    # state_str = str(partial_state) # This line for partial info
+    state_str = str(partial_state)   # This line for partial info
+    # state_str = str(state)         # This line for full info    
     moved_before = information[2]
     moved_scout = information[3]
     final = ""
@@ -204,7 +204,7 @@ def generate_state(state, information):
 
     while not is_valid_state(final):
         # TODO: Conceptuellement elle doit pas etre là cette boucle.
-        # Commencer par assigner les pieces qui ont déjà bouger avant celle qui ont jamais bougé, débile...
+        # Commencer par assigner les pieces qui ont déjà bouger avant celle qui ont jamais bougé...
         final = ""
         i = 0
         piece_left = information[1].copy()
@@ -214,9 +214,8 @@ def generate_state(state, information):
                     proba = [0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0]
                 elif not moved_before[i//10][i%10]:
                     proba = no_info_piece(piece_left)
-                    # Force Flag/Bomb if too few can be
+                    # Force Flag/Bomb if too few can be them
                     if (state_str.count("?") - np.sum(moved_before)) < (information[1][0] + information[1][1] + 2) and np.sum(piece_left[:2]) > 0:
-                        #print("This condition was used")
                         flag = piece_left[0]
                         bomb = piece_left[1]
                         proba = [flag/(flag+bomb), bomb/(flag+bomb), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
@@ -310,7 +309,7 @@ def updating_knowledge(information, state, action):
     return information
 
 def unknown_acc(state, state2):
-    """Check the accuracy for the pieces unknown by comparing the two state piece-wise"""
+    """Check the accuracy for the pieces unknown only by comparing the two states piece-wise"""
     str_partial = str(state.information_state_string(state.current_player()))
     str_state1 = str(state).upper()[:100]
     str_state2 = str(state2).upper()[:100]
@@ -324,7 +323,7 @@ def unknown_acc(state, state2):
     return good/total
 
 def global_accuracy_state(state1, state2):
-    """Check the accuracy for the pieces (ally & ennemy) by comparing the two state piece-wise"""
+    """Check the accuracy for the pieces (ally & ennemy, known or unkown) by comparing the two states piece-wise"""
     str_state1 = str(state1).upper()[:100]
     str_state2 = str(state2).upper()[:100]
     total = 0
@@ -347,17 +346,18 @@ def data_for_games(move, state, generated, evaluator):
         Our_pieces: The number of pieces we have still
         Ennemy_pieces: The number of pieces the ennemy has still ("?" and known pieces)
     """
+    player = state.current_player()
     players_piece = players_pieces()
-    eval_real = round(evaluator.evaluate(state)[state.current_player()], 4)
-    eval_generated = 0 #round(evaluator.evaluate(generated)[state.current_player()], 4)
+    eval_real = round(evaluator.evaluate(state)[player], 4)
+    eval_generated = round(evaluator.evaluate(generated)[player], 4)
     unknow_acc = round(unknown_acc(state, generated), 2)
-    unk_pieces = str(state.information_state_string(state.current_player())).count("?")
+    unk_pieces = str(state.information_state_string(player)).count("?")
     our_pieces = 0
     ennemy_pieces = 0
-    for i in str(generated[:100]).upper():
-        if i in players_piece[state.current_player()]:
+    for i in str(generated)[:100].upper():
+        if i in players_piece[player]:
             our_pieces += 1
-        if i in players_piece[1-state.current_player()]:
+        if i in players_piece[1-player]:
             ennemy_pieces += 1
     print("====================================")
     print("move:", move)

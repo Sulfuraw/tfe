@@ -389,6 +389,22 @@ def generate_state_via_matrix(state, matrix_of_possibilities, information):
     return final
 
 ###############################################################################
+
+#More weight moving forward with game advancement
+                # for move, adv, div in [(25, 50, 20), (75, 40, 20), (200, 30, 10)]:
+                #     if move_of_state > move:
+                #         if player: # player = 1
+                #             score[player] += state_str[:adv].count(self.player_pieces[player][piece_id])/div
+                #         else:
+                #             score[player] += state_str[-adv:].count(self.player_pieces[player][piece_id])/div
+
+# Change way of counting with game advancement
+                # if move_of_state < 200:
+                #     score[player] += nbr_pieces[player][piece_id]*value
+                # else:
+                #     score[player] += nbr_pieces[player][piece_id]
+
+###############################################################################
 def basic_test():
     game = pyspiel.load_game("yorktown")
     bots = [
@@ -450,8 +466,5 @@ pieces = [["M", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L"],
 # print(len("FEBMBEFEEFBGIBHIBEDBGJDDDHCGJGDHDLIFKDDHAA__AA__AAAA__AA__AATPPWRUXPTPSVSOTPPPVSNPQNUTNUSNRQQRQNYNQR r 1"))
 
 state = pyspiel.load_game("yorktown").new_initial_state("FDBMBEFEEFBGIBHIBEDBGJDDDHCGJGDHHLIFKDDAAA__AA__AAAA__AA__AAAAAEAAAAAAAAAAAAAAAAAAAAAANUSNRQQRQNYNQR r 205")
-
-t = customBot.CustomEvaluator().prior(state)
-for i in range(len(t)):
-    print(state.action_to_string(t[i][0]), t[i][1])
-print()
+action = state.legal_actions(state.current_player())[5]
+player = state.current_player()
