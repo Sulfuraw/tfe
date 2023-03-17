@@ -320,6 +320,13 @@ def graph():
 
 # printCharMatrix(state.information_state_string(maximizing_player_id))
 
+# Base state debugged
+# "FEBMBEFEEFBGIBHIBEDBGJDDDHCGJGDHDLIFKDDHAA__AA__AAAA__AA__AASTQPNSQPTSUPWPVRPXPURNQONNQSNVPTNQRRTYUP r 0"
+# Equal state
+# state = game.new_initial_state("FEBMBEFEEFBGIBHIBEDBGJDDDHCGJGDHDLIFKDDHAA__AA__AAAA__AA__AATPPWRUXPTPSVSOTPPPVSNPQNUTNUSNRQQRQNYNQR r 0")
+# Test avec un miner (E) plus devant seul devant les mines du flag
+# state = game.new_initial_state("FDBMBEFEEFBGIBHIBEDBGJDDDHCGJGDHHLIFKDDEAA__AA__AAAA__AA__AAAAAAAAAAAAAAAAAAAAAAAAAAAANUSNRQQRQNYNQR r 205")
+
 ###############################################################################
 
 # Generate the matrix of possibilites / probabilities used for piece generation in the generate_state
@@ -403,6 +410,13 @@ def generate_state_via_matrix(state, matrix_of_possibilities, information):
                 #     score[player] += nbr_pieces[player][piece_id]*value
                 # else:
                 #     score[player] += nbr_pieces[player][piece_id]
+
+# Adapt the max_simulation during the game: Useless-sama ?
+            # We adapt the max_simulation parameter to the advancement of the game:
+            # if move == 0 or move==1:
+            #     bot.set_max_simulations(100)
+            # if move == 50 or move == 51:
+            #     bot.set_max_simulations(2000)
 
 ###############################################################################
 def basic_test():

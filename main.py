@@ -64,20 +64,17 @@ def _init_bot(bot_type, game, player_id):
         return customBot.CustomBot(game, 1.5, 75, customBot.CustomEvaluator(), player_id)
     if bot_type == "rnadBot":
         try:
-            bot = rnadBot.rnadBot().getSavedState("states/state5000.pkl")
-            print("Bot rnad 5000 loaded")
+            bot = rnadBot.rnadBot().getSavedState("states/state.pkl")
+            print("Bot rnad loaded")
             return bot
         except:
-            bot = rnadBot.rnadBot()
-            print("Bot rnad 5000 failed so start a base bot")
-            return bot
+            print("Bot rnad failed to load so load the base rnad bot")
+            return rnadBot.rnadBot()
     raise ValueError("Invalid bot type: %s" % bot_type)
 
 def _play_game(game, bots, game_num):
     """Plays one game."""
-    # "FEBMBEFEEFBGIBHIBEDBGJDDDHCGJGDHDLIFKDDHAA__AA__AAAA__AA__AASTQPNSQPTSUPWPVRPXPURNQONNQSNVPTNQRRTYUP r 0"  # Base state debugged
     state = game.new_initial_state("FEBMBEFEEFBGIBHIBEDBGJDDDHCGJGDHDLIFKDDHAA__AA__AAAA__AA__AATPPWRUXPTPSVSOTPPPVSNPQNUTNUSNRQQRQNYNQR r 0") # Equal state
-    # state = game.new_initial_state("FDBMBEFEEFBGIBHIBEDBGJDDDHCGJGDHHLIFKDDEAA__AA__AAAA__AA__AAAAAAAAAAAAAAAAAAAAAAAAAAAANUSNRQQRQNYNQR r 205") # Test avec un miner (E) plus devant seul devant les mines du flag
     history = []
     allStates = []
 
@@ -91,12 +88,6 @@ def _play_game(game, bots, game_num):
         bot = bots[current_player]
 
         if str(bot) == "customBot":
-            # We adapt the max_simulation parameter to the advancement of the game:
-            # if move == 0 or move==1:
-            #     bot.set_max_simulations(100)
-            # if move == 50 or move == 51:
-            #     bot.set_max_simulations(2000)
-
             start = time.time()
             generated = game.new_initial_state(generate_state(state, bot.information))
             # Test the generate time for anomaly
@@ -122,8 +113,6 @@ def _play_game(game, bots, game_num):
 
     # Game is now done
     returns = state.returns()
-    # print("Game actions:", " ".join(history), "\nReturns:", 
-    #         " ".join(map(str, returns)), "\n# moves:", len(history), "\n")
     print("\nReturns:", 
         " ".join(map(str, returns)), "\n# moves:", len(history))
     for bot in bots:
@@ -179,12 +168,6 @@ auto = False
 
 if __name__ == "__main__":
     # app.run(main)
-    # wrapper(print_board, getGame("Custom1/3"), ["customBot", "random"], auto) # 271 moves
-    # wrapper(print_board, getGame("Custom1/14"), ["customBot", "random"], auto) # 1256 moves, lose
-    # wrapper(print_board, getGame("FullKnown1/30"), ["customBot", "random"], auto)
-    # wrapper(print_board, getGame("FullKnown1/14lose"), ["customBot", "random"], auto)
-    
-    wrapper(print_board, getGame("games/2"), ["customBot", "random"], auto)
+    # wrapper(print_board, getGame("games/2"), ["customBot", "random"], auto)
 
-    # everythingEverywhereAllAtOnce("states/state.pkl", 1000) # 34000, 3sec/step
-    
+    everythingEverywhereAllAtOnce("states/state.pkl", 10000) # 100000, 3sec/step
