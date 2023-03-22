@@ -32,7 +32,7 @@ class basicAIBot(pyspiel.Bot):
                       ['N','X','W','V','U','T','S','R','Q','P','O','Y']]
 
     def __str__(self):
-        return "basicAIBot"
+        return "basicAI"
     
     def valuedRank(self, rank, player):
         if self.ranks[player].count(rank) > 0:
@@ -44,6 +44,7 @@ class basicAIBot(pyspiel.Bot):
         pass
     
     def make_move(self, policy, state):
+        """Random move is chosen, overwrite this function to implement more bots"""
         actions, proba = np.array(policy).T
         actions = actions.astype(int)
         action = np.random.choice(actions, p=proba)

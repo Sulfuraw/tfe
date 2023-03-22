@@ -27,14 +27,14 @@ class asmodeusBot(basicAIBot.basicAIBot):
             self.killScores = {'X' : 1.0 , 'W' : 0.9 , 'V' : 0.8 , 'U' : 0.5, 'T' : 0.5, 'S' : 0.5,  'R' : 0.4, 'Q' : 0.9 , 'P' : 0.6, 'O' : 0.9}
 
     def __str__(self):
-        return "asmodeusBot"
+        return "asmodeus"
 
     def make_move(self, policy, state):
         player_pieces = players_pieces()
         partial_state = state.information_state_string(state.current_player())
         matrix = stateIntoCharMatrix(partial_state)
-        # print("====================================================")
-        # printCharMatrix(partial_state)
+        
+        # Locate all moveable ally piece and all accessible enemy piece
         units = []
         enemies = []
         for i in range(len(matrix)):
@@ -44,24 +44,26 @@ class asmodeusBot(basicAIBot.basicAIBot):
                     units.append([j, i, piece])
                 elif (piece in player_pieces[1-self.player] or piece == '?') and (not piece_protec(matrix, 1-self.player, [i, j], True)):
                     enemies.append([j, i, piece])
+
+        # Check for each combination of unit / enemy if there is a path, and compute the score of this
         moveList = []
         for unit in units:
             for enemy in enemies:
                 path = PathFinder().pathFind((unit[0], unit[1]), (enemy[0], enemy[1]), matrix)
-                # print(unit)
-                # print(enemy)
-                # print(path)
-                
                 if path == False or len(path) <= 0:
                     continue
                 score = self.calculate_score(unit[2], enemy[2])
                 score = float(score / float(len(path) + 1))
                 moveList.append([unit, path, enemy, score])
+        
+        # No path found between the pieces, use a random move then
         if len(moveList) <= 0:
             # sys.stderr.write("NO Moves!\n")
             return super().make_move(policy, state)
         
+        # Sort the moveList list with the score 
         moveList.sort(key = lambda e : e[len(e)-1], reverse=True)
+        # Transform the direction and the base position into the string format
         direction = moveList[0][1][0]
         base = moveList[0][0]
         coord = [base[0], base[1]]
@@ -80,12 +82,14 @@ class asmodeusBot(basicAIBot.basicAIBot):
         action_str = coord_to_action(coord)
         actions, proba = np.array(policy).T
         actions = actions.astype(int)
+        # Find the action that correspond to the string format we found
         for action in actions:
             if state.action_to_string(action) == action_str:
                 return action
         return action
     
     def spy_attack_ms(self, attacker, defender):
+        """"Check that the attacker is a spy and it attack the defender Marshal"""
         if self.player:
             return defender == 'L' and attacker == 'O'
         else:

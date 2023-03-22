@@ -490,4 +490,4 @@ class CustomBot(pyspiel.Bot):
         pass
 
     def __str__(self):
-        return "customBot"
+        return "custom"
