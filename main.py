@@ -15,6 +15,8 @@ from open_spiel.python.bots import uniform_random
 import alphaBeta
 import rnadBot
 import customBot
+import basicAIBot
+import asmodeusBot
 from statework import *
 
 def everythingEverywhereAllAtOnce(filename, iterations):
@@ -62,14 +64,28 @@ def _init_bot(bot_type, game, player_id):
         return alphaBeta.AlphaBetaBot(player_id, game)
     if bot_type == "customBot":
         return customBot.CustomBot(game, 1.5, 75, customBot.CustomEvaluator(), player_id)
-    if bot_type == "rnadBot":
+    if bot_type == "rnad":
         try:
-            bot = rnadBot.rnadBot().getSavedState("states/state.pkl")
+            state = "state.pkl"
+            bot = rnadBot.rnadBot().getSavedState("states/"+state)
             print("Bot rnad loaded")
             return bot
         except:
-            print("Bot rnad failed to load so load the base rnad bot")
+            print("Bot rnad " + state + " failed to load so load the base rnad bot")
             return rnadBot.rnadBot()
+    if bot_type == "rnadBis":
+        try:
+            state = "state51k.pkl"
+            bot = rnadBot.rnadBot().getSavedState("states/"+state)
+            print("Bot rnadBis loaded")
+            return bot
+        except:
+            print("Bot rnad " + state + " failed to load so load the base rnad bot")
+            return rnadBot.rnadBot()
+    if bot_type == "basicAIBot":
+        return basicAIBot.basicAIBot(player_id)
+    if bot_type == "asmodeusBot":
+        return asmodeusBot.asmodeusBot(player_id)
     raise ValueError("Invalid bot type: %s" % bot_type)
 
 def _play_game(game, bots, game_num):
@@ -160,14 +176,13 @@ def main(argv):
     print("Players:", player1, player2)
     print("Overall wins", overall_wins)
 
-player1 = "customBot"
-player2 = "random"
-num_games = 5
+player1 = "basicAIBot"
+player2 = "asmodeusBot"
+num_games = 50
 replay = False
 auto = False
 
 if __name__ == "__main__":
-    # app.run(main)
+    app.run(main)
     # wrapper(print_board, getGame("games/2"), ["customBot", "random"], auto)
-
-    everythingEverywhereAllAtOnce("states/state.pkl", 10000) # 100000, 3sec/step
+    # everythingEverywhereAllAtOnce("states/state.pkl", 10000) # 100000, 3sec/step

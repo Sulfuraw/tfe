@@ -160,6 +160,11 @@ def action_to_coord(action_str):
         returns.append(rocols[pos[i]])
     return returns
 
+def coord_to_action(coord):
+    cols = {0:"a", 1:"b", 2:"c", 3:"d", 4:"e", 5:"f", 6:"g", 7:"h", 8:"i", 9:"k"}
+    rows = {0:"1", 1:"2", 2:"3", 3:"4", 4:"5", 5:"6", 6:"7", 7:"8", 8:"9", 9:":"}
+    return cols[coord[0]] + rows[coord[1]] + cols[coord[2]] + rows[coord[3]]
+
 def is_valid_state(state_str):
     """Verify that the state_str is a valid state, to be used for our generate_state"""
     return (state_str.count("M") == 1 

@@ -51,7 +51,7 @@ class CustomEvaluator():
                 # # make more weight having pieces on the other part of the board, go forward
                 score[player] += (state_str[:40].count(self.player_pieces[player][piece_id]) if player else state_str[-40:].count(self.player_pieces[player][piece_id]))/20
 
-            # TODO: Make more weight to miner to go attack in search of bombs
+            # Make more weight to miner to go attack in search of bombs
             if player:
                 score[player] += 3.0 if self.player_pieces[player][4] in state_str[:50] else 0.0
             else:
@@ -66,7 +66,7 @@ class CustomEvaluator():
             print(state_str)
         return returns    
 
-    # TODO: Test with different n_moves_before with advancement of the game
+    # TODO: Test with different n_moves_before with advancement of the game (move_of_state)
     def evaluate(self, state):
         """Returns evaluation on given state."""
         result = None
@@ -107,7 +107,7 @@ class CustomEvaluator():
         flag = [flag_str_pos//10, flag_str_pos%10]
         man_distance_before = abs(flag[0] - coord[1]) + abs(flag[1] - coord[0])
         man_distance_after = abs(flag[0] - coord[3]) + abs(flag[1] - coord[2])
-        # Categories the weight
+        # Categorize the weight
         value = 21-man_distance_after
         if value < 11: value = 10
         elif value < 16: value = 15
