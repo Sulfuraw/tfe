@@ -25,7 +25,7 @@ class basicAIBot(pyspiel.Bot):
         self.total_ennemies = dicts_of_value[1-player].copy()
         self.total_hidden_allies = dicts_of_value[player].copy()
         self.total_hidden_ennemies = dicts_of_value[1-player].copy()
-        self.last_moved = None
+        self.last_moves = [None, None, None]
 
         #              Bo, Ms  Ge  Co  Mj  Cp  Lt  Sg  Mi  Sc  Sp  Fl
         self.ranks = [['B','L','K','J','I','H','G','F','E','D','C','M'],
@@ -57,6 +57,7 @@ class basicAIBot(pyspiel.Bot):
     def step_with_policy(self, state):
         policy = self.prior(state)
         action = self.make_move(policy, state)
+        self.last_moves = [state.action_to_string(action), self.last_moves[0], self.last_moves[1]]
         return policy, action
     
     def step(self, state):

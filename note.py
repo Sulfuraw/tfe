@@ -4,18 +4,9 @@ from __future__ import print_function
 from open_spiel.python.egt import dynamics
 from open_spiel.python.egt.utils import game_payoffs_array
 import pyspiel
-import collections
-import time
-import pickle
-from curses import wrapper
 from absl import app
 import numpy as np
-from open_spiel.python.bots import human
-from open_spiel.python.bots import uniform_random
-import alphaBeta
-import rnadBot
-import customBot
-from main import _init_bot
+from asmodeusBot import *
 from statework import *
 import pandas as pd
 
@@ -549,66 +540,43 @@ def generate_state_via_matrix(state, matrix_of_possibilities, information):
             #     bot.set_max_simulations(2000)
 
 ###############################################################################
-def basic_test():
-    game = pyspiel.load_game("yorktown")
-    bots = [
-        _init_bot(player1, game, 0),
-        _init_bot(player2, game, 1),
-    ]
-    state = game.new_initial_state("FEBMBEFEEFBGIBHIBEDBGJDDDHCGJGDHDLIFKDDHAA__AA__AAAA__AA__AATPPWRUXPTPSVSOTPPPVSNPQNUTNUSNRQQRQNYNQR r 0") # Equal state
+
+import matplotlib.pyplot as plt
+import seaborn as sns
+import matplotlib.colors as mcolors
+
+def decrypt_benchmark(folder):
+    df = pd.read_csv(folder+"stats.csv")
+    df = df.loc[df['win'] < 2]
+
+    # create a copy of the dataframe with the players switched
+    df_switched = df.copy()
+    df_switched['player1'] = df['player2']
+    df_switched['player2'] = df['player1']
+    df_switched['win'] = 1 - df['win']
+    # concatenate the original and switched dataframes
+    df_concat = pd.concat([df, df_switched], ignore_index=True)
+    # create pivot table with win rate for each pair of bots
+    pt = pd.pivot_table(df_concat, values='win', index='player1', columns='player2', aggfunc='mean')
+
+    # Define the custom color map
+    cmap = mcolors.LinearSegmentedColormap.from_list(name='custom_cmap',
+        colors = ['#bf1f1f', '#c93a3a', '#f46d43', '#fdae61', '#94eb94', '#5cdb5c', '#3bc43b', '#24b324'])
     
-    for i, bot in enumerate(bots):
-        if str(bot) == "customBot":
-            bot.init_knowledge(state)
-    
-    history = []
-    allStates = []
-    allStates.append(stateIntoCharMatrix(state))
+    sns.heatmap(pt, annot=True, cmap=cmap, fmt='.0%')
+    plt.show()
 
-    #while not state.is_terminal():
-    for n in range(10):
-        current_player = state.current_player()
-        bot = bots[current_player]
+    if False: # Satisfying result to see only win percentage in total
+        # calculate win percentages
+        df2 = df.copy()
+        df2['player1_wins'] = np.where(df2['win'] == 1, 1, 0)
+        df2['player2_wins'] = np.where(df2['win'] == 0, 1, 0)
+        df3 = df2.groupby('player1').sum()[['player1_wins', 'player2_wins']]
+        df3['total_games'] = df3.sum(axis=1)
+        df3['win'] = df3['player1_wins'] / df3['total_games']
+        print(df3)
 
-        if str(bot) == "customBot":
-            generated = generate_state(state, bot.information)
-            action = bot.step(game.new_initial_state(generated))
-        else:
-            action = bot.step(state)
-        action_str = state.action_to_string(current_player, action)
-        for i, bot in enumerate(bots):
-            if i != current_player:
-                bot.inform_action(state, current_player, action)
-            if str(bot) == "customBot":
-                bot.update_knowledge(state.clone(), action)
-        history.append(action_str)
-        state.apply_action(action)
-        allStates.append(stateIntoCharMatrix(state))
+decrypt_benchmark("benchmark1-30-March/")
 
-    # Game is now done. Print return for each player
-    returns = state.returns()
-    print("Game actions:", " ".join(history), "\nReturns:", 
-            " ".join(map(str, returns)), "\n# moves:", len(history), "\n")
-    for bot in bots:
-        bot.restart()
-    wrapper(print_board, allStates, bots, auto)
-    return returns, history, allStates
+###############################################################################
 
-player1 = "customBot"
-player2 = "random"
-num_games = 50
-replay = False
-auto = False
-# basic_test()
-
-pieces = [["M", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L"],
-              ["Y", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X"]]
-    # It is:  [Fl,  Bo,   Sp,  Sc,  Mi,  Sg,  Lt,  Cp,  Mj,  Co,  Ge,  Ms]
-    # Nbr     [1,   6,    1,   8,   5,   4,   4,   4,   3,   2,   1,   1]
-
-# print(len("FDBMBEFEEFBGIBHIBEDBGJDDDHCGJGDHHLIFKDDEAA__AA__AAAA__AA__AAAAAAAAAAAAAAAAAAAAAAAAAAAENUSNRQQRQNYNQR r 0"))
-# print(len("FEBMBEFEEFBGIBHIBEDBGJDDDHCGJGDHDLIFKDDHAA__AA__AAAA__AA__AATPPWRUXPTPSVSOTPPPVSNPQNUTNUSNRQQRQNYNQR r 1"))
-
-state = pyspiel.load_game("yorktown").new_initial_state("FDBMBEFEEFBGIBHIBEDBGJDDDHCGJGDHHLIFKDDAAA__AA__AAAA__AA__AAAAAEAAAAAAAAAAAAAAAAAAAAAANUSNRQQRQNYNQR r 205")
-action = state.legal_actions(state.current_player())[5]
-player = state.current_player()

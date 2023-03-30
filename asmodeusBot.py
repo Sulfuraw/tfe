@@ -3,10 +3,7 @@ from __future__ import division
 from __future__ import print_function
 import basicAIBot
 
-import pyspiel
 import numpy as np
-import sys
-import random
 from statework import *
 
 class asmodeusBot(basicAIBot.basicAIBot):
@@ -41,9 +38,9 @@ class asmodeusBot(basicAIBot.basicAIBot):
             for j in range(len(matrix[i])):
                 piece = matrix[i][j]
                 if piece in player_pieces[self.player] and (not piece_protec(matrix, self.player, [i, j], False)) and piece != player_pieces[self.player][0] and piece != player_pieces[self.player][1]:
-                    units.append([j, i, piece])
+                    units.append([i, j, piece])
                 elif (piece in player_pieces[1-self.player] or piece == '?') and (not piece_protec(matrix, 1-self.player, [i, j], True)):
-                    enemies.append([j, i, piece])
+                    enemies.append([i, j, piece])
 
         # Check for each combination of unit / enemy if there is a path, and compute the score of this
         moveList = []
@@ -66,19 +63,19 @@ class asmodeusBot(basicAIBot.basicAIBot):
         # Transform the direction and the base position into the string format
         direction = moveList[0][1][0]
         base = moveList[0][0]
-        coord = [base[0], base[1]]
+        coord = [base[1], base[0]]
         if direction == "UP":
-            coord.append(base[0])
-            coord.append(base[1]-1)
+            coord.append(coord[0])
+            coord.append(coord[1]-1)
         elif direction == "DOWN":
-            coord.append(base[0])
-            coord.append(base[1]+1)
+            coord.append(coord[0])
+            coord.append(coord[1]+1)
         elif direction == "LEFT":
-            coord.append(base[0]-1)
-            coord.append(base[1])
+            coord.append(coord[0]-1)
+            coord.append(coord[1])
         elif direction == "RIGHT":
-            coord.append(base[0]+1)
-            coord.append(base[1])
+            coord.append(coord[0]+1)
+            coord.append(coord[1])
         action_str = coord_to_action(coord)
         actions, proba = np.array(policy).T
         actions = actions.astype(int)
@@ -115,7 +112,7 @@ def piece_protec(matrix, player, coord, ennemy):
     """Check that the piece is surrounded by allies or wall"""
     players_piece = players_pieces()
     protected = True
-    to_check = [(coord[0]+1, coord[1]), (coord[0]-1, coord[1]), (coord[0], coord[1]+1), (coord[0], coord[1]-1)]
+    to_check = [[coord[0]+1, coord[1]], [coord[0]-1, coord[1]], [coord[0], coord[1]+1], [coord[0], coord[1]-1]]
     for pos in to_check:
         if is_valid_coord(pos):
             if ennemy:
@@ -126,50 +123,49 @@ def piece_protec(matrix, player, coord, ennemy):
 
 
 class PathFinder:
-	def __init__(self):
-		self.visited = []
-		pass
+    def __init__(self):
+        self.visited = []
+        pass
 
-	def pathFind(self, start, end, board):
-		if start[0] == end[0] and start[1] == end[1]:
-			# sys.stderr.write("Got to destination!\n")
-			return []
+    def pathFind(self, start, end, board):
+        if start[0] == end[0] and start[1] == end[1]:
+            # sys.stderr.write("Got to destination!\n")
+            return []
 
-		if self.visited.count(start) > 0:
-			# sys.stderr.write("Back track!!\n")
-			return False
-		if start[0] < 0 or start[0] >= len(board) or start[1] < 0 or start[1] >= len(board[start[0]]):
-			# sys.stderr.write("Out of bounds!\n")
-			return False
-		if len(self.visited) > 0 and board[start[0]][start[1]] != "A" and board[start[0]][start[1]] != "_":
-			# sys.stderr.write("Full position!\n")
-			return False
-		
-		self.visited.append(start)
-		left = (start[0]-1, start[1])
-		right = (start[0]+1, start[1])
-		up = (start[0], start[1]-1)
-		down = (start[0], start[1]+1)
-		choices = [left, right, up, down]
-		choices.sort(key = lambda e : (e[0] - end[0])**2.0 + (e[1] - end[1])**2.0 )
-		options = []
-		for point in choices:
-			option = [point, self.pathFind(point,end,board)]
-			if option[1] != False:
-				options.append(option)	
-
-		options.sort(key = lambda e : len(e[1]))
-		if len(options) == 0:
-			# sys.stderr.write("NO options!\n")
-			return False
-		else:
-			if options[0][0] == left:
-				options[0][1].insert(0,"LEFT")
-			elif options[0][0] == right:
-				options[0][1].insert(0,"RIGHT")
-			elif options[0][0] == up:
-				options[0][1].insert(0,"UP")
-			elif options[0][0] == down:
-				options[0][1].insert(0,"DOWN")
-		# sys.stderr.write("PathFind got path " + str(options[0]) + "\n")
-		return options[0][1]
+        if self.visited.count(start) > 0:
+            # sys.stderr.write("Back track!!\n")
+            return False
+        if start[0] < 0 or start[0] >= len(board) or start[1] < 0 or start[1] >= len(board[start[0]]):
+            # sys.stderr.write("Out of bounds!\n")
+            return False
+        if len(self.visited) > 0 and board[start[0]][start[1]] != "A": #and board[start[0]][start[1]] != "_":
+            # sys.stderr.write("Full position!\n")
+            return False
+        
+        self.visited.append(start)
+        left = (start[0], start[1]-1)
+        right = (start[0], start[1]+1)
+        up = (start[0]-1, start[1])
+        down = (start[0]+1, start[1])
+        choices = [left, right, up, down]
+        choices.sort(key = lambda e : (e[0] - end[0])**2.0 + (e[1] - end[1])**2.0 )
+        options = []
+        for point in choices:
+            option = [point, self.pathFind(point,end,board)]
+            if option[1] != False:
+                options.append(option)
+        options.sort(key = lambda e : len(e[1]))
+        if len(options) == 0:
+            # sys.stderr.write("NO options!\n")
+            return False
+        else:
+            if options[0][0] == left:
+                options[0][1].insert(0,"LEFT")
+            elif options[0][0] == right:
+                options[0][1].insert(0,"RIGHT")
+            elif options[0][0] == up:
+                options[0][1].insert(0,"UP")
+            elif options[0][0] == down:
+                options[0][1].insert(0,"DOWN")
+        # sys.stderr.write("PathFind got path " + str(options[0]) + "\n")
+        return options[0][1]

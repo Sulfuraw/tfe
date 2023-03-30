@@ -46,7 +46,7 @@ class CustomEvaluator():
                 score[player] += nbr_pieces[player][piece_id]*value
 
                 # make more weight if flag is protected
-                score[player] += 1 if flag_protec(state, player) else 0
+                # score[player] += 1 if flag_protec(state, player) else 0
 
                 # # make more weight having pieces on the other part of the board, go forward
                 score[player] += (state_str[:40].count(self.player_pieces[player][piece_id]) if player else state_str[-40:].count(self.player_pieces[player][piece_id]))/20
@@ -58,7 +58,7 @@ class CustomEvaluator():
                 score[player] += 3.0 if self.player_pieces[player][4] in state_str[-50:] else 0.0
         returns = [0, 0]
         for player in [0, 1]:
-            returns[player] = ((score[player] - np.sum(nbr_pieces[1-player])/2)-15)/(35-15)   # Re-range with (x - min)/(max-min) with max = 50 min = 0
+            returns[player] = ((score[player] - np.sum(nbr_pieces[1-player])/2)-10)/(30-10)   # Re-range with (x - min)/(max-min)
         # Print for debug
         if returns[0] > 1 or returns[0] < -1 or returns[1] > 1 or returns[1] < -1:
             print("==============================")
@@ -70,8 +70,8 @@ class CustomEvaluator():
     def evaluate(self, state):
         """Returns evaluation on given state."""
         result = None
-        n_rollouts = 9
-        n_moves_before = 30
+        n_rollouts = 7
+        n_moves_before = 20
         move_of_state = int(str(state)[103-len(str(state)):])
         for _ in range(n_rollouts):
             working_state = state.clone()
@@ -137,7 +137,7 @@ class CustomEvaluator():
                 clone.apply_action(action)
                 clone_str = str(clone).upper()
                 arrival_after = clone_str[coord[3]*10 + coord[2]]
-                value = (value + 15) if (start == arrival_after) else (value//3)
+                value = (value + 15) if (start == arrival_after) else (value/3)
 
             sum += value
             prio.append([action, value])

@@ -364,11 +364,11 @@ def data_for_games(move, state, generated, evaluator):
             our_pieces += 1
         if i in players_piece[1-player]:
             ennemy_pieces += 1
-    print("====================================")
-    print("move:", move)
-    print("state:")
-    printCharMatrix(state)
-    print("evaluate:", eval_real)
+    # print("====================================")
+    # print("move:", move)
+    # print("state:")
+    # printCharMatrix(state)
+    # print("evaluate:", eval_real)
     return {'move': [move], 'eval_real': [eval_real], 'eval_generated': [eval_generated], 'unknow_acc': [unknow_acc], 'unk_pieces': [unk_pieces], 'our_pieces': [our_pieces], 'ennemy_pieces': [ennemy_pieces]}
 
 def is_valid_coord(pos):
@@ -388,7 +388,7 @@ def flag_protec(state, player):
             if matrix[i][j] == players_piece[player][0]:
                 coord = [i, j]
     protected = True
-    to_check = [(coord[0]+1, coord[1]), (coord[0]-1, coord[1]), (coord[0], coord[1]+1), (coord[0], coord[1]-1)]
+    to_check = [[coord[0]+1, coord[1]], [coord[0]-1, coord[1]], [coord[0], coord[1]+1], [coord[0], coord[1]-1]]
     for pos in to_check:
         if is_valid_coord(pos):
             protected = protected and (matrix[pos[0]][pos[1]] in players_piece[player])
