@@ -576,7 +576,30 @@ def decrypt_benchmark(folder):
         df3['win'] = df3['player1_wins'] / df3['total_games']
         print(df3)
 
-decrypt_benchmark("benchmark1-30-March/")
+# decrypt_benchmark("benchmark1-30-March/")
 
 ###############################################################################
+
+enemy = [9, 2]
+ally = [7, 2]
+
+directions = {"RIGHT" : enemy[1] - ally[1], "LEFT" : ally[1] - enemy[1], "DOWN" : enemy[0] - ally[0], "UP" : ally[0] - enemy[0]}
+d = sorted(directions.items(), key = lambda e : e[1], reverse = True)
+
+
+direction = d[0][0]
+new_coord = []
+if direction == "UP":
+    new_coord.append(ally[0]-1)
+    new_coord.append(ally[1])
+elif direction == "DOWN":
+    new_coord.append(ally[0]+1)
+    new_coord.append(ally[1])
+elif direction == "LEFT":
+    new_coord.append(ally[0])
+    new_coord.append(ally[1]-1)
+elif direction == "RIGHT":
+    new_coord.append(ally[0])
+    new_coord.append(ally[1]+1)
+print(new_coord)
 

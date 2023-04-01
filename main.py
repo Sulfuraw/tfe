@@ -16,6 +16,7 @@ import rnadBot
 import customBot
 import basicAIBot
 import asmodeusBot
+import hunterBot
 from statework import *
 
 def everythingEverywhereAllAtOnce(filename, iterations):
@@ -70,10 +71,12 @@ def _init_bot(bot_type, game, player_id):
         except:
             print("Bot rnad " + state + " failed to load so load the base rnad bot")
             return rnadBot.rnadBot()
-    if bot_type == "basicAI":
+    if bot_type == "basic":
         return basicAIBot.basicAIBot(player_id)
     if bot_type == "asmodeus":
         return asmodeusBot.asmodeusBot(player_id)
+    if bot_type == "hunter":
+        return hunterBot.hunterBot(player_id)
     raise ValueError("Invalid bot type: %s" % bot_type)
 
 def _play_game(game, bots, game_num):
@@ -83,7 +86,7 @@ def _play_game(game, bots, game_num):
     allStates = []
 
     for i, bot in enumerate(bots):
-        if str(bot) == "custom":
+        if str(bot) == "custom" or str(bot) == "hunter":
             bot.init_knowledge()
 
     move = 0
@@ -101,6 +104,7 @@ def _play_game(game, bots, game_num):
 
         current_player = state.current_player()
         bot = bots[current_player]
+        # if move%100 == 0: printCharMatrix(state)
 
         if str(bot) == "custom":
             start = time.time()
@@ -118,7 +122,7 @@ def _play_game(game, bots, game_num):
         for i, bot in enumerate(bots):
             if i != current_player:
                 bot.inform_action(state, current_player, action)
-            if str(bot) == "custom":
+            if str(bot) == "custom" or str(bot) == "hunter":
                 bot.update_knowledge(state.clone(), action)
 
         history.append(action_str)
@@ -184,8 +188,8 @@ def play_n_games(player1, player2, num_games, replay=False, auto=False):
 
 def benchmark(num_games):
     """With the num_games with 50, effectively each bot will play 100 games versus other bots"""
-    # bots_to_play = ["custom", "basicAI", "asmodeus", "rnad", "mcts"]
-    bots_to_play = ["custom", "asmodeus", "basicAI", "rnad"]
+    # bots_to_play = ["custom", "basic", "asmodeus", "rnad", "mcts"]
+    bots_to_play = ["custom", "asmodeus", "basic", "rnad"]
     for i in range(len(bots_to_play)):
         for j in range(len(bots_to_play)):
             if i != j:
@@ -199,13 +203,13 @@ def benchmark(num_games):
 
 if __name__ == "__main__":
     ###### Launch only n games, params: player1, player2, game_nums, replay, auto
-    # play_n_games("asmodeus", "custom", 3, replay=False, auto=False)
+    play_n_games("basic", "hunter", 5, replay=False, auto=False)
 
-    benchmark(5)
+    # benchmark(5)
 
     ###### Watch a game played
     # player1 = "asmodeus"
-    # player2 = "basicAI"
+    # player2 = "basic"
     # game_num = 0
     # wrapper(print_board, getGame("games/"+player1+"-"+player2+str(game_num)), [player1, player2], auto=False)
 

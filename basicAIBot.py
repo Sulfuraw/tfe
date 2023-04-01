@@ -5,12 +5,12 @@ from __future__ import print_function
 import pyspiel
 import numpy as np
 
-pieces = [["M", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L"],
-          ["Y", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X"]]
-# It is:  [Fl,  Bo,   Sp,  Sc,  Mi,  Sg,  Lt,  Cp,  Mj,  Co,  Ge,  Ms]
-# Nbr     [1,   6,    1,   8,   5,   4,   4,   4,   3,   2,   1,   1]
-{"M":[0, 0], "B":[1, 0], "C":[2, 0], "D":[3, 0], "E":[4, 0], "F":[5, 0], "G":[6, 0], "H":[7, 0], "I":[8, 0], "J":[9, 0], "K":[10, 0], "L":[11, 0],
- "Y":[0, 1], "N":[1, 1], "O":[2, 1], "P":[3, 1], "Q":[4, 1], "R":[5, 1], "S":[6, 1], "T":[7, 1], "U":[8, 1], "V":[9, 1], "W":[10, 1], "X":[11, 1]}
+# pieces = [["M", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L"],
+#           ["Y", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X"]]
+# # It is:  [Fl,  Bo,   Sp,  Sc,  Mi,  Sg,  Lt,  Cp,  Mj,  Co,  Ge,  Ms]
+# # Nbr     [1,   6,    1,   8,   5,   4,   4,   4,   3,   2,   1,   1]
+# {"M":[0, 0], "B":[1, 0], "C":[2, 0], "D":[3, 0], "E":[4, 0], "F":[5, 0], "G":[6, 0], "H":[7, 0], "I":[8, 0], "J":[9, 0], "K":[10, 0], "L":[11, 0],
+#  "Y":[0, 1], "N":[1, 1], "O":[2, 1], "P":[3, 1], "Q":[4, 1], "R":[5, 1], "S":[6, 1], "T":[7, 1], "U":[8, 1], "V":[9, 1], "W":[10, 1], "X":[11, 1]}
 
 class basicAIBot(pyspiel.Bot):
     def __init__(self, player):
@@ -32,7 +32,7 @@ class basicAIBot(pyspiel.Bot):
                       ['N','X','W','V','U','T','S','R','Q','P','O','Y']]
 
     def __str__(self):
-        return "basicAI"
+        return "basic"
     
     def valuedRank(self, rank, player):
         if self.ranks[player].count(rank) > 0:
