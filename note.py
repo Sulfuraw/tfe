@@ -388,23 +388,6 @@ class RandomRolloutEvaluator(Evaluator):
 
 #####################################################################################################
 
-# Print a graph 
-import pandas as pd
-from matplotlib import pyplot as plt
-import matplotlib
-matplotlib.use('TkAgg')
-def graph():
-    df = pd.read_csv('games/0.csv')
-    x = df["move"]
-    y = df["unknow_acc"]
-    plt.plot(x, y)
-    plt.xlabel("Number of moves")
-    plt.ylabel("knowledge accuracy")
-    plt.ylim(0.0, 1.0)
-    plt.show()
-
-#####################################################################################################
-
 # # Debugging asset, printing things for debug
  
 # A mettre dans la fonction generate state
@@ -539,11 +522,34 @@ def generate_state_via_matrix(state, matrix_of_possibilities, information):
             # if move == 50 or move == 51:
             #     bot.set_max_simulations(2000)
 
+#####################################################################################################
+
+# Print a graph 
+import pandas as pd
+from matplotlib import pyplot as plt
+import matplotlib
+matplotlib.use('TkAgg')
+def graph():
+    df = pd.read_csv('games/0.csv')
+    x = df["move"]
+    y = df["unknow_acc"]
+    plt.plot(x, y)
+    plt.xlabel("Number of moves")
+    plt.ylabel("knowledge accuracy")
+    plt.ylim(0.0, 1.0)
+    plt.show()
+
 ###############################################################################
 
 import matplotlib.pyplot as plt
 import seaborn as sns
 import matplotlib.colors as mcolors
+
+# TODO THEN: Modifify the print of the benchmark to take into account ties as lose
+# for both and not win for the other...
+# Cause this was working for when we only had one column 'win' for when the player1 won.
+# Now we have 'win_player1' and 'win_player2', that allow to know when tie happen and
+# so we don't give a win to the other player if there was a tie and not a loss.
 
 def decrypt_benchmark(folder):
     df = pd.read_csv(folder+"stats.csv")

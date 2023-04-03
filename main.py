@@ -161,9 +161,8 @@ def play_n_games(player1, player2, num_games, replay=False, auto=False):
             print("Game Number:", game_num)
 
             saveGame("games/"+player1+"-"+player2+str(game_num), allStates)
-            # TODO: Modify to know when ties are done: 1 if returns[0]==1.0 else 0 if returns[0]==0.0 else -1
-            # TODO THEN: Modifify the print of the benchmark to take into account ties as lose for both and not win for the other...
-            data = {'player1': [player1], 'player2': [player2], 'game_num': [game_num], 'time_taken': [time_taken], 'moves': [move], 'win': 1 if returns[0]==1.0 else 0}
+            # In case of tie, both win_player1 and win_player2 are equal to 0, otherwise the winner is 1, the other is 0
+            data = {'player1': [player1], 'player2': [player2], 'game_num': [game_num], 'time_taken': [time_taken], 'moves': [move], 'win_player1': 1 if returns[0]==1.0 else 0, 'win_player2': 1 if returns[1]==1.0 else 0}
             save_to_csv("./games/stats.csv", data)
             
             histories[" ".join(history)] += 1
@@ -191,7 +190,7 @@ def play_n_games(player1, player2, num_games, replay=False, auto=False):
 def benchmark(num_games):
     """With the num_games with 50, effectively each bot will play 100 games versus other bots"""
     # bots_to_play = ["custom", "basic", "asmodeus", "hunter", "rnad", "mcts"]
-    bots_to_play = ["custom", "asmodeus", "basic", "rnad"]
+    bots_to_play = ["basic", "rnad"]
     for i in range(len(bots_to_play)):
         for j in range(len(bots_to_play)):
             if i != j:
@@ -205,9 +204,9 @@ def benchmark(num_games):
 
 if __name__ == "__main__":
     ###### Launch only n games, params: player1, player2, game_nums, replay, auto
-    play_n_games("mcts", "hunter", 1, replay=False, auto=False)
+    # play_n_games("mcts", "hunter", 1, replay=False, auto=False)
 
-    # benchmark(5)
+    benchmark(5)
 
     ###### Watch a game played
     # player1 = "custom"
