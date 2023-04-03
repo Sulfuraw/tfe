@@ -184,7 +184,7 @@ def play_n_games(player1, player2, num_games, replay=False, auto=False):
     print("Average time till finish:", avg_time_taken)
     print("Players:", player1, player2)
     print("Overall wins", overall_wins)
-    data = {'player1': [player1], 'player2': [player2], 'game_num': [game_num+1], 'time_taken': [avg_time_taken], 'moves': [avg_move], 'win': [int((overall_wins[0]/(game_num+1))*100)]}
+    data = {'player1': [player1], 'player2': [player2], 'game_num': [game_num+1], 'time_taken': [avg_time_taken], 'moves': [avg_move], 'win_player1': [int((overall_wins[0]/(game_num+1))*100)]}
     save_to_csv("./games/stats.csv", data)
 
 def benchmark(num_games):

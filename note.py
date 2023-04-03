@@ -551,7 +551,10 @@ import matplotlib.colors as mcolors
 # Now we have 'win_player1' and 'win_player2', that allow to know when tie happen and
 # so we don't give a win to the other player if there was a tie and not a loss.
 
-def decrypt_benchmark(folder):
+# df = df.loc[df['win'] < 2]  ---->   df = df.loc[df['win_player1'] < 2]
+# Le reste faut tout changer partout avec des win_player1 et win_player2 
+
+def decrypt_benchmark_firstBenchmark(folder):
     df = pd.read_csv(folder+"stats.csv")
     df = df.loc[df['win'] < 2]
 
@@ -582,7 +585,6 @@ def decrypt_benchmark(folder):
         df3['win'] = df3['player1_wins'] / df3['total_games']
         print(df3)
 
-# decrypt_benchmark("benchmark1-30-March/")
 
 ###############################################################################
 
