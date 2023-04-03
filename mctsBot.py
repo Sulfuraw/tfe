@@ -8,143 +8,6 @@ import time
 from statework import *
 
 # Using the Copyright 2019 DeepMind Technologies Limited using modified version of """Monte-Carlo Tree Search algorithm for game play"""
-class CustomEvaluator():
-    def __init__(self):
-        self.piece_to_index = pieces_to_index()
-        self.player_pieces = players_pieces()
-
-    # It is:  [Fl,  Bo,   Sp,  Sc,  Mi,  Sg,  Lt,  Cp,  Mj,  Co,  Ge,  Ms]
-    # Nbr     [1,   6,    1,   8,   5,   4,   4,   4,   3,   2,   1,   1]
-    # TODO: Changé ça en version avec une version [0.1]*12 de base et chaque range au dessus si ya des pieces ennemies de ce rang on fait rang[i-1]*1.45, range[i-1] sinon
-    def value_for_piece(self, ennemy_nbr_pieces):
-        value = np.array([0]*12)
-        for i in range(3, 12):
-            value[i] = np.sum(ennemy_nbr_pieces[2:(i+1)])+2
-        value[0] = 100.0
-        value[1] = np.sum(ennemy_nbr_pieces[2:]) if ennemy_nbr_pieces[4] == 0 else (np.sum(ennemy_nbr_pieces[2:]) - ennemy_nbr_pieces[4])*0.8
-        value[2] = 9.0 if ennemy_nbr_pieces[11] else 1.0
-        value[4] += ennemy_nbr_pieces[1]
-        value = value / np.max(value[1:])
-        returns = []
-        for i in range(12):
-            returns.append((i, value[i]))
-        return returns
-
-    def evaluate_state(self, state, move_of_state):
-        """Returns evaluation on given state."""
-        state_str = str(state)
-
-        nbr_pieces = [[0]*12, [0]*12]
-        for piece in state_str[:100].upper():
-            if piece not in ["A", "_"]:
-                i, player = self.piece_to_index[piece]
-                nbr_pieces[player][i] += 1
-
-        score = [0, 0]
-        for player in [0, 1]:
-            for piece_id, value in self.value_for_piece(nbr_pieces[1-player]):
-                score[player] += nbr_pieces[player][piece_id]*value
-
-                # make more weight if flag is protected
-                # score[player] += 1 if flag_protec(state, player) else 0
-
-                # # make more weight having pieces on the other part of the board, go forward
-                score[player] += (state_str[:40].count(self.player_pieces[player][piece_id]) if player else state_str[-40:].count(self.player_pieces[player][piece_id]))/20
-
-            # Make more weight to miner to go attack in search of bombs
-            if player:
-                score[player] += 3.0 if self.player_pieces[player][4] in state_str[:50] else 0.0
-            else:
-                score[player] += 3.0 if self.player_pieces[player][4] in state_str[-50:] else 0.0
-        returns = [0, 0]
-        for player in [0, 1]:
-            returns[player] = ((score[player] - np.sum(nbr_pieces[1-player])/2)-10)/(30-10)   # Re-range with (x - min)/(max-min)
-        # Print for debug
-        # if returns[0] > 1 or returns[0] < -1 or returns[1] > 1 or returns[1] < -1:
-        #     print("==============================")
-        #     print("Here, the returns were strange:", returns, "\n")
-        #     print(state_str)
-        return returns    
-
-    # TODO: Test with different n_moves_before with advancement of the game (move_of_state)
-    def evaluate(self, state):
-        """Returns evaluation on given state."""
-        result = None
-        n_rollouts = 10
-        n_moves_before = 20
-        move_of_state = int(str(state)[103-len(str(state)):])
-        for _ in range(n_rollouts):
-            working_state = state.clone()
-            i = 0
-            while not working_state.is_terminal() and i < n_moves_before:
-                # We simulate our moves with prior and simulate ennemy move randomly.
-                if (i%2) == 0:
-                    legal_actions = self.prior(working_state)
-                    actions, proba = list(zip(*legal_actions))
-
-                    # Transform proba to delete values below a treshold and help converge the results
-                    proba = np.array(proba)
-                    if np.max(proba) > 0.045 and (move_of_state+i) > 125:
-                        proba[proba <= 0.045] = 0
-                        proba = proba/np.sum(proba)
-
-                    action = np.random.choice(actions, p=proba)
-                else:
-                    action = np.random.choice(working_state.legal_actions())
-                working_state.apply_action(action)
-                i += 1
-            # We sum the returns with terminal*5 if the last state is terminal, the evaluation of the state if it's not
-            returns = np.array(working_state.returns())*5 if working_state.is_terminal() else np.array(self.evaluate_state(working_state, move_of_state+i))
-            result = returns if result is None else result + returns
-        return result / n_rollouts
-
-    def is_forward(self, action, player):
-        _, pos1, _, pos2 = list(action)
-        return pos1 < pos2 if player == 0 else pos1 > pos2
-    
-    def toward_flag(self, state, player, coord):
-        flag_str_pos = str(state).find(players_pieces()[1-player][0])
-        flag = [flag_str_pos//10, flag_str_pos%10]
-        man_distance_before = abs(flag[0] - coord[1]) + abs(flag[1] - coord[0])
-        man_distance_after = abs(flag[0] - coord[3]) + abs(flag[1] - coord[2])
-        # Categorize the weight
-        value = 21-man_distance_after
-        if value < 11: value = 10
-        elif value < 16: value = 15
-        else: value = 20
-        return man_distance_before > man_distance_after, value
-
-    def prior(self, state):
-        """Returns probability for each actions"""
-        # TODO:
-        # Utilisé les probabilités de pièce à un endroit [x,y] et pas uniquement la pièce générée
-        sum = 0.0
-        prio = []
-        player = state.current_player()
-        state_str = str(state).upper()
-        for action in state.legal_actions(player):
-            coord = action_to_coord(state.action_to_string(player, action))
-            # Priorize moving toward the ennemy flag
-            toward_flag = self.toward_flag(state, player, coord)
-            value = toward_flag[1] if toward_flag[0] else 1.0
-
-            # # Prioritize winning attacks / penalize loosing ones
-            arrival = state_str[coord[3]*10 + coord[2]]
-            # Fight
-            if arrival != "A":
-                start = state_str[coord[1]*10 + coord[0]]
-                clone = state.clone()
-                clone.apply_action(action)
-                clone_str = str(clone).upper()
-                arrival_after = clone_str[coord[3]*10 + coord[2]]
-                value = (value + 15) if (start == arrival_after) else (value/3)
-
-            sum += value
-            prio.append([action, value])
-        for i in range(len(prio)):
-            prio[i][1] = prio[i][1]/sum
-        return prio
-
 class SearchNode(object):
     """A node in the search tree.
 
@@ -258,7 +121,37 @@ class SearchNode(object):
     def __str__(self):
         return self.to_str(None)
 
-class CustomBot(pyspiel.Bot):
+class RandomRolloutEvaluator():
+    """A simple evaluator doing random rollouts.
+
+    This evaluator returns the average outcome of playing random actions from the
+    given state until the end of the game.  n_rollouts is the number of random
+    outcomes to be considered.
+    """
+
+    def __init__(self, n_rollouts=5, random_state=None):
+        self.n_rollouts = n_rollouts
+        self._random_state = random_state or np.random.RandomState()
+
+    def evaluate(self, state):
+        """Returns evaluation on given state."""
+        result = None
+        for _ in range(self.n_rollouts):
+            working_state = state.clone()
+            while not working_state.is_terminal():
+                action = self._random_state.choice(working_state.legal_actions())
+                working_state.apply_action(action)
+            returns = np.array(working_state.returns())
+            result = returns if result is None else result + returns
+
+        return result / self.n_rollouts
+
+    def prior(self, state):
+        """Returns equal probability for all actions."""
+        legal_actions = state.legal_actions(state.current_player())
+        return [(action, 1.0 / len(legal_actions)) for action in legal_actions]
+
+class mctsBot(pyspiel.Bot):
     """Bot that uses Monte-Carlo Tree Search algorithm."""
 
     def __init__(self,
@@ -314,7 +207,6 @@ class CustomBot(pyspiel.Bot):
         self._random_state = random_state or np.random.RandomState()
         self._child_selection_fn = child_selection_fn
 
-        # self.matrix_of_possibilities = []
         self.information = []
 
     def set_max_simulations(self, new_value):
@@ -490,4 +382,4 @@ class CustomBot(pyspiel.Bot):
         pass
 
     def __str__(self):
-        return "custom"
+        return "mcts"

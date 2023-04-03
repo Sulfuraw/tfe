@@ -17,6 +17,7 @@ import customBot
 import basicAIBot
 import asmodeusBot
 import hunterBot
+import mctsBot
 from statework import *
 
 def everythingEverywhereAllAtOnce(filename, iterations):
@@ -62,6 +63,8 @@ def _init_bot(bot_type, game, player_id):
         return human.HumanBot()
     if bot_type == "custom":
         return customBot.CustomBot(game, 1.5, 75, customBot.CustomEvaluator(), player_id)
+    if bot_type == "mcts":
+        return mctsBot.mctsBot(game, 1.5, 75, mctsBot.RandomRolloutEvaluator(), player_id)
     if bot_type == "rnad":
         try:
             state = "state.pkl"
@@ -86,7 +89,7 @@ def _play_game(game, bots, game_num):
     allStates = []
 
     for i, bot in enumerate(bots):
-        if str(bot) == "custom" or str(bot) == "hunter":
+        if str(bot) == "custom" or str(bot) == "hunter" or str(bot) == "mcts":
             bot.init_knowledge()
 
     move = 0
@@ -104,9 +107,8 @@ def _play_game(game, bots, game_num):
 
         current_player = state.current_player()
         bot = bots[current_player]
-        # if move%100 == 0: printCharMatrix(state)
 
-        if str(bot) == "custom":
+        if str(bot) == "custom" or str(bot) == "mcts":
             start = time.time()
             generated = game.new_initial_state(generate_state(state, bot.information))
             # Test the generate time for anomaly
@@ -122,7 +124,7 @@ def _play_game(game, bots, game_num):
         for i, bot in enumerate(bots):
             if i != current_player:
                 bot.inform_action(state, current_player, action)
-            if str(bot) == "custom" or str(bot) == "hunter":
+            if str(bot) == "custom" or str(bot) == "hunter" or str(bot) == "mcts":
                 bot.update_knowledge(state.clone(), action)
 
         history.append(action_str)
@@ -188,7 +190,7 @@ def play_n_games(player1, player2, num_games, replay=False, auto=False):
 
 def benchmark(num_games):
     """With the num_games with 50, effectively each bot will play 100 games versus other bots"""
-    # bots_to_play = ["custom", "basic", "asmodeus", "rnad", "mcts"]
+    # bots_to_play = ["custom", "basic", "asmodeus", "hunter", "rnad", "mcts"]
     bots_to_play = ["custom", "asmodeus", "basic", "rnad"]
     for i in range(len(bots_to_play)):
         for j in range(len(bots_to_play)):
@@ -198,18 +200,18 @@ def benchmark(num_games):
                 print(player1 + " VS " + player2 + ": Begin")
                 play_n_games(player1, player2, num_games)
                 print(player1 + " VS " + player2 + ": Finished")
-    print("Banchmark finished its execution, congratulation !")
+    print("Benchmark finished its execution, congratulation !")
     
 
 if __name__ == "__main__":
     ###### Launch only n games, params: player1, player2, game_nums, replay, auto
-    play_n_games("basic", "hunter", 5, replay=False, auto=False)
+    play_n_games("mcts", "hunter", 1, replay=False, auto=False)
 
     # benchmark(5)
 
     ###### Watch a game played
-    # player1 = "asmodeus"
-    # player2 = "basic"
+    # player1 = "custom"
+    # player2 = "hunter"
     # game_num = 0
     # wrapper(print_board, getGame("games/"+player1+"-"+player2+str(game_num)), [player1, player2], auto=False)
 

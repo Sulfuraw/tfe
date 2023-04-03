@@ -6,32 +6,7 @@ from __future__ import print_function
 import basicAIBot
 import numpy as np
 from statework import *
-
-def OppositeDirection(direction):
-    if direction == "UP":
-        return "DOWN"
-    elif direction == "DOWN":
-        return "UP"
-    elif direction == "LEFT":
-        return "RIGHT"
-    elif direction == "RIGHT":
-        return "LEFT"
-    else:
-        assert(False)
-    return "ERROR"
-
-def piece_protec(matrix, player, coord, ennemy):
-    """Check that the piece is surrounded by allies or wall"""
-    players_piece = players_pieces()
-    protected = True
-    to_check = [[coord[0]+1, coord[1]], [coord[0]-1, coord[1]], [coord[0], coord[1]+1], [coord[0], coord[1]-1]]
-    for pos in to_check:
-        if is_valid_coord(pos):
-            if ennemy:
-                protected = protected and (matrix[pos[0]][pos[1]] in players_piece[player] or matrix[pos[0]][pos[1]] == "?")
-            else:
-                protected = protected and (matrix[pos[0]][pos[1]] in players_piece[player])
-    return protected
+import time
 
 class hunterBot(basicAIBot.basicAIBot):
     """ Implementation with only a max-depth of 1 
@@ -62,28 +37,35 @@ class hunterBot(basicAIBot.basicAIBot):
         self.information = updating_knowledge(self.information, state, action)
     
     def make_move(self, policy, state):
-        # Can do by scanning too if needed, still 1 for the moment
-        # if len(self.units) < 20:
-        #     self.maxdepth = 1
-        bestMove = self.BestMove(policy, state, self.maxdepth)
-        if bestMove == None:
-            return super().MakeMove(policy, state)
-        
-        direction = bestMove[2][0] # ['UP'][0] fe
-        coord = [bestMove[3][1], bestMove[3][0]] # [6, 5, 'U'][1] or [0] fe  
-        if direction == "UP":
-            coord.append(coord[0])
-            coord.append(coord[1]-1)
-        elif direction == "DOWN":
-            coord.append(coord[0])
-            coord.append(coord[1]+1)
-        elif direction == "LEFT":
-            coord.append(coord[0]-1)
-            coord.append(coord[1])
-        elif direction == "RIGHT":
-            coord.append(coord[0]+1)
-            coord.append(coord[1])
-        action_str = coord_to_action(coord)
+        i = 0
+        found = False
+        bestMoveList = self.BestMove(policy, state, self.maxdepth)
+        # Modification to forbid to do the two cases forbidden move: Going back and forth between two positions
+        while not found and i < len(bestMoveList):
+            bestMove = bestMoveList[i]
+            if bestMove == None:
+                return super().MakeMove(policy, state)
+            
+            direction = bestMove[2][0] # ['UP'][0] fe
+            coord = [bestMove[3][1], bestMove[3][0]] # [6, 5, 'U'][1] or [0] fe  
+            if direction == "UP":
+                coord.append(coord[0])
+                coord.append(coord[1]-1)
+            elif direction == "DOWN":
+                coord.append(coord[0])
+                coord.append(coord[1]+1)
+            elif direction == "LEFT":
+                coord.append(coord[0]-1)
+                coord.append(coord[1])
+            elif direction == "RIGHT":
+                coord.append(coord[0]+1)
+                coord.append(coord[1])
+            action_str = coord_to_action(coord)
+            # Use the last_moves list of 5 last moves done to take the next best move if the current one participate in the forbidden move
+            if action_str == self.last_moves[1] and self.last_moves[1] == self.last_moves[3] and self.last_moves[0] == self.last_moves[2]:
+                i += 1
+            else:
+                found = True
         actions, proba = np.array(policy).T
         actions = actions.astype(int)
         # Find the action that correspond to the string format we found
@@ -92,28 +74,18 @@ class hunterBot(basicAIBot.basicAIBot):
                 return action
         return action
     
-    def PositionLegal(self, x, y, unit = None):
-        # TODO: Reverified the calls because it can be "?" too
+    def PositionLegal(self, x, y, matrix, unit = None):
         if x >= 0 and x < 10 and y >= 0 and y < 10:
             if unit == None:
                 return True
             else:
                 player_of_unit = self.piece_to_index[unit[2]][1]
-                return self.board[x][y] == "A" or self.board[x][y] in self.player_pieces[1-player_of_unit]
-                # return self.board[x][y] == None or self.board[x][y].colour == oppositeColour(unit.colour)
+                return matrix[x][y] == "A" or matrix[x][y] in self.player_pieces[1-player_of_unit]
         else:
             return False        
 
     def BestMove(self, policy, state, maxdepth = 1):
         moveList = []
-
-        # if maxdepth < self.maxdepth:
-        #     #sys.stderr.write("Recurse!\n")
-        #     considerAllies = self.recursiveConsider["allies"]
-        #     considerEnemies = self.recursiveConsider["enemies"]
-        # else:
-        #     considerAllies = len(self.units)+1
-        #     considerEnemies = len(self.enemyUnits)+1
 
         partial_state = state.information_state_string(state.current_player())
         matrix = stateIntoCharMatrix(partial_state)
@@ -138,42 +110,54 @@ class hunterBot(basicAIBot.basicAIBot):
             if desiredMove[0] == "NO_MOVE" or desiredMove[2] == None:
                 desiredMove[1] = -2.0
 
+        # If maxdepth was higher than 1, then this normalization would work
         for desiredMove in moveList:
             if desiredMove[1] > 0.0:
                 desiredMove[1] = desiredMove[1] / float(len(desiredMove[2]))
+        # But we recalculate it another way (Changes done by me)
+        for desiredMove in moveList:
+            if desiredMove[1] > 0.0 and desiredMove[6] != 0:
+                desiredMove[1] = desiredMove[1] / float(desiredMove[6])
+        # Check that it wants to retreat, if it's chosen and doesnt get away from the enemy, then we cancel it
+        for desiredMove in moveList:
+            if desiredMove[5] == "RETREAT":
+                direction = desiredMove[2][0]
+                ally = desiredMove[3]
+                enemy = desiredMove[4]
+                new_pos = new_position(ally[0], ally[1], direction)
+                man_distance_before = abs(enemy[0] - ally[0]) + abs(enemy[1] - ally[1])
+                man_distance_after = abs(enemy[0] - new_pos[0]) + abs(enemy[1] - new_pos[1])
+                if man_distance_before >= man_distance_after or man_distance_before > 3:
+                    desiredMove[1] = -2.0
         
         if len(moveList) <= 0:
             return None
-        moveList.sort(key = lambda e : e[1], reverse = True)            
-        return moveList[0]
+        moveList.sort(key = lambda e : e[1], reverse = True)
+        # print("=====================================")
+        printCharMatrix(state)
+        # print(moveList[:10])
+        return moveList
     
 
     def DesiredMove(self, ally, enemy, matrix):
         """ Determine desired move of allied piece, towards or away from enemy, with score value """
         scaleFactor = 1.0
-        # Les ally.rank sont remplacé par des ally[2]
-        # 'F' ici est remplacé par self.player_pieces[self.player][0]
-        # 'B' pareil mais [1]
-        if ally[2] == self.player_pieces[self.player][0] or ally[2] == self.player_pieces[self.player][1]:
-            return ["NO_MOVE", 0, None, ally, enemy]
+        # [Changes done by me]
+        path = PathFinder().pathFind((ally[0], ally[1]), (enemy[0], enemy[1]), matrix)
+        man_distance = abs(enemy[0] - ally[0]) + abs(enemy[1] - ally[1])
+        if ally[2] == self.player_pieces[self.player][0] or ally[2] == self.player_pieces[self.player][1] or path == False or len(path) <= 0: #or man_distance < len(path)/3:
+            return ["NO_MOVE", 0, None, ally, enemy, 'NO_MOVE', 0]
         
         actionScores = {"ATTACK" : 0, "RETREAT" : 0}
-        # enemy.rank -> enemy[2]
         if enemy[2] == '?':
             for i in range(0, len(self.ranks[1-self.player])):
-                # ranks -> self.ranks[1-self.player]
                 prob = self.rankProbability(enemy, self.ranks[1-self.player][i])
                 if prob > 0:
                     desiredAction = self.DesiredAction(ally, self.ranks[1-self.player][i])
                     actionScores[desiredAction[0]] += prob * (desiredAction[1] / 2.0)
-            # enemy.positions <= 1 -> signifie, cette pièce a jamais bougé
-            #                      -> not self.information[2][enemy[0]][enemy[1]]
-            # ally.rand != '8' -> ally[3] != self.player_pieces[1-self.player][5]
-            if not self.information[2][enemy[0]][enemy[1]] and ally[2] != self.player_pieces[1-self.player][5]:
-                # valuedRank(ally.rank) -> self.valuedRank(ally[2], self.player)
-                # valuedRank('1') -> self.valuedRank(self.player_pieces[1-self.player][11], 1-self.player)
+            if not self.information[2][enemy[0]][enemy[1]] and ally[2] != self.player_pieces[1-self.player][4]:
                 scaleFactor *= (1.0 - float(self.valuedRank(ally[2], self.player)) / float(self.valuedRank(self.player_pieces[1-self.player][11], 1-self.player)))**2.0
-            elif self.information[2][enemy[0]][enemy[1]] and ally[2] != self.player_pieces[1-self.player][5]:
+            elif self.information[2][enemy[0]][enemy[1]] and ally[2] == self.player_pieces[1-self.player][4]:
                 scaleFactor *= 0.05
         else:
             desiredAction = self.DesiredAction(ally, enemy[2])
@@ -181,9 +165,7 @@ class hunterBot(basicAIBot.basicAIBot):
 
         desiredAction = sorted(actionScores.items(), key = lambda e : e[1], reverse = True)[0]
         direction = None
-        # Before it was like beneath but we exchanged x and y, so inverse 0 and 1 position from this
-        # directions = {"RIGHT" : enemy.x - ally.x, "LEFT" : ally.x - enemy.x, "DOWN" : enemy.y - ally.y, "UP" : ally.y - enemy.y}
-        directions = {"RIGHT" : enemy[1] - ally[1], "LEFT" : ally[1] - enemy[1], "DOWN" : enemy[0] - ally[0], "UP" : ally[0] - enemy[0]}
+        directions = {"UP" : ally[0] - enemy[0], "DOWN" : enemy[0] - ally[0], "RIGHT" : enemy[1] - ally[1], "LEFT" : ally[1] - enemy[1]}
         if desiredAction[0] == "RETREAT":
             for key in directions.keys():
                 directions[key] = -directions[key]
@@ -191,17 +173,21 @@ class hunterBot(basicAIBot.basicAIBot):
         while direction == None:
             d = sorted(directions.items(), key = lambda e : e[1], reverse = True)
             p = new_position(ally[0], ally[1], d[0][0])
-            if self.PositionLegal(p[0], p[1]) and (matrix[p[0]][p[1]] == "A" or matrix[p[0]][p[1]] == enemy[2]):
+            if self.PositionLegal(p[0], p[1], matrix) and (matrix[p[0]][p[1]] == "A" or matrix[p[0]][p[1]] == enemy[2]):
                 direction = d[0][0]
                 scaleFactor *= (1.0 - float(max(d[0][1], 0.0)) / 10.0)**2.0
             else:
                 del directions[d[0][0]]
                 if len(directions.keys()) <= 0:
                     break 
-
         if direction == None:
-            return ["NO_MOVE", 0, [], ally, enemy]
-        return [str(ally[0]) + " " + str(ally[1]) + " " + direction, desiredAction[1], [direction], ally, enemy]
+            return ["NO_MOVE", 0, None, ally, enemy, 'NO_MOVE', 0]
+        path_direction = path[0]
+        # [Changes done by me]
+        if desiredAction[0]=="ATTACK" and path_direction != direction:
+            # scaleFactor *= 0.5
+            return [str(ally[0]) + " " + str(ally[1]) + " " + path_direction, desiredAction[1]*scaleFactor, [path_direction], ally, enemy, desiredAction[0], man_distance, path_direction]
+        return [str(ally[0]) + " " + str(ally[1]) + " " + direction, desiredAction[1]*scaleFactor, [direction], ally, enemy, desiredAction[0], man_distance, path_direction]
 
 
     def DesiredAction(self, ally, enemyRank):
@@ -233,7 +219,12 @@ class hunterBot(basicAIBot.basicAIBot):
     def rankProbability(self, target, targetRank):
         if target[2] == targetRank:
             return 1.0
-        elif target[2] != '?':
+        if target[2] != '?':
+            return 0.0
+        # Because of the way we store information, the scout may be in this case too if he moved like that before
+        if self.information[3][target[0]][target[1]] and targetRank == self.player_pieces[1-self.player][3]:
+            return 1.0
+        if not self.information[3][target[0]][target[1]] and targetRank == self.player_pieces[1-self.player][3]:
             return 0.0
         
         target_rank_index = self.ranks[1-self.player].index(targetRank)
@@ -241,19 +232,7 @@ class hunterBot(basicAIBot.basicAIBot):
             return float(moved_piece(self.information[1])[target_rank_index])
         else:
             return float(no_info_piece(self.information[1])[target_rank_index])
-        # total = 0.0
-        # for rank in self.ranks:
-        #     if rank == 'F' or rank == 'B':
-        #         if target.lastMoved < 0:
-        #             total += self.hiddenEnemies[rank]
-        #     else:
-        #         total += self.hiddenEnemies[rank]
-
-        # if total == 0.0:
-        #     return 0.0
-        # return float(float(self.hiddenEnemies[targetRank]) / float(total))
-     
-
+ 
 
 def new_position(x, y, direction):
     """ Return the new position of a piece after a move 
@@ -270,3 +249,78 @@ def new_position(x, y, direction):
         return [x, y + 1]
     else:
         return [x, y]
+    
+def OppositeDirection(direction):
+    if direction == "UP":
+        return "DOWN"
+    elif direction == "DOWN":
+        return "UP"
+    elif direction == "LEFT":
+        return "RIGHT"
+    elif direction == "RIGHT":
+        return "LEFT"
+    else:
+        assert(False)
+    return "ERROR"
+
+def piece_protec(matrix, player, coord, ennemy):
+    """Check that the piece is surrounded by allies or wall"""
+    players_piece = players_pieces()
+    protected = True
+    to_check = [[coord[0]+1, coord[1]], [coord[0]-1, coord[1]], [coord[0], coord[1]+1], [coord[0], coord[1]-1]]
+    for pos in to_check:
+        if is_valid_coord(pos):
+            if ennemy:
+                protected = protected and (matrix[pos[0]][pos[1]] in players_piece[player] or matrix[pos[0]][pos[1]] == "?")
+            else:
+                protected = protected and (matrix[pos[0]][pos[1]] in players_piece[player])
+    return protected
+
+class PathFinder:
+    def __init__(self):
+        self.visited = []
+        pass
+
+    def pathFind(self, start, end, board):
+        if start[0] == end[0] and start[1] == end[1]:
+            # sys.stderr.write("Got to destination!\n")
+            return []
+
+        if self.visited.count(start) > 0:
+            # sys.stderr.write("Back track!!\n")
+            return False
+        if start[0] < 0 or start[0] >= len(board) or start[1] < 0 or start[1] >= len(board[start[0]]):
+            # sys.stderr.write("Out of bounds!\n")
+            return False
+        if len(self.visited) > 0 and board[start[0]][start[1]] != "A": #and board[start[0]][start[1]] != "_":
+            # sys.stderr.write("Full position!\n")
+            return False
+        
+        self.visited.append(start)
+        left = (start[0], start[1]-1)
+        right = (start[0], start[1]+1)
+        up = (start[0]-1, start[1])
+        down = (start[0]+1, start[1])
+        choices = [left, right, up, down]
+        choices.sort(key = lambda e : (e[0] - end[0])**2.0 + (e[1] - end[1])**2.0 )
+        options = []
+        for point in choices:
+            option = [point, self.pathFind(point,end,board)]
+            if option[1] != False:
+                options.append(option)
+        options.sort(key = lambda e : len(e[1]))
+        if len(options) == 0:
+            # sys.stderr.write("NO options!\n")
+            return False
+        else:
+            if options[0][0] == left:
+                options[0][1].insert(0,"LEFT")
+            elif options[0][0] == right:
+                options[0][1].insert(0,"RIGHT")
+            elif options[0][0] == up:
+                options[0][1].insert(0,"UP")
+            elif options[0][0] == down:
+                options[0][1].insert(0,"DOWN")
+        # sys.stderr.write("PathFind got path " + str(options[0]) + "\n")
+        return options[0][1]
+    
