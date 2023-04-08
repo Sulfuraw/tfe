@@ -73,8 +73,8 @@ class CustomEvaluator():
     def evaluate(self, state):
         """Returns evaluation on given state."""
         result = None
-        n_rollouts = 5 # 10
-        n_moves_before = 10 # 20
+        n_rollouts = 10 # 10
+        n_moves_before = 20 # 20
         move_of_state = int(str(state)[103-len(str(state)):])
         for _ in range(n_rollouts):
             working_state = state.clone()
@@ -97,7 +97,7 @@ class CustomEvaluator():
                 working_state.apply_action(action)
                 i += 1
             # We sum the returns with terminal*5 if the last state is terminal, the evaluation of the state if it's not
-            returns = np.array(working_state.returns())*5 if working_state.is_terminal() else np.array(self.evaluate_state(working_state, move_of_state+i))
+            returns = np.array(working_state.returns())*40 if working_state.is_terminal() else np.array(self.evaluate_state(working_state, move_of_state+i))
             result = returns if result is None else result + returns
         return result / n_rollouts
 

@@ -133,9 +133,6 @@ class hunterBot(basicAIBot.basicAIBot):
         if len(moveList) <= 0:
             return None
         moveList.sort(key = lambda e : e[1], reverse = True)
-        # print("=====================================")
-        printCharMatrix(state)
-        # print(moveList[:10])
         return moveList
     
 

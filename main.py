@@ -221,7 +221,7 @@ def benchmark(num_games):
 def evaluate_bot(bot, num_games):
     """Evaluate the bot against all the other bots"""
     # bots_to_play = ["custom", "asmodeus", "hunter", "rnad", "mcts"]
-    bots_to_play = ["basic", "asmodeus", "hunter", "rnad"]
+    bots_to_play = ["basic", "asmodeus", "hunter", "rnad", "mcts"]
     win = 0
     for i in range(len(bots_to_play)):
         player2 = bots_to_play[i]
@@ -230,16 +230,16 @@ def evaluate_bot(bot, num_games):
         data = play_n_games(player1, player2, num_games)
         print("Winrate VS " + player2 + ":", data["win_1"][0], "%")
         win += data["win_1"][0]
-    win = int(win/(num_games*len(bots_to_play)))
+    win = int(win/len(bots_to_play))
     print("Total winrate of the bot:", win)
     print("Evaluation finished its execution, congratulation !")
     
 
 if __name__ == "__main__":
     ###### Launch only n games, params: player1, player2, game_nums, replay, auto
-    play_n_games("custom", "hunter", 1, replay=False, auto=False)
+    # play_n_games("custom", "hunter", 1, replay=False, auto=False)
 
-    # evaluate_bot("custom", 5)
+    evaluate_bot("custom", 3)
 
     # benchmark(5)
 

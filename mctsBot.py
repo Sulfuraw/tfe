@@ -219,7 +219,7 @@ class mctsBot(pyspiel.Bot):
         self.information = [self.player_id, nbr_piece_left, moved_before, moved_scout]
 
     def update_knowledge(self, state, action):
-        self.information = updating_knowledge(self.information, state, action)
+        updating_knowledge(self.information, state, action)
 
     def step_with_policy(self, state):
         """Returns bot's policy and action at given state."""
