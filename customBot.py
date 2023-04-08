@@ -49,7 +49,10 @@ class CustomEvaluator():
                 # score[player] += 1 if flag_protec(state, player) else 0
 
                 # # make more weight having pieces on the other part of the board, go forward
-                score[player] += (state_str[:40].count(self.player_pieces[player][piece_id]) if player else state_str[-40:].count(self.player_pieces[player][piece_id]))/20
+                if player:
+                    score[player] += state_str[:40].count(self.player_pieces[player][piece_id])/20
+                else: 
+                    score[player] += state_str[-40:].count(self.player_pieces[player][piece_id])/20
 
             # Make more weight to miner to go attack in search of bombs
             if player:
@@ -58,7 +61,7 @@ class CustomEvaluator():
                 score[player] += 3.0 if self.player_pieces[player][4] in state_str[-50:] else 0.0
         returns = [0, 0]
         for player in [0, 1]:
-            returns[player] = ((score[player] - np.sum(nbr_pieces[1-player])/2)-10)/(30-10)   # Re-range with (x - min)/(max-min)
+            returns[player] = score[player] - np.sum(nbr_pieces[1-player])/2   # Re-range with (x - min)/(max-min)
         # Print for debug
         # if returns[0] > 1 or returns[0] < -1 or returns[1] > 1 or returns[1] < -1:
         #     print("==============================")
@@ -70,8 +73,8 @@ class CustomEvaluator():
     def evaluate(self, state):
         """Returns evaluation on given state."""
         result = None
-        n_rollouts = 10
-        n_moves_before = 20
+        n_rollouts = 5 # 10
+        n_moves_before = 10 # 20
         move_of_state = int(str(state)[103-len(str(state)):])
         for _ in range(n_rollouts):
             working_state = state.clone()
@@ -84,7 +87,7 @@ class CustomEvaluator():
 
                     # Transform proba to delete values below a treshold and help converge the results
                     proba = np.array(proba)
-                    if np.max(proba) > 0.045 and (move_of_state+i) > 125:
+                    if np.max(proba) > 0.045 and (move_of_state+i) > 100:
                         proba[proba <= 0.045] = 0
                         proba = proba/np.sum(proba)
 
@@ -267,38 +270,20 @@ class CustomBot(pyspiel.Bot):
                 max_simulations,
                 evaluator,
                 player_id,
-                solve=True,
-                random_state=None,
                 child_selection_fn=SearchNode.uct_value,
-                dirichlet_noise=None,
-                verbose=False):
+                dirichlet_noise=None):
         """Initializes a MCTS Search algorithm in the form of a bot.
 
-        In multiplayer games, or non-zero-sum games, the players will play the
-        greedy strategy.
-
-        Args:
-        game: A pyspiel.Game to play.
         uct_c: The exploration constant for UCT.
         max_simulations: How many iterations of MCTS to perform. Each simulation
             will result in one call to the evaluator. Memory usage should grow
-            linearly with simulations * branching factor. How many nodes in the
-            search tree should be evaluated. This is correlated with memory size and
-            tree depth.
-        evaluator: A `Evaluator` object to use to evaluate a leaf node.
-        solve: Whether to back up solved states.
-        random_state: An optional numpy RandomState to make it deterministic.
+            linearly with simulations * branching factor.
         child_selection_fn: A function to select the child in the descent phase.
             The default is UCT.
         dirichlet_noise: A tuple of (epsilon, alpha) for adding dirichlet noise to
             the policy at the root. This is from the alpha-zero paper.
-        verbose: Whether to print information about the search tree before
-            returning the action. Useful for confirming the search is working
-            sensibly.
 
-        Raises:
-        ValueError: if the game type isn't supported:
-        game.get_type().reward_model != pyspiel.GameType.RewardModel.TERMINAL and game.get_type().dynamics != pyspiel.GameType.Dynamics.SEQUENTIAL
+        ValueError if game.get_type().reward_model != pyspiel.GameType.RewardModel.TERMINAL and game.get_type().dynamics != pyspiel.GameType.Dynamics.SEQUENTIAL
         """
         pyspiel.Bot.__init__(self)
 
@@ -307,15 +292,17 @@ class CustomBot(pyspiel.Bot):
         self.max_simulations = max_simulations
         self.evaluator = evaluator
         self.player_id = player_id
-        self.verbose = verbose
-        self.solve = solve
+        self.verbose = False # Whether to print information about the search tree before returning the action
+        self.solve = True # Whether to back up solved states.
         self.max_utility = game.max_utility()
         self._dirichlet_noise = dirichlet_noise
-        self._random_state = random_state or np.random.RandomState()
+        self._random_state = None or np.random.RandomState() # An optional numpy RandomState to make it deterministic.
         self._child_selection_fn = child_selection_fn
 
-        # self.matrix_of_possibilities = []
         self.information = []
+
+    def __str__(self):
+        return "custom"
 
     def set_max_simulations(self, new_value):
         self.max_simulations = new_value
@@ -327,10 +314,9 @@ class CustomBot(pyspiel.Bot):
         self.information = [self.player_id, nbr_piece_left, moved_before, moved_scout]
 
     def update_knowledge(self, state, action):
-        self.information = updating_knowledge(self.information, state, action)
+        updating_knowledge(self.information, state, action)
 
-    def step_with_policy(self, state):
-        """Returns bot's policy and action at given state."""
+    def step(self, state):
         t1 = time.time()
         root = self.mcts_search(state)
 
@@ -352,13 +338,9 @@ class CustomBot(pyspiel.Bot):
 
         mcts_action = best.action
 
-        policy = [(action, (1.0 if action == mcts_action else 0.0))
-                for action in state.legal_actions(state.current_player())]
-
-        return policy, mcts_action
-
-    def step(self, state):
-        return self.step_with_policy(state)[1]
+        # policy = [(action, (1.0 if action == mcts_action else 0.0))
+        #         for action in state.legal_actions(state.current_player())]
+        return mcts_action
 
     def _apply_tree_policy(self, root, state):
         """Applies the UCT policy to play the game until reaching a leaf node.
@@ -387,14 +369,15 @@ class CustomBot(pyspiel.Bot):
                     noise = self._random_state.dirichlet([alpha] * len(legal_actions))
                     legal_actions = [(a, (1 - epsilon) * p + epsilon * n)
                                 for (a, p), n in zip(legal_actions, noise)]
-                # Reduce bias from move generation order.
+                # Reduce bias from move generation order
+                # TODO: Verify that we can disable this because we have a prior
                 self._random_state.shuffle(legal_actions)
                 player = working_state.current_player()
                 current_node.children = [
                     SearchNode(action, player, prior) for action, prior in legal_actions
                 ]
 
-            # Otherwise (not chance node) choose node with largest UCT value
+            # Choose node with largest UCT value
             chosen_child = max(current_node.children,
                     key=lambda c: self._child_selection_fn(  # pylint: disable=g-long-lambda
                         c, current_node.explore_count, self.uct_c))
@@ -408,8 +391,7 @@ class CustomBot(pyspiel.Bot):
     def mcts_search(self, state):
         """A vanilla Monte-Carlo Tree Search algorithm.
 
-        This algorithm searches the game tree from the given state.
-        At the leaf, the evaluator is called if the game state is not terminal.
+        From state, search tree and at leaf, evaluator is called (if not terminal)
         A total of max_simulations states are explored.
 
         At every node, the algorithm chooses the action with the highest PUCT value,
@@ -423,26 +405,7 @@ class CustomBot(pyspiel.Bot):
         At the end of the search, the chosen action is the action that has been
         explored most often. This is the action that is returned.
 
-        This implementation supports sequential n-player games, with or without
-        chance nodes. All players maximize their own reward and ignore the other
-        players' rewards. This corresponds to max^n for n-player games. It is the
-        norm for zero-sum games, but doesn't have any special handling for
-        non-zero-sum games. It doesn't have any special handling for imperfect
-        information games.
-
-        The implementation also supports backing up solved states, i.e. MCTS-Solver.
-        The implementation is general in that it is based on a max^n backup (each
-        player greedily chooses their maximum among proven children values, or there
-        exists one child whose proven value is game.max_utility()), so it will work
-        for multiplayer, general-sum, and arbitrary payoff games (not just win/loss/
-        draw games). Also chance nodes are considered proven only if all children
-        have the same value.
-
-        Arguments:
-        state: pyspiel.State object, state to search from
-
-        Returns:
-        The most visited move from the root node.
+        Returns: The most visited move from the root node.
         """
         root = SearchNode(None, state.current_player(), 0)
         for _ in range(self.max_simulations):
@@ -485,9 +448,4 @@ class CustomBot(pyspiel.Bot):
             if root.outcome is not None:
                 break
         return root
-
-    def restart_at(self, state):
-        pass
-
-    def __str__(self):
-        return "custom"
+    

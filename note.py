@@ -588,26 +588,27 @@ def decrypt_benchmark_firstBenchmark(folder):
 
 ###############################################################################
 
-enemy = [9, 2]
-ally = [7, 2]
-
-directions = {"RIGHT" : enemy[1] - ally[1], "LEFT" : ally[1] - enemy[1], "DOWN" : enemy[0] - ally[0], "UP" : ally[0] - enemy[0]}
-d = sorted(directions.items(), key = lambda e : e[1], reverse = True)
 
 
-direction = d[0][0]
-new_coord = []
-if direction == "UP":
-    new_coord.append(ally[0]-1)
-    new_coord.append(ally[1])
-elif direction == "DOWN":
-    new_coord.append(ally[0]+1)
-    new_coord.append(ally[1])
-elif direction == "LEFT":
-    new_coord.append(ally[0])
-    new_coord.append(ally[1]-1)
-elif direction == "RIGHT":
-    new_coord.append(ally[0])
-    new_coord.append(ally[1]+1)
-print(new_coord)
+state = pyspiel.load_game("yorktown").new_initial_state("FEBMBEFEEFBGIBHIBEDBGJDDDHCGJGDHDLIFKDDHAA__AA__AAAA__AA__AATPPWRUXPTPSVSOTPPPVSNPQNUTNUSNRQQRQNYNQR r 0")
+print(state.information_state_string(state.current_player()))
+nbr_piece_left = np.array([1, 8, 1, 6, 5, 4, 4, 4, 3, 2, 1, 1])
+moved_before = np.zeros((10, 10))
+moved_scout = np.zeros((10, 10))
+information = [1, nbr_piece_left, moved_before, moved_scout]
+# moved_before[0][0] = 1
+# moved_before[0][1] = 1
+# moved_scout[3][7] = 1
+# moved_scout[3][8] = 1
 
+# printCharMatrix(state)
+# action = state.legal_actions()[1]
+# updating_knowledge(information, state.clone(), action)
+# state.apply_action(action)
+# printCharMatrix(state)
+# print(information)
+# action = state.legal_actions()[3]
+# updating_knowledge(information, state.clone(), action)
+# state.apply_action(action)
+# printCharMatrix(state)
+# print(information)

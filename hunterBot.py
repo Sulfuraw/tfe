@@ -34,7 +34,7 @@ class hunterBot(basicAIBot.basicAIBot):
         self.information = [self.player, nbr_piece_left, moved_before, moved_scout]
 
     def update_knowledge(self, state, action):
-        self.information = updating_knowledge(self.information, state, action)
+        updating_knowledge(self.information, state, action)
     
     def make_move(self, policy, state):
         i = 0
@@ -43,8 +43,8 @@ class hunterBot(basicAIBot.basicAIBot):
         # Modification to forbid to do the two cases forbidden move: Going back and forth between two positions
         while not found and i < len(bestMoveList):
             bestMove = bestMoveList[i]
-            if bestMove == None:
-                return super().MakeMove(policy, state)
+            if bestMove == None or bestMove[2] == None:
+                return super().make_move(policy, state)
             
             direction = bestMove[2][0] # ['UP'][0] fe
             coord = [bestMove[3][1], bestMove[3][0]] # [6, 5, 'U'][1] or [0] fe  

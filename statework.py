@@ -199,48 +199,49 @@ def generate_state(state, information):
         Generate a valid state, with the knowledge of our bot + the partial state
         Information : [self.player_id, nbr_piece_left, moved_before, moved_scout]
     """
-    partial_state = state.information_state_string(state.current_player())
-    state_str = str(partial_state)   # This line for partial info
-    # state_str = str(state)         # This line for full info    
+    player = state.current_player()
+    partial_state = state.information_state_string(player)
+    piece_left = information[1].copy()
     moved_before = information[2]
     moved_scout = information[3]
-    final = ""
     players_piece = players_pieces()
 
-    while not is_valid_state(final):
-        # TODO: Conceptuellement elle doit pas etre là cette boucle.
-        # Commencer par assigner les pieces qui ont déjà bouger avant celle qui ont jamais bougé...
-        final = ""
-        i = 0
-        piece_left = information[1].copy()
-        while i < len(state_str):
-            if state_str[i] == "?":
-                if moved_scout[i//10][i%10]:
-                    proba = [0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0]
-                elif not moved_before[i//10][i%10]:
-                    proba = no_info_piece(piece_left)
-                    # Force Flag/Bomb if too few can be them
-                    if (state_str.count("?") - np.sum(moved_before)) < (information[1][0] + information[1][1] + 2) and np.sum(piece_left[:2]) > 0:
-                        flag = piece_left[0]
-                        bomb = piece_left[1]
-                        proba = [flag/(flag+bomb), bomb/(flag+bomb), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-                elif np.sum(piece_left[2:]) > 0:
-                    proba = moved_piece(piece_left)
-                else:
-                    # print("Error in the generation of a state, retrying...", i)
-                    break
-                
-                piece_id = np.random.choice(np.arange(12), p=proba)
-                if not moved_scout[i//10][i%10]:
-                    piece_left[piece_id] -= 1
-                piece = players_piece[1-state.current_player()][piece_id]
-                final += piece
-                i += 1
-            else:
-                piece = state_str[i]
-                final += piece
-                i += 1
-    return final
+    state_list = list(partial_state)
+
+    unk_coord = []
+    for i in range(100):
+        if state_list[i] == "?":
+            unk_coord.append(i)
+
+    if player:
+        unk_coord = unk_coord[::]
+    
+    # Treat the scout and moved piece first
+    last_unk_coord = []
+    for i in unk_coord:
+        if moved_scout[i//10][i%10]:
+            proba = [0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0]
+        elif moved_before[i//10][i%10]:
+            proba = moved_piece(piece_left)
+        else:
+            last_unk_coord.append(i)
+            continue
+        piece_id = np.random.choice(np.arange(12), p=proba)
+        if not moved_scout[i//10][i%10]:
+            piece_left[piece_id] -= 1
+        piece = players_piece[1-player][piece_id]
+        state_list[i] = piece
+    
+    # Comeback on the one we didn't treat: the one that never moved
+    for i in last_unk_coord:
+        proba = no_info_piece(piece_left)
+        piece_id = np.random.choice(np.arange(12), p=proba)
+        piece_left[piece_id] -= 1
+        piece = players_piece[1-player][piece_id]
+        state_list[i] = piece
+    
+    state_str = "".join(state_list)
+    return state_str
 
 def updating_knowledge(information, state, action):
     """
@@ -259,6 +260,7 @@ def updating_knowledge(information, state, action):
     start = matrix_before[coord[1]][coord[0]]
     arrival = matrix_before[coord[3]][coord[2]]
 
+    # This is ok because the state passed in argument was a clone
     state.apply_action(action)
     matrix_after = stateIntoCharMatrix(state.information_state_string(player_id))
     arrival_after = matrix_after[coord[3]][coord[2]]
@@ -267,7 +269,6 @@ def updating_knowledge(information, state, action):
         # Fight
         if arrival == "?":
             # Either win or lose the fight, it will result in the same operation
-            # We -1 the count and generate_possibilities_matrix will do the work thanks to information_state_string
             # We also delete information of moved piece at this place because it doesnt matter anymore
             for p in range(12):
                 if full_matrix_before[coord[3]][coord[2]] == players_piece[1-player_id][p]:
@@ -275,7 +276,7 @@ def updating_knowledge(information, state, action):
                         nbr_piece_left[p] -= 1
                     moved_before[coord[3]][coord[2]] = 0
                     moved_scout[coord[3]][coord[2]] = 0
-                    return [player_id, nbr_piece_left, moved_before, moved_scout]
+                    # return [player_id, nbr_piece_left, moved_before, moved_scout]
     else:
         # Fight
         if arrival in players_piece[player_id]:
@@ -297,7 +298,7 @@ def updating_knowledge(information, state, action):
                     if full_matrix_before[coord[1]][coord[0]] == players_piece[current_player][p] and start == "?":
                         if not (p==3 and was_scout):
                             nbr_piece_left[p] -= 1
-            return [player_id, nbr_piece_left, moved_before, moved_scout]
+            # return [player_id, nbr_piece_left, moved_before, moved_scout]
         # Deplacement on empty space: Deplacement of moved and/or get information about moved/scout_moved
         else:
             moved_before[coord[1]][coord[0]] = 0
@@ -310,8 +311,8 @@ def updating_knowledge(information, state, action):
             if moved_scout[coord[1]][coord[0]]:
                 moved_scout[coord[1]][coord[0]] = 0
                 moved_scout[coord[3]][coord[2]] = 1
-            return [player_id, nbr_piece_left, moved_before, moved_scout]
-    return information
+            # return [player_id, nbr_piece_left, moved_before, moved_scout]
+    # return information
 
 def unknown_acc(state, state2):
     """Check the accuracy for the pieces unknown only by comparing the two states piece-wise"""
@@ -373,10 +374,12 @@ def data_for_games(move, state, generated, evaluator):
 
 def is_valid_coord(pos):
     """Tools to check if a position is playable (in board and not a river)"""
-    for pos_bis in [[4, 2], [4, 3], [5, 2], [5, 3], [4, 6], [4, 7], [5, 6], [5, 7]]:
-        if pos == pos_bis:
-            return False
-    return (0 <= pos[0] < 10) and (0 <= pos[1] < 10)
+    x, y = pos[0], pos[1]
+    if x < 0 or x > 9 or y < 0 or y > 9:
+        return False
+    if y == 2 or y == 3 or y == 6 or y == 7:
+        return x != 4 and x != 5
+    return True
 
 def flag_protec(state, player):
     """Check that the flag is protected all around him (4 positions)"""

@@ -18,6 +18,7 @@ import basicAIBot
 import asmodeusBot
 import hunterBot
 import mctsBot
+import gptBot
 from statework import *
 
 def everythingEverywhereAllAtOnce(filename, iterations):
@@ -80,6 +81,8 @@ def _init_bot(bot_type, game, player_id):
         return asmodeusBot.asmodeusBot(player_id)
     if bot_type == "hunter":
         return hunterBot.hunterBot(player_id)
+    if bot_type == "gpt":
+        return gptBot.gptBot(player_id)
     raise ValueError("Invalid bot type: %s" % bot_type)
 
 def _play_game(game, bots, game_num):
@@ -96,14 +99,20 @@ def _play_game(game, bots, game_num):
     while not state.is_terminal():
         # Draw by the rules
         if move == 2001:
-            returns = [0, 0]
-            # Game is now done
+            pieces0 = 0
+            pieces1 = 0
+            players_piece = players_pieces()
+            for i in str(state)[:100].upper():
+                if i in players_piece[0]:
+                    pieces0 += 1
+                if i in players_piece[1]:
+                    pieces1 += 1
             returns = state.returns()
             print("\nReturns:", 
                 " ".join(map(str, returns)), "\n# moves:", len(history))
             for bot in bots:
                 bot.restart()
-            return returns, history, allStates, move            
+            return returns, history, allStates, move, [pieces0, pieces1]            
 
         current_player = state.current_player()
         bot = bots[current_player]
@@ -119,7 +128,6 @@ def _play_game(game, bots, game_num):
             save_to_csv("./games/"+str(bots[0])+"-"+str(bots[1])+str(game_num)+".csv", data_for_games(move, state, generated, customBot.CustomEvaluator()))
         else:
             action = bot.step(state)
-
         action_str = state.action_to_string(current_player, action)
         for i, bot in enumerate(bots):
             if i != current_player:
@@ -132,13 +140,21 @@ def _play_game(game, bots, game_num):
         move+=1
         state.apply_action(action)
 
+    pieces0 = 0
+    pieces1 = 0
+    players_piece = players_pieces()
+    for i in str(state)[:100].upper():
+        if i in players_piece[0]:
+            pieces0 += 1
+        if i in players_piece[1]:
+            pieces1 += 1
     # Game is now done
     returns = state.returns()
     print("\nReturns:", 
         " ".join(map(str, returns)), "\n# moves:", len(history))
     for bot in bots:
         bot.restart()
-    return returns, history, allStates, move
+    return returns, history, allStates, move, [pieces0, pieces1]
 
 def play_n_games(player1, player2, num_games, replay=False, auto=False):
     game = pyspiel.load_game("yorktown")
@@ -155,14 +171,14 @@ def play_n_games(player1, player2, num_games, replay=False, auto=False):
     try:
         for game_num in range(0, num_games):
             start_game_time = time.time()
-            returns, history, allStates, move = _play_game(game, bots, game_num)
+            returns, history, allStates, move, pieces = _play_game(game, bots, game_num)
             time_taken = round(time.time()-start_game_time)
             print("Time for this game in seconde:", time_taken)
             print("Game Number:", game_num)
 
             saveGame("games/"+player1+"-"+player2+str(game_num), allStates)
-            # In case of tie, both win_player1 and win_player2 are equal to 0, otherwise the winner is 1, the other is 0
-            data = {'player1': [player1], 'player2': [player2], 'game_num': [game_num], 'time_taken': [time_taken], 'moves': [move], 'win_player1': 1 if returns[0]==1.0 else 0, 'win_player2': 1 if returns[1]==1.0 else 0}
+            # In case of tie, both win_1 and win_2 are equal to 0, otherwise the winner is 1, the other is 0
+            data = {'player1': [player1], 'player2': [player2], 'game_num': [game_num], 'time_taken': [time_taken], 'moves': [move], 'win_1': 1 if returns[0]==1.0 else 0, 'win_2': 1 if returns[1]==1.0 else 0, 'pieces_1': [pieces[0]], 'pieces_2': [pieces[1]]}
             save_to_csv("./games/stats.csv", data)
             
             histories[" ".join(history)] += 1
@@ -184,12 +200,13 @@ def play_n_games(player1, player2, num_games, replay=False, auto=False):
     print("Average time till finish:", avg_time_taken)
     print("Players:", player1, player2)
     print("Overall wins", overall_wins)
-    data = {'player1': [player1], 'player2': [player2], 'game_num': [game_num+1], 'time_taken': [avg_time_taken], 'moves': [avg_move], 'win_player1': [int((overall_wins[0]/(game_num+1))*100)]}
+    data = {'player1': [player1], 'player2': [player2], 'game_num': [game_num+1], 'time_taken': [avg_time_taken], 'moves': [avg_move], 'win_1': [int((overall_wins[0]/(game_num+1))*100)], 'win_2': [int((overall_wins[1]/(game_num+1))*100)], 'pieces_1': [0], 'pieces_2': [0]}
     save_to_csv("./games/stats.csv", data)
+    return data
 
 def benchmark(num_games):
     """With the num_games with 50, effectively each bot will play 100 games versus other bots"""
-    # bots_to_play = ["custom", "basic", "asmodeus", "hunter", "rnad", "mcts"]
+    # bots_to_play = ["custom", "asmodeus", "hunter", "rnad", "mcts"]
     bots_to_play = ["basic", "rnad"]
     for i in range(len(bots_to_play)):
         for j in range(len(bots_to_play)):
@@ -200,17 +217,35 @@ def benchmark(num_games):
                 play_n_games(player1, player2, num_games)
                 print(player1 + " VS " + player2 + ": Finished")
     print("Benchmark finished its execution, congratulation !")
+
+def evaluate_bot(bot, num_games):
+    """Evaluate the bot against all the other bots"""
+    # bots_to_play = ["custom", "asmodeus", "hunter", "rnad", "mcts"]
+    bots_to_play = ["basic", "asmodeus", "hunter", "rnad"]
+    win = 0
+    for i in range(len(bots_to_play)):
+        player2 = bots_to_play[i]
+        player1 = bot
+        print(player1 + " VS " + player2 + ": Begin")
+        data = play_n_games(player1, player2, num_games)
+        print("Winrate VS " + player2 + ":", data["win_1"][0], "%")
+        win += data["win_1"][0]
+    win = int(win/(num_games*len(bots_to_play)))
+    print("Total winrate of the bot:", win)
+    print("Evaluation finished its execution, congratulation !")
     
 
 if __name__ == "__main__":
     ###### Launch only n games, params: player1, player2, game_nums, replay, auto
-    # play_n_games("mcts", "hunter", 1, replay=False, auto=False)
+    play_n_games("custom", "hunter", 1, replay=False, auto=False)
 
-    benchmark(5)
+    # evaluate_bot("custom", 5)
+
+    # benchmark(5)
 
     ###### Watch a game played
-    # player1 = "custom"
-    # player2 = "hunter"
+    # player1 = "gpt"
+    # player2 = "basic"
     # game_num = 0
     # wrapper(print_board, getGame("games/"+player1+"-"+player2+str(game_num)), [player1, player2], auto=False)
 
