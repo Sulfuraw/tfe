@@ -6,9 +6,11 @@ from open_spiel.python.egt.utils import game_payoffs_array
 import pyspiel
 from absl import app
 import numpy as np
+from curses import wrapper
 from asmodeusBot import *
 from statework import *
 import pandas as pd
+import random
 
 def game_list(_):
     games_list = pyspiel.registered_games()
@@ -591,7 +593,7 @@ def decrypt_benchmark_firstBenchmark(folder):
 
 
 state = pyspiel.load_game("yorktown").new_initial_state("FEBMBEFEEFBGIBHIBEDBGJDDDHCGJGDHDLIFKDDHAA__AA__AAAA__AA__AATPPWRUXPTPSVSOTPPPVSNPQNUTNUSNRQQRQNYNQR r 0")
-print(state.information_state_string(state.current_player()))
+# print(state.information_state_string(state.current_player()))
 nbr_piece_left = np.array([1, 8, 1, 6, 5, 4, 4, 4, 3, 2, 1, 1])
 moved_before = np.zeros((10, 10))
 moved_scout = np.zeros((10, 10))

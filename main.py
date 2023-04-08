@@ -87,7 +87,8 @@ def _init_bot(bot_type, game, player_id):
 
 def _play_game(game, bots, game_num):
     """Plays one game."""
-    state = game.new_initial_state("FEBMBEFEEFBGIBHIBEDBGJDDDHCGJGDHDLIFKDDHAA__AA__AAAA__AA__AATPPWRUXPTPSVSOTPPPVSNPQNUTNUSNRQQRQNYNQR r 0") # Equal state
+    # state = game.new_initial_state("FEBMBEFEEFBGIBHIBEDBGJDDDHCGJGDHDLIFKDDHAA__AA__AAAA__AA__AATPPWRUXPTPSVSOTPPPVSNPQNUTNUSNRQQRQNYNQR r 0") # Equal state
+    state = game.new_initial_state(create_initial_state_str())
     history = []
     allStates = []
 
@@ -221,7 +222,7 @@ def benchmark(num_games):
 def evaluate_bot(bot, num_games):
     """Evaluate the bot against all the other bots"""
     # bots_to_play = ["custom", "asmodeus", "hunter", "rnad", "mcts"]
-    bots_to_play = ["basic", "asmodeus", "hunter", "rnad", "mcts"]
+    bots_to_play = ["asmodeus", "basic", "hunter", "rnad", "mcts"]
     win = 0
     for i in range(len(bots_to_play)):
         player2 = bots_to_play[i]

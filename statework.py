@@ -1,5 +1,6 @@
 import curses
 import numpy as np
+import random
 
 def players_pieces():
     pieces = [["M", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L"],
@@ -193,6 +194,24 @@ def is_valid_state(state_str):
         and (state_str.count("X") == 1 or state_str.count("X") == 0)
         and state_str.count("?") == 0
         and len(state_str) >= 104)
+
+def create_initial_state_str():
+    player_pieces = players_pieces()
+    setups = [
+        [5, 4, 1, 0, 1, 4, 5, 4, 4, 5, 1, 6, 8, 1, 7, 8, 1, 4, 3, 1, 6, 9, 3, 3, 3, 7, 2, 6, 9, 6, 3, 7, 3, 11, 8, 5, 10, 3, 3, 7], # Base p1 Full protec, well spread
+        [3, 8, 0, 7, 5, 5, 4, 1, 7, 3, 9, 1, 6, 4, 1, 1, 2, 4, 1, 5, 8, 3, 11, 3, 5, 9, 3, 10, 3, 8, 6, 7, 3, 4, 6, 1, 3, 4, 7, 6], # Base p2 0 protec, well spread
+        [6, 1, 4, 1, 5, 3, 7, 0, 7, 4, 3, 5, 1, 4, 1, 7, 8, 8, 3, 3, 5, 3, 8, 1, 9, 10, 4, 3, 9, 6, 3, 4, 6, 3, 1, 6, 2, 11, 7, 5], # 95 moves bait flag, stacked near flag
+        [5, 4, 1, 1, 0, 5, 5, 1, 3, 5, 1, 7, 9, 4, 3, 2, 4, 6, 3, 1, 7, 6, 10, 11, 3, 6, 9, 4, 3, 6, 1, 3, 8, 4, 7, 3, 8, 8, 3, 7], # 106 moves 1/3 protec, stacked
+        [5, 7, 0, 1, 7, 3, 1, 3, 3, 4, 1, 4, 1, 2, 4, 8, 4, 3, 4, 5, 9, 7, 8, 6, 11, 5, 3, 10, 3, 1, 6, 3, 6, 3, 8, 6, 9, 1, 7, 5], # 130 moves 2/3 protec, not well placed, doubt
+        [4, 5, 3, 4, 3, 1, 0, 4, 3, 4, 3, 3, 1, 1, 6, 1, 8, 8, 3, 9, 6, 5, 1, 1, 5, 5, 2, 7, 3, 10, 7, 6, 3, 7, 4, 7, 9, 11, 6, 8], # 150 moves 1/3 protec, not well placed, doubt but less than above
+        [6, 7, 1, 3, 1, 3, 0, 1, 3, 1, 9, 4, 4, 2, 4, 3, 1, 8, 11, 7, 4, 6, 8, 10, 9, 6, 5, 3, 5, 8, 5, 3, 7, 3, 6, 1, 4, 3, 7, 5], # 150 moves 2/3 protec, well spread
+        [1, 1, 0, 5, 3, 1, 4, 4, 1, 3, 8, 8, 3, 3, 3, 3, 3, 6, 1, 6, 6, 6, 10, 4, 7, 11, 2, 1, 8, 3, 5, 7, 4, 9, 7, 5, 9, 4, 5, 7], # 270 moves 1/3 protec, well spread
+        [1, 4, 1, 4, 0, 3, 1, 5, 6, 1, 1, 3, 4, 3, 8, 3, 4, 8, 3, 1, 3, 7, 9, 2, 7, 8, 3, 4, 7, 9, 6, 5, 6, 10, 5, 6, 11, 7, 3, 5], # 340 moves No protec flag, but well spread
+        [7, 3, 4, 1, 0, 1, 4, 1, 5, 1, 9, 2, 4, 6, 1, 6, 4, 1, 7, 5, 8, 10, 3, 9, 4, 3, 11, 8, 3, 7, 5, 3, 7, 3, 6, 8, 3, 6, 5, 3]  # 625 moves Full protec flag, well spread
+    ]
+    setup0 = "".join([player_pieces[0][x] for x in random.choice(setups)])
+    setup1 = "".join([player_pieces[1][x] for x in random.choice(setups)[::-1]]) 
+    return setup0 + "AA__AA__AAAA__AA__AA" + setup1 + " r 0"
 
 def generate_state(state, information):
     """
