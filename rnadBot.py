@@ -30,7 +30,7 @@ class rnadBot(pyspiel.Bot):
         self.solver = rnad.RNaDSolver(rnad.RNaDConfig(game_name="yorktown"))
 
     def __str__(self):
-        return "rnadBot"
+        return "rnad"
 
     def getSolver(self):
         return self.solver

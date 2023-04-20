@@ -216,7 +216,8 @@ class mctsBot(pyspiel.Bot):
         nbr_piece_left = np.array([1, 6, 1, 8, 5, 4, 4, 4, 3, 2, 1, 1])
         moved_before = np.zeros((10, 10))
         moved_scout = np.zeros((10, 10))
-        self.information = [self.player_id, nbr_piece_left, moved_before, moved_scout]
+        matrix_of_stat = matrix_of_stats(self.player_id)
+        self.information = [self.player_id, nbr_piece_left, moved_before, moved_scout, matrix_of_stat]
 
     def update_knowledge(self, state, action):
         updating_knowledge(self.information, state, action)

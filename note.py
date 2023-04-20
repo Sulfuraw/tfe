@@ -501,6 +501,197 @@ def generate_state_via_matrix(state, matrix_of_possibilities, information):
                 i += 1
     return final
 
+###############################################################################################""
+# 15 avril
+
+def generate_state_old(state, information):
+    """
+        Generate a valid state, with the knowledge of our bot + the partial state
+        Information : [self.player_id, nbr_piece_left, moved_before, moved_scout]
+    """
+    player = state.current_player()
+    partial_state = state.information_state_string(player)
+    piece_left = information[1].copy()
+    moved_before = information[2]
+    moved_scout = information[3]
+    players_piece = players_pieces()
+
+    state_list = list(partial_state)
+
+    unk_coord = []
+    for i in range(100):
+        if state_list[i] == "?":
+            unk_coord.append(i)
+
+    if player:
+        unk_coord = unk_coord[::]
+    
+    # Treat the scout and moved piece first
+    last_unk_coord = []
+    for i in unk_coord:
+        if moved_scout[i//10][i%10]:
+            proba = [0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0]
+        elif moved_before[i//10][i%10]:
+            proba = moved_piece(piece_left)
+        else:
+            last_unk_coord.append(i)
+            continue
+        piece_id = np.random.choice(np.arange(12), p=proba)
+        if not moved_scout[i//10][i%10]:
+            piece_left[piece_id] -= 1
+        piece = players_piece[1-player][piece_id]
+        state_list[i] = piece
+    
+    # Comeback to the ones we didn't treat: the one that never moved
+    for i in last_unk_coord:
+        proba = no_info_piece(piece_left)
+        piece_id = np.random.choice(np.arange(12), p=proba)
+        piece_left[piece_id] -= 1
+        piece = players_piece[1-player][piece_id]
+        state_list[i] = piece
+    
+    state_str = "".join(state_list)
+    return state_str
+
+def updating_knowledge_old(information, state, action):
+    """
+        Each move a player does can affect the information / knowledge that our bot has
+        Here we update the variable information
+        Information : [self.player_id, nbr_piece_left, moved_before, moved_scout]
+    """
+    player_id, nbr_piece_left, moved_before, moved_scout = information
+    players_piece = players_pieces()
+    current_player = state.current_player()
+
+    coord = action_to_coord(state.action_to_string(current_player, action))
+
+    full_matrix_before = stateIntoCharMatrix(state)
+    matrix_before = stateIntoCharMatrix(state.information_state_string(player_id))
+    start = matrix_before[coord[1]][coord[0]]
+    arrival = matrix_before[coord[3]][coord[2]]
+
+    # This is ok because the state passed in argument was a clone
+    state.apply_action(action)
+    matrix_after = stateIntoCharMatrix(state.information_state_string(player_id))
+    arrival_after = matrix_after[coord[3]][coord[2]]
+
+    if current_player == player_id:
+        # Fight
+        if arrival == "?":
+            # Either win or lose the fight, it will result in the same operation
+            # We also delete information of moved piece at this place because it doesnt matter anymore
+            for p in range(12):
+                if full_matrix_before[coord[3]][coord[2]] == players_piece[1-player_id][p]:
+                    if not (p==3 and moved_scout[coord[3]][coord[2]]):
+                        nbr_piece_left[p] -= 1
+                    moved_before[coord[3]][coord[2]] = 0
+                    moved_scout[coord[3]][coord[2]] = 0
+    else:
+        # Fight
+        if arrival in players_piece[player_id]:
+            was_scout = moved_scout[coord[1]][coord[0]]
+            moved_before[coord[1]][coord[0]] = 0
+            moved_before[coord[3]][coord[2]] = 0
+            moved_scout[coord[1]][coord[0]] = 0
+            moved_scout[coord[3]][coord[2]] = 0
+            # Ennemy Won: But if he killed our piece, we get information of it
+            if arrival_after in players_piece[current_player]:
+                if start == "?":
+                    for p in range(12):
+                        if arrival_after == players_piece[current_player][p]:
+                            if not (p==3 and was_scout):
+                                nbr_piece_left[p] -= 1
+            # Ennemy lose:
+            else:
+                for p in range(12):
+                    if full_matrix_before[coord[1]][coord[0]] == players_piece[current_player][p] and start == "?":
+                        if not (p==3 and was_scout):
+                            nbr_piece_left[p] -= 1
+        # Deplacement on empty space: Deplacement of moved and/or get information about moved/scout_moved
+        else:
+            moved_before[coord[1]][coord[0]] = 0
+            moved_before[coord[3]][coord[2]] = 1
+            if abs(coord[1]-coord[3]) > 1 or abs(coord[0]-coord[2]) > 1:
+                if not moved_scout[coord[1]][coord[0]] and start == "?":
+                    nbr_piece_left[3] -= 1
+                moved_scout[coord[1]][coord[0]] = 0
+                moved_scout[coord[3]][coord[2]] = 1
+            if moved_scout[coord[1]][coord[0]]:
+                moved_scout[coord[1]][coord[0]] = 0
+                moved_scout[coord[3]][coord[2]] = 1
+
+    # # It is:  [Fl,  Bo,   Sp,  Sc,  Mi,  Sg,  Lt,  Cp,  Mj,  Co,  Ge,  Ms]
+    # # Nbr     [1,   6,    1,   8,   5,   4,   4,   4,   3,   2,   1,   1]
+    # # TODO: Changé ça en version avec une version [0.1]*12 de base et chaque range au dessus si ya des pieces ennemies de ce rang on fait rang[i-1]*1.45, range[i-1] sinon
+    # def value_for_piece_old(self, ennemy_nbr_pieces):
+    #     value = np.array([0]*12)
+    #     for i in range(3, 12):
+    #         value[i] = np.sum(ennemy_nbr_pieces[2:(i+1)])+2
+    #     value[0] = 100.0
+    #     value[1] = np.sum(ennemy_nbr_pieces[2:]) if ennemy_nbr_pieces[4] == 0 else (np.sum(ennemy_nbr_pieces[2:]) - ennemy_nbr_pieces[4])*0.8
+    #     value[2] = 9.0 if ennemy_nbr_pieces[11] else 1.0
+    #     value[4] += ennemy_nbr_pieces[1]
+    #     value = value / np.max(value[1:])
+    #     returns = []
+    #     for i in range(12):
+    #         returns.append((i, value[i]))
+    #     return returns
+
+    # Less old but it was not working well
+    # for i in range(4, 12):
+    # # This line cause lots of problems:
+    # #   I suicide a piece and it gives me more evaluation
+    # #   I kill a small piece and it gives me REALLY much value +0.7 quand all miner eliminé ? 
+    # #   That is the inverse of what we want...
+    # value[i] = value[i-1]*1.6 if enemies[i] > 0 else value[i-1]
+
+
+    # def evaluate_state(self, state, move_of_state):
+    #     """Returns evaluation on given state."""
+    #     state_str = str(state)
+
+    #     nbr_pieces = [[0]*12, [0]*12]
+    #     for piece in state_str[:100].upper():
+    #         if piece not in ["A", "_"]:
+    #             i, player = self.piece_to_index[piece]
+    #             nbr_pieces[player][i] += 1
+
+    #     score = [0, 0]
+    #     for player in [0, 1]:
+    #         for piece_id, value in self.value_for_piece(nbr_pieces[1-player]):
+    #             score[player] += nbr_pieces[player][piece_id]*value
+
+    #             # make more weight if flag is protected
+    #             # score[player] += 1 if flag_protec(state, player) else 0
+
+    #             # # make more weight having pieces on the other part of the board, go forward
+    #             if player:
+    #                 score[player] += state_str[:40].count(self.player_pieces[player][piece_id])/20
+    #             else: 
+    #                 score[player] += state_str[-40:].count(self.player_pieces[player][piece_id])/20
+
+    #         # Make more weight to miner to go attack in search of bombs
+    #         if player:
+    #             score[player] += 3.0 if self.player_pieces[player][4] in state_str[:50] else 0.0
+    #         else:
+    #             score[player] += 3.0 if self.player_pieces[player][4] in state_str[-50:] else 0.0
+    #     returns = [0, 0]
+    #     for player in [0, 1]:
+    #         returns[player] = score[player] - np.sum(nbr_pieces[1-player])/2   # Re-range with (x - min)/(max-min)
+    #     return returns    
+
+    # def is_forward(self, action, player):
+    # _, pos1, _, pos2 = list(action)
+    # return pos1 < pos2 if player == 0 else pos1 > pos2
+
+    # if arrival != "A":
+    #     ally = state_str[coord[1]*10 + coord[0]]
+    #     clone = state.clone()
+    #     clone.apply_action(action)
+    #     clone_str = str(clone).upper()
+    #     arrival_after = clone_str[coord[3]*10 + coord[2]]
+    #     value = (value + 15) if (ally == arrival_after) else (value/3)
+
 ###############################################################################
 
 #More weight moving forward with game advancement
@@ -531,8 +722,8 @@ import pandas as pd
 from matplotlib import pyplot as plt
 import matplotlib
 matplotlib.use('TkAgg')
-def graph():
-    df = pd.read_csv('games/0.csv')
+def unk_acc_graph(filename):
+    df = pd.read_csv(filename)
     x = df["move"]
     y = df["unknow_acc"]
     plt.plot(x, y)
@@ -540,6 +731,24 @@ def graph():
     plt.ylabel("knowledge accuracy")
     plt.ylim(0.0, 1.0)
     plt.show()
+
+def compare_unk_acc_graph(filename1, filename2):
+    df = pd.read_csv(filename1)
+    x = df["move"]
+    y = df["unknow_acc"]
+    plt.plot(x, y)
+    df = pd.read_csv(filename2)
+    x = df["move"]
+    y = df["unknow_acc"]
+    plt.plot(x, y)
+    plt.xlabel("Number of moves")
+    plt.ylabel("knowledge accuracy")
+    plt.legend(['Before', 'After'], loc='upper left')
+    plt.ylim(0.0, 1.0)
+    plt.show()
+
+# compare_unk_acc_graph('bench2-8-April/custom-asmodeus1.csv', 'generate_with_stats/custom-asmodeus4.csv')
+
 
 ###############################################################################
 
@@ -597,20 +806,55 @@ state = pyspiel.load_game("yorktown").new_initial_state("FEBMBEFEEFBGIBHIBEDBGJD
 nbr_piece_left = np.array([1, 8, 1, 6, 5, 4, 4, 4, 3, 2, 1, 1])
 moved_before = np.zeros((10, 10))
 moved_scout = np.zeros((10, 10))
-information = [1, nbr_piece_left, moved_before, moved_scout]
-# moved_before[0][0] = 1
-# moved_before[0][1] = 1
-# moved_scout[3][7] = 1
-# moved_scout[3][8] = 1
+information = [0, nbr_piece_left, moved_before, moved_scout, matrix_of_stats(0)]
+
 
 # printCharMatrix(state)
 # action = state.legal_actions()[1]
 # updating_knowledge(information, state.clone(), action)
 # state.apply_action(action)
 # printCharMatrix(state)
-# print(information)
 # action = state.legal_actions()[3]
 # updating_knowledge(information, state.clone(), action)
 # state.apply_action(action)
 # printCharMatrix(state)
-# print(information)
+
+# path = astar(stateIntoCharMatrix(state), (3, 4), (6, 5))
+# print(path)
+# print(len(path)-1)
+
+
+pieces = [["M", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L"],
+          ["Y", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X"]]
+# It is:  [Fl,  Bo,   Sp,  Sc,  Mi,  Sg,  Lt,  Cp,  Mj,  Co,  Ge,  Ms]
+# Nbr     [1,   6,    1,   8,   5,   4,   4,   4,   3,   2,   1,   1]
+
+def proba_win_combat(ally, enemy_pos, state, information):
+    def win_combat(ally, enemy):
+        """Only work on moveable ally at the moment"""
+        allyIdx, _ = pieces_to_index()[ally]
+        enemyIdx, _ = pieces_to_index()[enemy]
+        if enemyIdx == 1:
+            return 1 if allyIdx == 4 else -1
+        if enemyIdx == 11:
+            return 1 if (allyIdx == 2 or allyIdx == 11) else -1
+        return 1 if enemyIdx <= allyIdx else -1
+    player, pieces_left, moved, scout, matrix_of_stats = information
+    enemy_pieces = players_pieces()[1-player]
+    partial_state_str = state.information_state_string(player).upper()
+    if sum(matrix_of_stats[enemy_pos[0]][enemy_pos[1]]) < 0.2:
+        return win_combat(ally, partial_state_str[enemy_pos[0]*10+enemy_pos[1]])
+    if scout[enemy_pos[0]][enemy_pos[1]]:
+        return win_combat(ally, enemy_pieces[3])
+    elif moved[enemy_pos[0]][enemy_pos[1]]:
+        probas = moved_piece_matrix(pieces_left, matrix_of_stats[enemy_pos[0]][enemy_pos[1]])
+    else:
+        probas = no_info_piece_matrix(pieces_left, matrix_of_stats[enemy_pos[0]][enemy_pos[1]])
+    summ = 0
+    for idx in range(12):
+        print(probas[idx], win_combat(ally, enemy_pieces[idx]))
+        summ += probas[idx]*win_combat(ally, enemy_pieces[idx])
+    return summ
+
+t = proba_win_combat("H", (6, 0), state, information)
+print(t)

@@ -125,7 +125,7 @@ def _play_game(game, bots, game_num):
             if time.time()-start > 2:
                 print("Time for generate was", round(time.time()-start, 2))
             action = bot.step(generated)
-            # print("time for generate and play a move:", time.time()-start)
+            #vprint("time for generate and play a move:", time.time()-start)
             save_to_csv("./games/"+str(bots[0])+"-"+str(bots[1])+str(game_num)+".csv", data_for_games(move, state, generated, customBot.CustomEvaluator()))
         else:
             action = bot.step(state)
@@ -222,7 +222,7 @@ def benchmark(num_games):
 def evaluate_bot(bot, num_games):
     """Evaluate the bot against all the other bots"""
     # bots_to_play = ["custom", "asmodeus", "hunter", "rnad", "mcts"]
-    bots_to_play = ["asmodeus", "basic", "hunter", "rnad", "mcts"]
+    bots_to_play = ["hunter", "asmodeus", "basic", "rnad"]
     win = 0
     for i in range(len(bots_to_play)):
         player2 = bots_to_play[i]
@@ -234,21 +234,26 @@ def evaluate_bot(bot, num_games):
     win = int(win/len(bots_to_play))
     print("Total winrate of the bot:", win)
     print("Evaluation finished its execution, congratulation !")
+    print("===========================================================")
     
 
 if __name__ == "__main__":
     ###### Launch only n games, params: player1, player2, game_nums, replay, auto
-    # play_n_games("custom", "hunter", 1, replay=False, auto=False)
+    # play_n_games("custom", "asmodeus", 1, replay=False, auto=False)
 
-    evaluate_bot("custom", 3)
+    evaluate_bot("custom", 10)
+    # play_n_games("custom", "basic", 20, replay=False, auto=False)
 
     # benchmark(5)
 
     ###### Watch a game played
-    # player1 = "gpt"
-    # player2 = "basic"
+    # player1 = "custom"
+    # player2 = "asmodeus"
     # game_num = 0
     # wrapper(print_board, getGame("games/"+player1+"-"+player2+str(game_num)), [player1, player2], auto=False)
-
+    # wrapper(print_board, getGame("games/pok/"+player1+"-"+player2+str(game_num)), [player1, player2], auto=False)
+    # wrapper(print_board, getGame("games/pieceAdaptative/"+player1+"-"+player2+str(game_num)), [player1, player2], auto=False)
+    # wrapper(print_board, getGame("games/samewithoutshuffle/"+player1+"-"+player2+str(game_num)), [player1, player2], auto=False)
+    
     ###### Train the Rnad a number of steps
     # everythingEverywhereAllAtOnce("states/state.pkl", 10000) # 100000, 3sec/step

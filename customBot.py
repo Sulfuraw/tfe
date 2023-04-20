@@ -13,18 +13,17 @@ class CustomEvaluator():
         self.piece_to_index = pieces_to_index()
         self.player_pieces = players_pieces()
 
-    # It is:  [Fl,  Bo,   Sp,  Sc,  Mi,  Sg,  Lt,  Cp,  Mj,  Co,  Ge,  Ms]
-    # Nbr     [1,   6,    1,   8,   5,   4,   4,   4,   3,   2,   1,   1]
-    # TODO: Changé ça en version avec une version [0.1]*12 de base et chaque range au dessus si ya des pieces ennemies de ce rang on fait rang[i-1]*1.45, range[i-1] sinon
-    def value_for_piece(self, ennemy_nbr_pieces):
-        value = np.array([0]*12)
-        for i in range(3, 12):
-            value[i] = np.sum(ennemy_nbr_pieces[2:(i+1)])+2
-        value[0] = 100.0
-        value[1] = np.sum(ennemy_nbr_pieces[2:]) if ennemy_nbr_pieces[4] == 0 else (np.sum(ennemy_nbr_pieces[2:]) - ennemy_nbr_pieces[4])*0.8
-        value[2] = 9.0 if ennemy_nbr_pieces[11] else 1.0
-        value[4] += ennemy_nbr_pieces[1]
-        value = value / np.max(value[1:])
+    def set_information(self, information):
+        self.information = information
+    
+    def value_for_piece(self, enemies):
+        value = np.array([0.02]*12)
+        for i in range(4, 12):
+            value[i] = value[i-1]*1.6
+        value[0] = 1.0
+        value[1] = 0.9 if enemies[4] == 0 else 0.8
+        value[2] = 0.8 if enemies[11] else 0.02
+        value[4] += 0.032 if enemies[1] < 3 else 0.6
         returns = []
         for i in range(12):
             returns.append((i, value[i]))
@@ -45,23 +44,15 @@ class CustomEvaluator():
             for piece_id, value in self.value_for_piece(nbr_pieces[1-player]):
                 score[player] += nbr_pieces[player][piece_id]*value
 
-                # make more weight if flag is protected
-                # score[player] += 1 if flag_protec(state, player) else 0
-
-                # # make more weight having pieces on the other part of the board, go forward
+                # make more weight having pieces on the other part of the board, go forward
                 if player:
-                    score[player] += state_str[:40].count(self.player_pieces[player][piece_id])/20
-                else: 
-                    score[player] += state_str[-40:].count(self.player_pieces[player][piece_id])/20
+                    score[player] += state_str[:40].count(self.player_pieces[player][piece_id]) * 0.01 # (old) 1/40 = 0.025
+                else:
+                    score[player] += state_str[-40:].count(self.player_pieces[player][piece_id]) * 0.01 # Mtn c'est * 0.01 parce 0.02 est la value la plus basse d'une pièce
 
-            # Make more weight to miner to go attack in search of bombs
-            if player:
-                score[player] += 3.0 if self.player_pieces[player][4] in state_str[:50] else 0.0
-            else:
-                score[player] += 3.0 if self.player_pieces[player][4] in state_str[-50:] else 0.0
         returns = [0, 0]
         for player in [0, 1]:
-            returns[player] = score[player] - np.sum(nbr_pieces[1-player])/2   # Re-range with (x - min)/(max-min)
+            returns[player] = score[player] - score[1-player]   # Re-range with (x - min)/(max-min)
         # Print for debug
         # if returns[0] > 1 or returns[0] < -1 or returns[1] > 1 or returns[1] < -1:
         #     print("==============================")
@@ -69,25 +60,36 @@ class CustomEvaluator():
         #     print(state_str)
         return returns    
 
-    # TODO: Test with different n_moves_before with advancement of the game (move_of_state)
     def evaluate(self, state):
         """Returns evaluation on given state."""
         result = None
-        n_rollouts = 10 # 10
-        n_moves_before = 20 # 20
         move_of_state = int(str(state)[103-len(str(state)):])
+        
+        if move_of_state < 50:
+            n_rollouts = 8
+            n_moves_before = 4
+        if move_of_state < 100:
+            n_rollouts = 8
+            n_moves_before = 8
+        elif move_of_state < 150:
+            n_rollouts = 8
+            n_moves_before = 10
+        else:
+            n_rollouts = 10
+            n_moves_before = 20
+
         for _ in range(n_rollouts):
             working_state = state.clone()
             i = 0
             while not working_state.is_terminal() and i < n_moves_before:
                 # We simulate our moves with prior and simulate ennemy move randomly.
-                if (i%2) == 0:
+                if True: # TODO: Change: (i%2) == 0
                     legal_actions = self.prior(working_state)
                     actions, proba = list(zip(*legal_actions))
 
                     # Transform proba to delete values below a treshold and help converge the results
                     proba = np.array(proba)
-                    if np.max(proba) > 0.045 and (move_of_state+i) > 100:
+                    if np.max(proba) > 0.045: #(move_of_state+i) > 100
                         proba[proba <= 0.045] = 0
                         proba = proba/np.sum(proba)
 
@@ -100,10 +102,6 @@ class CustomEvaluator():
             returns = np.array(working_state.returns())*40 if working_state.is_terminal() else np.array(self.evaluate_state(working_state, move_of_state+i))
             result = returns if result is None else result + returns
         return result / n_rollouts
-
-    def is_forward(self, action, player):
-        _, pos1, _, pos2 = list(action)
-        return pos1 < pos2 if player == 0 else pos1 > pos2
     
     def toward_flag(self, state, player, coord):
         flag_str_pos = str(state).find(players_pieces()[1-player][0])
@@ -112,38 +110,60 @@ class CustomEvaluator():
         man_distance_after = abs(flag[0] - coord[3]) + abs(flag[1] - coord[2])
         # Categorize the weight
         value = 21-man_distance_after
-        if value < 11: value = 10
-        elif value < 16: value = 15
-        else: value = 20
+        if value < 11: value = 5
+        elif value < 16: value = 10
+        else: value = 15
         return man_distance_before > man_distance_after, value
+    
+    def proba_win_combat(self, ally, enemy_pos, state, information):
+        def win_combat(ally, enemy):
+            """Only work on moveable ally at the moment"""
+            allyIdx, _ = pieces_to_index()[ally]
+            enemyIdx, _ = pieces_to_index()[enemy]
+            if enemyIdx == 1:
+                return 1 if allyIdx == 4 else -1
+            if enemyIdx == 11:
+                return 1 if (allyIdx == 2 or allyIdx == 11) else -1
+            return 1 if enemyIdx <= allyIdx else -1
+        _, pieces_left, moved, scout, matrix_of_stats = information
+        player = state.current_player()
+        enemy_pieces = players_pieces()[1-player]
+        state_str = str(state).upper()
+        if sum(matrix_of_stats[enemy_pos[0]][enemy_pos[1]]) < 0.2:
+            return win_combat(ally, state_str[enemy_pos[0]*10+enemy_pos[1]])
+        elif scout[enemy_pos[0]][enemy_pos[1]]:
+            return win_combat(ally, enemy_pieces[3])
+        elif moved[enemy_pos[0]][enemy_pos[1]]:
+            probas = moved_piece_matrix(pieces_left, matrix_of_stats[enemy_pos[0]][enemy_pos[1]])
+        else:
+            probas = no_info_piece_matrix(pieces_left, matrix_of_stats[enemy_pos[0]][enemy_pos[1]])
+        summ = 0
+        for idx in range(12):
+            summ += probas[idx]*win_combat(ally, enemy_pieces[idx])
+        return summ
 
     def prior(self, state):
         """Returns probability for each actions"""
-        # TODO:
-        # Utilisé les probabilités de pièce à un endroit [x,y] et pas uniquement la pièce générée
         sum = 0.0
         prio = []
         player = state.current_player()
         state_str = str(state).upper()
         for action in state.legal_actions(player):
             coord = action_to_coord(state.action_to_string(player, action))
-            # Priorize moving toward the ennemy flag
-            toward_flag = self.toward_flag(state, player, coord)
-            value = toward_flag[1] if toward_flag[0] else 1.0
-
             # # Prioritize winning attacks / penalize loosing ones
             arrival = state_str[coord[3]*10 + coord[2]]
             # Fight
             if arrival != "A":
-                start = state_str[coord[1]*10 + coord[0]]
-                clone = state.clone()
-                clone.apply_action(action)
-                clone_str = str(clone).upper()
-                arrival_after = clone_str[coord[3]*10 + coord[2]]
-                value = (value + 15) if (start == arrival_after) else (value/3)
-
+                ally = state_str[coord[1]*10 + coord[0]]
+                value = self.proba_win_combat(ally, [coord[3], coord[2]], state, self.information)*20
+                if value < 0: value = 1.0
+            else:
+                # Priorize moving toward the ennemy flag
+                toward_flag = self.toward_flag(state, player, coord)
+                value = toward_flag[1] if toward_flag[0] else 1.0
             sum += value
             prio.append([action, value])
+        # Rescale to make the sum equal to 1
         for i in range(len(prio)):
             prio[i][1] = prio[i][1]/sum
         return prio
@@ -311,7 +331,9 @@ class CustomBot(pyspiel.Bot):
         nbr_piece_left = np.array([1, 6, 1, 8, 5, 4, 4, 4, 3, 2, 1, 1])
         moved_before = np.zeros((10, 10))
         moved_scout = np.zeros((10, 10))
-        self.information = [self.player_id, nbr_piece_left, moved_before, moved_scout]
+        matrix_of_stat = matrix_of_stats(self.player_id)
+        self.information = [self.player_id, nbr_piece_left, moved_before, moved_scout, matrix_of_stat]
+        self.evaluator.set_information(self.information)
 
     def update_knowledge(self, state, action):
         updating_knowledge(self.information, state, action)
@@ -321,20 +343,6 @@ class CustomBot(pyspiel.Bot):
         root = self.mcts_search(state)
 
         best = root.best_child()
-
-        if self.verbose:
-            seconds = time.time() - t1
-            print("Finished {} sims in {:.3f} secs, {:.1f} sims/s".format(
-                root.explore_count, seconds, root.explore_count / seconds))
-            print("Root:")
-            print(root.to_str(state))
-            print("Children:")
-            print(root.children_str(state))
-            if best.children:
-                chosen_state = state.clone()
-                chosen_state.apply_action(best.action)
-                print("Children of chosen:")
-                print(best.children_str(chosen_state))
 
         mcts_action = best.action
 
@@ -370,7 +378,7 @@ class CustomBot(pyspiel.Bot):
                     legal_actions = [(a, (1 - epsilon) * p + epsilon * n)
                                 for (a, p), n in zip(legal_actions, noise)]
                 # Reduce bias from move generation order
-                # TODO: Verify that we can disable this because we have a prior
+                # TODO: Verify that we can disable this because we have a prior: Chelou mais ça a vraiment l'air de rien changer
                 self._random_state.shuffle(legal_actions)
                 player = working_state.current_player()
                 current_node.children = [
