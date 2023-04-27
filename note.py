@@ -622,7 +622,6 @@ def updating_knowledge_old(information, state, action):
 
     # # It is:  [Fl,  Bo,   Sp,  Sc,  Mi,  Sg,  Lt,  Cp,  Mj,  Co,  Ge,  Ms]
     # # Nbr     [1,   6,    1,   8,   5,   4,   4,   4,   3,   2,   1,   1]
-    # # TODO: Changé ça en version avec une version [0.1]*12 de base et chaque range au dessus si ya des pieces ennemies de ce rang on fait rang[i-1]*1.45, range[i-1] sinon
     # def value_for_piece_old(self, ennemy_nbr_pieces):
     #     value = np.array([0]*12)
     #     for i in range(3, 12):
@@ -670,11 +669,11 @@ def updating_knowledge_old(information, state, action):
     #             else: 
     #                 score[player] += state_str[-40:].count(self.player_pieces[player][piece_id])/20
 
-    #         # Make more weight to miner to go attack in search of bombs
-    #         if player:
-    #             score[player] += 3.0 if self.player_pieces[player][4] in state_str[:50] else 0.0
-    #         else:
-    #             score[player] += 3.0 if self.player_pieces[player][4] in state_str[-50:] else 0.0
+            # # Make more weight to miner to go attack in search of bombs
+            # if player:
+            #     score[player] += 3.0 if self.player_pieces[player][4] in state_str[:50] else 0.0
+            # else:
+            #     score[player] += 3.0 if self.player_pieces[player][4] in state_str[-50:] else 0.0
     #     returns = [0, 0]
     #     for player in [0, 1]:
     #         returns[player] = score[player] - np.sum(nbr_pieces[1-player])/2   # Re-range with (x - min)/(max-min)
@@ -714,6 +713,22 @@ def updating_knowledge_old(information, state, action):
             #     bot.set_max_simulations(100)
             # if move == 50 or move == 51:
             #     bot.set_max_simulations(2000)
+
+# Simulation rollout prior random:
+                # # We simulate our moves with prior and simulate ennemy move randomly.
+                # if (i%2) == 0:
+                #     legal_actions = self.prior(working_state)
+                #     actions, proba = list(zip(*legal_actions))
+
+                #     # Transform proba to delete values below a treshold and help converge the results
+                #     proba = np.array(proba)
+                #     if np.max(proba) > 0.045: #(move_of_state+i) > 100
+                #         proba[proba <= 0.045] = 0
+                #         proba = proba/np.sum(proba)
+
+                #     action = np.random.choice(actions, p=proba)
+                # else:
+                #     action = np.random.choice(working_state.legal_actions())
 
 #####################################################################################################
 
@@ -762,6 +777,8 @@ import matplotlib.colors as mcolors
 # Now we have 'win_player1' and 'win_player2', that allow to know when tie happen and
 # so we don't give a win to the other player if there was a tie and not a loss.
 
+# Do a double entry array and each entry is something of the type  "%win / %tie / %loss" and not only %win
+
 # df = df.loc[df['win'] < 2]  ---->   df = df.loc[df['win_player1'] < 2]
 # Le reste faut tout changer partout avec des win_player1 et win_player2 
 
@@ -801,13 +818,11 @@ def decrypt_benchmark_firstBenchmark(folder):
 
 
 
-state = pyspiel.load_game("yorktown").new_initial_state("FEBMBEFEEFBGIBHIBEDBGJDDDHCGJGDHDLIFKDDHAA__AA__AAAA__AA__AATPPWRUXPTPSVSOTPPPVSNPQNUTNUSNRQQRQNYNQR r 0")
-# print(state.information_state_string(state.current_player()))
-nbr_piece_left = np.array([1, 8, 1, 6, 5, 4, 4, 4, 3, 2, 1, 1])
-moved_before = np.zeros((10, 10))
-moved_scout = np.zeros((10, 10))
-information = [0, nbr_piece_left, moved_before, moved_scout, matrix_of_stats(0)]
-
+# state = pyspiel.load_game("yorktown").new_initial_state("FEBMBEFEEFBGIBHIBEDBGJDDDHCGJGDHDLIFKDDHAA__AA__AAAA__AA__AATPPWRUXPTPSVSOTPPPVSNPQNUTNUSNRQQRQNYNQR r 0")
+# nbr_piece_left = np.array([1, 8, 1, 6, 5, 4, 4, 4, 3, 2, 1, 1])
+# moved_before = np.zeros((10, 10))
+# moved_scout = np.zeros((10, 10))
+# information = [0, nbr_piece_left, moved_before, moved_scout, matrix_of_stats(0)]
 
 # printCharMatrix(state)
 # action = state.legal_actions()[1]
@@ -852,9 +867,8 @@ def proba_win_combat(ally, enemy_pos, state, information):
         probas = no_info_piece_matrix(pieces_left, matrix_of_stats[enemy_pos[0]][enemy_pos[1]])
     summ = 0
     for idx in range(12):
-        print(probas[idx], win_combat(ally, enemy_pieces[idx]))
         summ += probas[idx]*win_combat(ally, enemy_pieces[idx])
     return summ
 
-t = proba_win_combat("H", (6, 0), state, information)
-print(t)
+# t = proba_win_combat("H", (6, 0), state, information)
+# print(t)

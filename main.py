@@ -10,6 +10,8 @@ from curses import wrapper
 from absl import app
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
+import markdown
 from open_spiel.python.bots import human
 from open_spiel.python.bots import uniform_random
 import rnadBot
@@ -55,6 +57,95 @@ def save_to_csv(path, data):
     else:
         df.to_csv(path, index=False, header=True)
 
+def script_md(folder):
+    # global_stats add 
+    stats_df = pd.read_csv(folder+"stats.csv")
+    markdown_content = []
+
+    # Create a dictionary to store the game data
+    global_stats = {}
+    eval_matrix_win = None
+    eval_matrix_lose = None
+
+    # Iterate over the rows of the stats dataframe and read in the corresponding game csv files
+    for index, row in stats_df.iterrows():
+        player1 = row['player1']
+        player2 = row['player2']
+        game_num = row['game_num']
+        win_1 = row['win_1']
+        win_2 = row['win_2']
+        
+        if win_1 < 2:
+            # Create the filename for the game csv file
+            filename = f"{player1}-{player2}{game_num}.csv"
+            # Read in the game csv file and store it in the games dictionary
+            game_df = pd.read_csv(folder+filename)
+            eval_real = np.array(game_df["eval_real"])
+            padded_eval_real = np.pad(eval_real, (0, 1001-len(eval_real)), mode='constant', constant_values=np.nan)
+            if win_1:
+                if eval_matrix_win is None:
+                    eval_matrix_win = padded_eval_real
+                else:
+                    eval_matrix_win = np.vstack((eval_matrix_win, padded_eval_real))
+            elif win_2:
+                if eval_matrix_lose is None:
+                    eval_matrix_lose = padded_eval_real
+                else:
+                    eval_matrix_lose = np.vstack((eval_matrix_lose, padded_eval_real))
+            # Draw not counted, turn the elif above into a if to take them in the lose one
+        else:
+            avg_time = row['time_taken']
+            avg_moves = row['moves']
+            # Add the stats versus this bot to the global stats
+                                            # Nombre de game, temps moyen, moves moyen, win%, draw%, lose%
+            global_stats[player2] = np.array([game_num, avg_time, avg_moves, win_1, 100-win_1-win_2, win_2])
+
+    for matrix, win in [(eval_matrix_win, "win"), (eval_matrix_lose, "lose")]:
+        x_values = range(0, 2001, 2)
+        # Compute the mean and standard deviation for each index
+        mean_values = np.nanmean(matrix, axis=0)
+        std_values = np.nanstd(matrix, axis=0)
+
+        # Plot the graph
+        fig, ax = plt.subplots()
+        ax.plot(x_values, mean_values)
+        ax.fill_between(x_values, mean_values - std_values, mean_values + std_values, alpha=0.3)
+        ax.set_xlabel('Moves')
+        ax.set_ylabel('Evaluation')
+        ax.set_title('Evaluation of the state over the moves: '+win)
+        # plt.show()
+        fig.savefig(folder+f"eval-{win}.png")
+
+    markdown_content.append(f"# Changement: {folder}\n")
+
+    markdown_content.append("## Evaluation of the state over the moves: win\n")
+    markdown_content.append(f"\n![{folder}eval-win.png Graph](./eval-win.png)\n")
+
+    markdown_content.append("## Evaluation of the state over the moves: lose\n")
+    markdown_content.append(f"\n![{folder}eval-lose.png Graph](./eval-lose.png)\n")
+
+    markdown_content.append("## Win/Draw/Lose versus the bots\n")
+    markdown_content.append(f"\n| ... | {player1} |\n")
+    markdown_content.append(f"| --- | --- |\n")
+    for e_player, information in global_stats.items():
+        # global_stats[player2] = np.array([game_num, avg_time, avg_moves, win_1, 100-win_1-win_2, win_2])
+        game_num, avg_time, avg_moves, win, draw, lose = information
+        markdown_content.append(f"| {e_player} | {win}/{draw}/{lose} |\n")
+
+    markdown_content.append("## Other miscellanous stats versus the bots\n")
+    markdown_content.append(f"\n| {player1} | Nbr Games | Avg_time | Avg_moves |\n")
+    markdown_content.append(f"| --- | --- | --- | --- |\n")
+    for e_player, information in global_stats.items():
+        # global_stats[player2] = np.array([game_num, avg_time, avg_moves, win_1, 100-win_1-win_2, win_2])
+        game_num, avg_time, avg_moves, win, draw, lose = information
+        markdown_content.append(f"| {e_player} | {game_num} | {avg_time} | {avg_moves} |\n")
+
+    # Write the markdown content to a file
+    with open(folder+'results.md', 'w') as f:
+        f.write(''.join(markdown_content))
+
+
+
 def _init_bot(bot_type, game, player_id):
     """Initializes a bot by type."""
     rng = np.random.RandomState(None)  # Seed
@@ -99,7 +190,7 @@ def _play_game(game, bots, game_num):
     move = 0
     while not state.is_terminal():
         # Draw by the rules
-        if move == 2001:
+        if move == 1500: # 2001
             pieces0 = 0
             pieces1 = 0
             players_piece = players_pieces()
@@ -241,19 +332,41 @@ if __name__ == "__main__":
     ###### Launch only n games, params: player1, player2, game_nums, replay, auto
     # play_n_games("custom", "asmodeus", 1, replay=False, auto=False)
 
-    evaluate_bot("custom", 10)
+    evaluate_bot("custom", 5)
+    script_md("games/")
     # play_n_games("custom", "basic", 20, replay=False, auto=False)
 
     # benchmark(5)
 
     ###### Watch a game played
     # player1 = "custom"
-    # player2 = "asmodeus"
-    # game_num = 0
+    # player2 = "hunter"
+    # game_num = 4
     # wrapper(print_board, getGame("games/"+player1+"-"+player2+str(game_num)), [player1, player2], auto=False)
-    # wrapper(print_board, getGame("games/pok/"+player1+"-"+player2+str(game_num)), [player1, player2], auto=False)
-    # wrapper(print_board, getGame("games/pieceAdaptative/"+player1+"-"+player2+str(game_num)), [player1, player2], auto=False)
-    # wrapper(print_board, getGame("games/samewithoutshuffle/"+player1+"-"+player2+str(game_num)), [player1, player2], auto=False)
-    
+    # wrapper(print_board, getGame("games/normal/"+player1+"-"+player2+str(game_num)), [player1, player2], auto=False)
+    # wrapper(print_board, getGame("games/simenemyprior/"+player1+"-"+player2+str(game_num)), [player1, player2], auto=False)
+    # wrapper(print_board, getGame("games/protscaleprio/"+player1+"-"+player2+str(game_num)), [player1, player2], auto=False)
+
     ###### Train the Rnad a number of steps
     # everythingEverywhereAllAtOnce("states/state.pkl", 10000) # 100000, 3sec/step
+
+
+# A chaque entrée de mon tableau à double entrée win/draw/lose
+
+# Tester les heuristic avec des graphs
+    # Faire des stats avec des evolution d'heuristic. Prendre des moyennes de l'evolution de l'heuristic
+    # Grouper par win / lose
+    # Generer des graphs a chaque changement pour voir les reels changement directement 
+    # Automatiser tout ça pour voir. Faire des scripts pour voir.
+    # Générer un .md avec les différents graphs et les stats de win / lose sous forme de tableau, nombre de coups, etc directement.
+
+# Prendre l'heuristic d'un autre bot et le mettre dans notre monte-carlo pour voir l'impact de ça
+
+# Faire le demon of ignorance comme bot en plus ou au moins avoir son heuristic et comment il fait des trucs pour comparer
+
+# Mettre mon heuristic à moi dans un alpha-beta pour à nouveau voir l'impact du monte-carlo sur l'heuristic
+
+# Regarder comment on choisis un move et comment les autres bots choisissent leur move. Regarder comment les autres bots evaluent leur %win
+
+
+

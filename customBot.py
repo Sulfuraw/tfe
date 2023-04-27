@@ -22,7 +22,7 @@ class CustomEvaluator():
             value[i] = value[i-1]*1.6
         value[0] = 1.0
         value[1] = 0.9 if enemies[4] == 0 else 0.8
-        value[2] = 0.8 if enemies[11] else 0.02
+        value[2] = 0.6 if enemies[11] else 0.02
         value[4] += 0.032 if enemies[1] < 3 else 0.6
         returns = []
         for i in range(12):
@@ -49,6 +49,16 @@ class CustomEvaluator():
                     score[player] += state_str[:40].count(self.player_pieces[player][piece_id]) * 0.01 # (old) 1/40 = 0.025
                 else:
                     score[player] += state_str[-40:].count(self.player_pieces[player][piece_id]) * 0.01 # Mtn c'est * 0.01 parce 0.02 est la value la plus basse d'une pièce
+            
+            if player:
+                # Make more weight if the flag is protected
+                score[player] += 0.5 if flag_protec(state, player) else 0.0
+                # Make more weight to miner to go attack in search of bombs
+                score[player] += 0.02 if self.player_pieces[player][4] in state_str[:50] else 0.0
+            else:
+                # Make more weight if the flag is protected
+                score[player] += 0.5 if flag_protec(state, player) else 0.0
+                score[player] += 0.02 if self.player_pieces[player][4] in state_str[-50:] else 0.0
 
         returns = [0, 0]
         for player in [0, 1]:
@@ -65,6 +75,11 @@ class CustomEvaluator():
         result = None
         move_of_state = int(str(state)[103-len(str(state)):])
         
+        # TODO: Tweak pour réduire les n_moves_before ?
+        # Regarde les distances avec des entitées enemy et augmenter par rapport à ça
+        # Obvious kill not taken and instead moving forward
+        # Lots of parasite move on the sides. Moving instead of taking pieces ??
+        # Spy devrait chase le marshall s'il est découvert et pas loin
         if move_of_state < 50:
             n_rollouts = 8
             n_moves_before = 4
@@ -76,26 +91,25 @@ class CustomEvaluator():
             n_moves_before = 10
         else:
             n_rollouts = 10
-            n_moves_before = 20
+            n_moves_before = 16
 
         for _ in range(n_rollouts):
             working_state = state.clone()
             i = 0
+            # TODO: Add one more condition to early stop
             while not working_state.is_terminal() and i < n_moves_before:
-                # We simulate our moves with prior and simulate ennemy move randomly.
-                if True: # TODO: Change: (i%2) == 0
-                    legal_actions = self.prior(working_state)
-                    actions, proba = list(zip(*legal_actions))
+                # We simulate our moves AND enemy moves with our prior
+                legal_actions = self.prior(working_state)
+                actions, proba = list(zip(*legal_actions))
 
-                    # Transform proba to delete values below a treshold and help converge the results
-                    proba = np.array(proba)
-                    if np.max(proba) > 0.045: #(move_of_state+i) > 100
-                        proba[proba <= 0.045] = 0
-                        proba = proba/np.sum(proba)
+                # Transform proba to delete values below a treshold and help converge the results
+                # TODO: Do this in the prior function directly ?
+                # proba = np.array(proba)
+                # if np.max(proba) > 0.045: #(move_of_state+i) > 100
+                #     proba[proba <= 0.045] = 0
+                #     proba = proba/np.sum(proba)
 
-                    action = np.random.choice(actions, p=proba)
-                else:
-                    action = np.random.choice(working_state.legal_actions())
+                action = np.random.choice(actions, p=proba)
                 working_state.apply_action(action)
                 i += 1
             # We sum the returns with terminal*5 if the last state is terminal, the evaluation of the state if it's not
@@ -116,6 +130,7 @@ class CustomEvaluator():
         return man_distance_before > man_distance_after, value
     
     def proba_win_combat(self, ally, enemy_pos, state, information):
+        # TODO: Multiply by a riskScore when not fully known. Risk is higher for higher piece and enemy piece that did not move yet
         def win_combat(ally, enemy):
             """Only work on moveable ally at the moment"""
             allyIdx, _ = pieces_to_index()[ally]
@@ -146,6 +161,8 @@ class CustomEvaluator():
         """Returns probability for each actions"""
         sum = 0.0
         prio = []
+        actions = []
+        proba = []
         player = state.current_player()
         state_str = str(state).upper()
         for action in state.legal_actions(player):
@@ -155,17 +172,28 @@ class CustomEvaluator():
             # Fight
             if arrival != "A":
                 ally = state_str[coord[1]*10 + coord[0]]
-                value = self.proba_win_combat(ally, [coord[3], coord[2]], state, self.information)*20
+                value = self.proba_win_combat(ally, [coord[3], coord[2]], state, self.information)*30
                 if value < 0: value = 1.0
             else:
                 # Priorize moving toward the ennemy flag
                 toward_flag = self.toward_flag(state, player, coord)
                 value = toward_flag[1] if toward_flag[0] else 1.0
+                # TODO: Prioritize moving toward an enemy piece we win versus
             sum += value
-            prio.append([action, value])
+            actions.append(action)
+            proba.append(value)
+
         # Rescale to make the sum equal to 1
-        for i in range(len(prio)):
-            prio[i][1] = prio[i][1]/sum
+        proba = np.array(proba)
+        proba = proba/np.sum(proba)
+
+        # Do that here if we have a lot of n_moves_before
+        if np.max(proba) > 0.045:
+            proba[proba <= 0.045] = 0
+            proba = proba/np.sum(proba)
+
+        for i in range(len(proba)):
+            prio.append([actions[i], proba[i]])
         return prio
 
 class SearchNode(object):
@@ -307,18 +335,15 @@ class CustomBot(pyspiel.Bot):
         """
         pyspiel.Bot.__init__(self)
 
-        self._game = game
         self.uct_c = uct_c
         self.max_simulations = max_simulations
         self.evaluator = evaluator
         self.player_id = player_id
-        self.verbose = False # Whether to print information about the search tree before returning the action
         self.solve = True # Whether to back up solved states.
         self.max_utility = game.max_utility()
         self._dirichlet_noise = dirichlet_noise
         self._random_state = None or np.random.RandomState() # An optional numpy RandomState to make it deterministic.
         self._child_selection_fn = child_selection_fn
-
         self.information = []
 
     def __str__(self):
@@ -339,15 +364,9 @@ class CustomBot(pyspiel.Bot):
         updating_knowledge(self.information, state, action)
 
     def step(self, state):
-        t1 = time.time()
         root = self.mcts_search(state)
-
         best = root.best_child()
-
         mcts_action = best.action
-
-        # policy = [(action, (1.0 if action == mcts_action else 0.0))
-        #         for action in state.legal_actions(state.current_player())]
         return mcts_action
 
     def _apply_tree_policy(self, root, state):
@@ -378,7 +397,6 @@ class CustomBot(pyspiel.Bot):
                     legal_actions = [(a, (1 - epsilon) * p + epsilon * n)
                                 for (a, p), n in zip(legal_actions, noise)]
                 # Reduce bias from move generation order
-                # TODO: Verify that we can disable this because we have a prior: Chelou mais ça a vraiment l'air de rien changer
                 self._random_state.shuffle(legal_actions)
                 player = working_state.current_player()
                 current_node.children = [

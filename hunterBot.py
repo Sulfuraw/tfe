@@ -61,6 +61,8 @@ class hunterBot(basicAIBot.basicAIBot):
             elif direction == "RIGHT":
                 coord.append(coord[0]+1)
                 coord.append(coord[1])
+            else:
+                return super().make_move(policy, state)
             action_str = coord_to_action(coord)
             # Use the last_moves list of 5 last moves done to take the next best move if the current one participate in the forbidden move
             if action_str == self.last_moves[1] and self.last_moves[1] == self.last_moves[3] and self.last_moves[0] == self.last_moves[2]:
