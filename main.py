@@ -57,7 +57,7 @@ def save_to_csv(path, data):
     else:
         df.to_csv(path, index=False, header=True)
 
-def script_md(folder):
+def script_md_evaluate_bot(folder):
     # global_stats add 
     stats_df = pd.read_csv(folder+"stats.csv")
     markdown_content = []
@@ -66,6 +66,8 @@ def script_md(folder):
     global_stats = {}
     eval_matrix_win = None
     eval_matrix_lose = None
+    unk_acc_win = None
+    unk_acc_lose = None
 
     # Iterate over the rows of the stats dataframe and read in the corresponding game csv files
     for index, row in stats_df.iterrows():
@@ -82,16 +84,23 @@ def script_md(folder):
             game_df = pd.read_csv(folder+filename)
             eval_real = np.array(game_df["eval_real"])
             padded_eval_real = np.pad(eval_real, (0, 1001-len(eval_real)), mode='constant', constant_values=np.nan)
+            unk_acc = np.array(game_df["unknow_acc"])
+            padded_unk_acc = np.pad(unk_acc, (0, 1001-len(unk_acc)), mode='constant', constant_values=np.nan)
+
             if win_1:
                 if eval_matrix_win is None:
                     eval_matrix_win = padded_eval_real
+                    unk_acc_win = padded_unk_acc
                 else:
                     eval_matrix_win = np.vstack((eval_matrix_win, padded_eval_real))
+                    unk_acc_win = np.vstack((unk_acc_win, padded_unk_acc))
             elif win_2:
                 if eval_matrix_lose is None:
                     eval_matrix_lose = padded_eval_real
+                    unk_acc_lose = padded_unk_acc
                 else:
                     eval_matrix_lose = np.vstack((eval_matrix_lose, padded_eval_real))
+                    unk_acc_lose = np.vstack((unk_acc_lose, padded_unk_acc))
             # Draw not counted, turn the elif above into a if to take them in the lose one
         else:
             avg_time = row['time_taken']
@@ -100,19 +109,26 @@ def script_md(folder):
                                             # Nombre de game, temps moyen, moves moyen, win%, draw%, lose%
             global_stats[player2] = np.array([game_num, avg_time, avg_moves, win_1, 100-win_1-win_2, win_2])
 
-    for matrix, win in [(eval_matrix_win, "win"), (eval_matrix_lose, "lose")]:
+    for matrix, acc, win in [(eval_matrix_win, unk_acc_win, "win"), (eval_matrix_lose, unk_acc_lose, "lose")]:
         x_values = range(0, 2001, 2)
         # Compute the mean and standard deviation for each index
-        mean_values = np.nanmean(matrix, axis=0)
-        std_values = np.nanstd(matrix, axis=0)
+        mean_values = [np.nanmean(matrix, axis=0), np.nanmean(acc, axis=0)]
+        std_values = [np.nanstd(matrix, axis=0), np.nanstd(acc, axis=0)]
 
         # Plot the graph
-        fig, ax = plt.subplots()
-        ax.plot(x_values, mean_values)
-        ax.fill_between(x_values, mean_values - std_values, mean_values + std_values, alpha=0.3)
-        ax.set_xlabel('Moves')
-        ax.set_ylabel('Evaluation')
-        ax.set_title('Evaluation of the state over the moves: '+win)
+        fig, axs = plt.subplots(1, 2, figsize=(10, 5))
+        axs[0].plot(x_values, mean_values[0])
+        axs[0].fill_between(x_values, mean_values[0] - std_values[0], mean_values[0] + std_values[0], alpha=0.3)
+        axs[0].set_xlabel('Moves')
+        axs[0].set_ylabel('Evaluation')
+        axs[0].set_title('Evaluation of the state over the moves: '+win)
+
+        axs[1].plot(x_values, mean_values[1])
+        axs[1].fill_between(x_values, mean_values[1] - std_values[1], mean_values[1] + std_values[1], alpha=0.3)
+        axs[1].set_xlabel('Moves')
+        axs[1].set_ylabel('Unknown accuracy')
+        axs[1].set_title('Accuracy of unknown pieces over the moves: '+win)
+        
         # plt.show()
         fig.savefig(folder+f"eval-{win}.png")
 
@@ -143,8 +159,6 @@ def script_md(folder):
     # Write the markdown content to a file
     with open(folder+'results.md', 'w') as f:
         f.write(''.join(markdown_content))
-
-
 
 def _init_bot(bot_type, game, player_id):
     """Initializes a bot by type."""
@@ -216,7 +230,7 @@ def _play_game(game, bots, game_num):
             if time.time()-start > 2:
                 print("Time for generate was", round(time.time()-start, 2))
             action = bot.step(generated)
-            #vprint("time for generate and play a move:", time.time()-start)
+            # print("time for generate and play a move:", time.time()-start)
             save_to_csv("./games/"+str(bots[0])+"-"+str(bots[1])+str(game_num)+".csv", data_for_games(move, state, generated, customBot.CustomEvaluator()))
         else:
             action = bot.step(state)
@@ -332,8 +346,8 @@ if __name__ == "__main__":
     ###### Launch only n games, params: player1, player2, game_nums, replay, auto
     # play_n_games("custom", "asmodeus", 1, replay=False, auto=False)
 
-    evaluate_bot("custom", 5)
-    script_md("games/")
+    # evaluate_bot("custom", 5)
+    script_md_evaluate_bot("games/prot/")
     # play_n_games("custom", "basic", 20, replay=False, auto=False)
 
     # benchmark(5)
