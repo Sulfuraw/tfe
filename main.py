@@ -77,7 +77,7 @@ def script_md_evaluate_bot(folder):
         win_1 = row['win_1']
         win_2 = row['win_2']
         
-        if win_1 < 2:
+        if win_1 < 2 and win_2 < 2:
             # Create the filename for the game csv file
             filename = f"{player1}-{player2}{game_num}.csv"
             # Read in the game csv file and store it in the games dictionary
@@ -312,8 +312,7 @@ def play_n_games(player1, player2, num_games, replay=False, auto=False):
 
 def benchmark(num_games):
     """With the num_games with 50, effectively each bot will play 100 games versus other bots"""
-    # bots_to_play = ["custom", "asmodeus", "hunter", "rnad", "mcts"]
-    bots_to_play = ["basic", "rnad"]
+    bots_to_play = ["custom", "asmodeus", "hunter", "rnad", "mcts"]
     for i in range(len(bots_to_play)):
         for j in range(len(bots_to_play)):
             if i != j:
@@ -326,8 +325,10 @@ def benchmark(num_games):
 
 def evaluate_bot(bot, num_games):
     """Evaluate the bot against all the other bots"""
-    # bots_to_play = ["custom", "asmodeus", "hunter", "rnad", "mcts"]
-    bots_to_play = ["hunter", "asmodeus", "basic", "rnad"]
+    # TODO: Launch different implem of our customBot versus other bots and itself and check winrates.
+    # (More efficient to copy/paste in a new file than each time checking a parameter with a if to do so)
+    # bots_to_play = ["custom", "asmodeus", "hunter", "rnad", "mcts", "basic"]
+    bots_to_play = ["hunter", "asmodeus", "rnad"]
     win = 0
     for i in range(len(bots_to_play)):
         player2 = bots_to_play[i]
@@ -346,8 +347,8 @@ if __name__ == "__main__":
     ###### Launch only n games, params: player1, player2, game_nums, replay, auto
     # play_n_games("custom", "asmodeus", 1, replay=False, auto=False)
 
-    # evaluate_bot("custom", 5)
-    script_md_evaluate_bot("games/prot/")
+    evaluate_bot("custom", 5)
+    script_md_evaluate_bot("games/")
     # play_n_games("custom", "basic", 20, replay=False, auto=False)
 
     # benchmark(5)
