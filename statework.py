@@ -1,7 +1,6 @@
 import curses
 import numpy as np
 import random
-import heapq # For A* search
 
 def players_pieces():
     pieces = [["M", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L"],
@@ -189,35 +188,6 @@ def coord_to_action(coord):
     rows = {0:"1", 1:"2", 2:"3", 3:"4", 4:"5", 5:"6", 6:"7", 7:"8", 8:"9", 9:":"}
     return cols[coord[0]] + rows[coord[1]] + cols[coord[2]] + rows[coord[3]]
 
-def is_valid_state(state_str):
-    """Verify that the state_str is a valid state, to be used for our generate_state"""
-    return (state_str.count("M") == 1 
-        and state_str.count("Y") == 1
-        and 0 <= state_str.count("B") <= 6
-        and 0 <= state_str.count("N") <= 6
-        and (state_str.count("C") == 1 or state_str.count("C") == 0)
-        and (state_str.count("O") == 1 or state_str.count("O") == 0)
-        and 0 <= state_str.count("D") <= 8
-        and 0 <= state_str.count("P") <= 8
-        and 0 <= state_str.count("E") <= 5
-        and 0 <= state_str.count("Q") <= 5
-        and 0 <= state_str.count("F") <= 4
-        and 0 <= state_str.count("R") <= 4
-        and 0 <= state_str.count("G") <= 4
-        and 0 <= state_str.count("S") <= 4
-        and 0 <= state_str.count("H") <= 4
-        and 0 <= state_str.count("T") <= 4
-        and 0 <= state_str.count("I") <= 3
-        and 0 <= state_str.count("U") <= 3
-        and 0 <= state_str.count("J") <= 2
-        and 0 <= state_str.count("V") <= 2
-        and (state_str.count("K") == 1 or state_str.count("K") == 0)
-        and (state_str.count("W") == 1 or state_str.count("W") == 0)
-        and (state_str.count("L") == 1 or state_str.count("L") == 0)
-        and (state_str.count("X") == 1 or state_str.count("X") == 0)
-        and state_str.count("?") == 0
-        and len(state_str) >= 104)
-
 def create_initial_state_str():
     player_pieces = players_pieces()
     setups = [
@@ -226,9 +196,7 @@ def create_initial_state_str():
         [6, 1, 4, 1, 5, 3, 7, 0, 7, 4, 3, 5, 1, 4, 1, 7, 8, 8, 3, 3, 5, 3, 8, 1, 9, 10, 4, 3, 9, 6, 3, 4, 6, 3, 1, 6, 2, 11, 7, 5], # 95 moves bait flag, stacked near flag
         [5, 4, 1, 1, 0, 5, 5, 1, 3, 5, 1, 7, 9, 4, 3, 2, 4, 6, 3, 1, 7, 6, 10, 11, 3, 6, 9, 4, 3, 6, 1, 3, 8, 4, 7, 3, 8, 8, 3, 7], # 106 moves 1/3 protec, stacked
         [5, 1, 0, 7, 7, 3, 1, 3, 3, 4, 1, 4, 1, 2, 4, 8, 4, 3, 4, 5, 9, 7, 8, 6, 11, 5, 3, 10, 3, 1, 6, 3, 6, 3, 8, 6, 9, 1, 7, 5], # 130 moves 2/3 protec, not well placed, doubt
-        # [4, 5, 3, 4, 3, 1, 0, 4, 3, 4, 3, 3, 1, 1, 6, 1, 8, 8, 3, 9, 6, 5, 1, 1, 5, 5, 2, 7, 3, 10, 7, 6, 3, 7, 4, 7, 9, 11, 6, 8], # 150 moves 1/3 protec, not well placed, doubt but less than above
         [6, 7, 1, 3, 1, 3, 0, 1, 3, 1, 9, 4, 4, 2, 4, 3, 1, 8, 11, 7, 4, 6, 8, 10, 9, 6, 5, 3, 5, 8, 5, 3, 7, 3, 6, 1, 4, 3, 7, 5], # 150 moves 2/3 protec, well spread
-        # [1, 1, 0, 5, 3, 1, 4, 4, 1, 3, 8, 8, 3, 3, 3, 3, 3, 6, 1, 6, 6, 6, 10, 4, 7, 11, 2, 1, 8, 3, 5, 7, 4, 9, 7, 5, 9, 4, 5, 7], # 270 moves 1/3 protec, well spread
         [1, 4, 1, 4, 0, 3, 1, 5, 6, 1, 1, 3, 4, 3, 8, 3, 4, 8, 3, 1, 3, 7, 9, 2, 7, 8, 3, 4, 7, 9, 6, 5, 6, 10, 5, 6, 11, 7, 3, 5], # 340 moves No protec flag, but well spread
         [7, 3, 4, 1, 0, 1, 4, 1, 5, 1, 9, 2, 4, 6, 1, 6, 4, 1, 7, 5, 8, 10, 3, 9, 4, 3, 11, 8, 3, 7, 5, 3, 7, 3, 6, 8, 3, 6, 5, 3]  # 625 moves Full protec flag, well spread
     ]
@@ -305,8 +273,7 @@ def updating_knowledge(information, state, action):
 
     # This is ok because the state passed in argument was a clone
     state.apply_action(action)
-    matrix_after = stateIntoCharMatrix(state.information_state_string(player_id))
-    arrival_after = matrix_after[coord[3]][coord[2]]
+    arrival_after = stateIntoCharMatrix(state.information_state_string(player_id))[coord[3]][coord[2]]
 
     if current_player == player_id:
         # Fight
@@ -358,67 +325,33 @@ def updating_knowledge(information, state, action):
                 moved_scout[coord[1]][coord[0]] = 0
                 moved_scout[coord[3]][coord[2]] = 1
 
-# Define the A* algorithm function
-def astar(array, start, end):
-    # Define the heuristic function (Manhattan distance)
-    def heuristic(a, b):
-        return abs(b[0] - a[0]) + abs(b[1] - a[1])
-    
-    # Create an empty set to store visited nodes
-    visited = set()
-    # Create a priority queue to store nodes to be visited
-    queue = [(0, start)]
-    # Create a dictionary to store the distance from the start node to each node
-    distance = {start: 0}
-    # Create a dictionary to store the path from the start node to each node
-    path = {start: [start]}
-    
-    # Loop until all nodes have been visited or the end node has been found
+# Path Search over 4 moves max
+def find_combat(matrix, start, pieces):
+    """ Find if there is a piece from pieces in the matrix within the range of 4 moves from the start """
+    visited = {start}
+    queue = [(start, [])]
     while queue:
-        # Get the node with the lowest estimated distance to the end node
-        (cost, current) = heapq.heappop(queue)
-        
-        # Check if the current node is the end node
-        if current == end:
-            # Return the path to the end node
-            return path[current]
-        
-        # Check if the current node has already been visited
-        if current in visited:
+        pos, path = queue.pop(0)
+        # A piece is found
+        if matrix[pos[0]][pos[1]] in pieces:
+            return True, path
+        # If further than 4 moves, stop
+        if len(path) >= 4:
             continue
-        
-        # Mark the current node as visited
-        visited.add(current)
-        
-        # Loop over the neighbors of the current node
-        for neighbor in [(current[0]+1, current[1]), (current[0]-1, current[1]), (current[0], current[1]+1), (current[0], current[1]-1)]:
-            # Check if the neighbor is within the bounds of the array
-            if neighbor[0] >= len(array) or neighbor[0] < 0 or neighbor[1] >= len(array[0]) or neighbor[1] < 0:
+        # Expand
+        for row, col in [(pos[0]-1, pos[1]), (pos[0]+1, pos[1]), (pos[0], pos[1]-1), (pos[0], pos[1]+1)]:
+            if (row, col) in visited or row < 0 or col < 0 or row >= len(matrix) or col >= len(matrix[0]):
                 continue
-            
-            # Check if the neighbor is a valid node
-            if array[neighbor[0]][neighbor[1]] != 'A' and (neighbor[0], neighbor[1]) != end:
-                continue
-            
-            # Calculate the distance from the start node to the neighbor node
-            cost = distance[current] + 1
-            
-            # Check if the neighbor node has already been visited or if it has a shorter distance from the start node
-            if neighbor not in distance or cost < distance[neighbor]:
-                # Update the distance and path dictionaries
-                distance[neighbor] = cost
-                priority = cost + heuristic(end, neighbor)
-                heapq.heappush(queue, (priority, neighbor))
-                path[neighbor] = path[current] + [neighbor]
-    # If the end node was not found, return None
-    return None
-
+            if matrix[row][col] == "A" or matrix[row][col] in pieces:
+                visited.add((row, col))
+                queue.append(((row, col), path + [(row, col)]))
+    return False, []
 
 def unknown_acc(state, state2):
     """Check the accuracy for the pieces unknown only by comparing the two states piece-wise"""
     str_partial = str(state.information_state_string(state.current_player()))
-    str_state1 = str(state).upper()[:100]
-    str_state2 = str(state2).upper()[:100]
+    str_state1 = str(state)[:100].upper()
+    str_state2 = str(state2)[:100].upper()
     total = 0
     good = 0
     for i in range(len(str_state1)):
@@ -430,8 +363,8 @@ def unknown_acc(state, state2):
 
 def global_accuracy_state(state1, state2):
     """Check the accuracy for the pieces (ally & ennemy, known or unkown) by comparing the two states piece-wise"""
-    str_state1 = str(state1).upper()[:100]
-    str_state2 = str(state2).upper()[:100]
+    str_state1 = str(state1)[:100].upper()
+    str_state2 = str(state2)[:100].upper()
     total = 0
     good = 0
     for i in range(len(str_state1)):
@@ -455,8 +388,8 @@ def data_for_games(move, state, generated, evaluator):
     player = state.current_player()
     players_piece = players_pieces()
     move_of_state = int(str(state)[103-len(str(state)):])
-    eval_real = round(evaluator.evaluate_state(state, move_of_state)[player], 4)
-    eval_generated = round(evaluator.evaluate_state(generated, move_of_state)[player], 4)
+    eval_real = round(evaluator.evaluate_state(state)[player], 4)
+    eval_generated = round(evaluator.evaluate_state(generated)[player], 4)
     unknow_acc = round(unknown_acc(state, generated), 2)
     unk_pieces = str(state.information_state_string(player)).count("?")
     our_pieces = 0
@@ -491,12 +424,11 @@ def flag_protec(state, player):
         for j in range(10):
             if matrix[i][j] == players_piece[player][0]:
                 coord = [i, j]
-    protected = True
     to_check = [[coord[0]+1, coord[1]], [coord[0]-1, coord[1]], [coord[0], coord[1]+1], [coord[0], coord[1]-1]]
     for pos in to_check:
-        if is_valid_coord(pos):
-            protected = protected and (matrix[pos[0]][pos[1]] in players_piece[player])
-    return protected 
+        if is_valid_coord(pos) and not matrix[pos[0]][pos[1]] in players_piece[player]:
+            return False
+    return True
     
 def stateIntoCharMatrix(state):
     """Transform a state into a Matrix of Character inside the str(state)"""

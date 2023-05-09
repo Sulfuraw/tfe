@@ -8,8 +8,10 @@ from absl import app
 import numpy as np
 from curses import wrapper
 from asmodeusBot import *
+from customBot import *
 from statework import *
 import pandas as pd
+import heapq
 import random
 
 def game_list(_):
@@ -93,17 +95,9 @@ def example_api_of_games(_):
     print(x)
     return "example finished"
 
-#########################################################################################
+###################################################################################
 
 # Alpha-beta bot, first thing didn't work:
-# from __future__ import absolute_import
-# from __future__ import division
-# from __future__ import print_function
-
-# import pyspiel
-# from open_spiel.python.algorithms import minimax
-# import numpy as np
-
 class AlphaBetaBot(pyspiel.Bot):
     # A state in str:
     # FEBMBEFEEF
@@ -222,8 +216,7 @@ class AlphaBetaBot(pyspiel.Bot):
 
     def step(self, state):
         return self.step_with_policy(state)[1]
-#########################################################################################
-
+###################################################################################
 
 # The customBot before it started looking like something
 class CustomBot(pyspiel.Bot):
@@ -339,7 +332,7 @@ class CustomBot(pyspiel.Bot):
     def step(self, state):
         return self.step_with_policy(state)[1]
 
-###############################################################################
+###################################################################################
 
 # Base Evaluator
 class Evaluator(object):
@@ -388,7 +381,7 @@ class RandomRolloutEvaluator(Evaluator):
         legal_actions = state.legal_actions(state.current_player())
         return [(action, 1.0 / len(legal_actions)) for action in legal_actions]
 
-#####################################################################################################
+#####################################################################################
 
 # # Debugging asset, printing things for debug
  
@@ -424,14 +417,36 @@ class RandomRolloutEvaluator(Evaluator):
             # print(generated)
             # print(is_valid_state(generated))
 
-# printCharMatrix(state.information_state_string(maximizing_player_id))
+###############################################################################
 
-# Base state debugged
-# "FEBMBEFEEFBGIBHIBEDBGJDDDHCGJGDHDLIFKDDHAA__AA__AAAA__AA__AASTQPNSQPTSUPWPVRPXPURNQONNQSNVPTNQRRTYUP r 0"
-# Equal state
-# state = game.new_initial_state("FEBMBEFEEFBGIBHIBEDBGJDDDHCGJGDHDLIFKDDHAA__AA__AAAA__AA__AATPPWRUXPTPSVSOTPPPVSNPQNUTNUSNRQQRQNYNQR r 0")
-# Test avec un miner (E) plus devant seul devant les mines du flag
-# state = game.new_initial_state("FDBMBEFEEFBGIBHIBEDBGJDDDHCGJGDHHLIFKDDEAA__AA__AAAA__AA__AAAAAAAAAAAAAAAAAAAAAAAAAAAANUSNRQQRQNYNQR r 205")
+def is_valid_state(state_str):
+    """Verify that the state_str is a valid state, to be used for our generate_state"""
+    return (state_str.count("M") == 1 
+        and state_str.count("Y") == 1
+        and 0 <= state_str.count("B") <= 6
+        and 0 <= state_str.count("N") <= 6
+        and (state_str.count("C") == 1 or state_str.count("C") == 0)
+        and (state_str.count("O") == 1 or state_str.count("O") == 0)
+        and 0 <= state_str.count("D") <= 8
+        and 0 <= state_str.count("P") <= 8
+        and 0 <= state_str.count("E") <= 5
+        and 0 <= state_str.count("Q") <= 5
+        and 0 <= state_str.count("F") <= 4
+        and 0 <= state_str.count("R") <= 4
+        and 0 <= state_str.count("G") <= 4
+        and 0 <= state_str.count("S") <= 4
+        and 0 <= state_str.count("H") <= 4
+        and 0 <= state_str.count("T") <= 4
+        and 0 <= state_str.count("I") <= 3
+        and 0 <= state_str.count("U") <= 3
+        and 0 <= state_str.count("J") <= 2
+        and 0 <= state_str.count("V") <= 2
+        and (state_str.count("K") == 1 or state_str.count("K") == 0)
+        and (state_str.count("W") == 1 or state_str.count("W") == 0)
+        and (state_str.count("L") == 1 or state_str.count("L") == 0)
+        and (state_str.count("X") == 1 or state_str.count("X") == 0)
+        and state_str.count("?") == 0
+        and len(state_str) >= 104)
 
 ###############################################################################
 
@@ -501,7 +516,7 @@ def generate_state_via_matrix(state, matrix_of_possibilities, information):
                 i += 1
     return final
 
-###############################################################################################""
+###############################################################################
 # 15 avril
 
 def generate_state_old(state, information):
@@ -693,26 +708,62 @@ def updating_knowledge_old(information, state, action):
 
 ###############################################################################
 
-#More weight moving forward with game advancement
-                # for move, adv, div in [(25, 50, 20), (75, 40, 20), (200, 30, 10)]:
-                #     if move_of_state > move:
-                #         if player: # player = 1
-                #             score[player] += state_str[:adv].count(self.player_pieces[player][piece_id])/div
-                #         else:
-                #             score[player] += state_str[-adv:].count(self.player_pieces[player][piece_id])/div
+# Define the A* algorithm function
+def astar(array, start, end):
+    # Define the heuristic function (Manhattan distance)
+    def heuristic(a, b):
+        return abs(b[0] - a[0]) + abs(b[1] - a[1])
+    
+    # Create an empty set to store visited nodes
+    visited = set()
+    # Create a priority queue to store nodes to be visited
+    queue = [(0, start)]
+    # Create a dictionary to store the distance from the start node to each node
+    distance = {start: 0}
+    # Create a dictionary to store the path from the start node to each node
+    path = {start: [start]}
+    
+    # Loop until all nodes have been visited or the end node has been found
+    while queue:
+        # Get the node with the lowest estimated distance to the end node
+        (cost, current) = heapq.heappop(queue)
+        
+        # Check if the current node is the end node
+        if current == end:
+            # Return the path to the end node
+            return path[current]
+        
+        # Check if the current node has already been visited
+        if current in visited:
+            continue
+        
+        # Mark the current node as visited
+        visited.add(current)
+        
+        # Loop over the neighbors of the current node
+        for neighbor in [(current[0]+1, current[1]), (current[0]-1, current[1]), (current[0], current[1]+1), (current[0], current[1]-1)]:
+            # Check if the neighbor is within the bounds of the array
+            if neighbor[0] >= len(array) or neighbor[0] < 0 or neighbor[1] >= len(array[0]) or neighbor[1] < 0:
+                continue
+            
+            # Check if the neighbor is a valid node
+            if array[neighbor[0]][neighbor[1]] != 'A' and (neighbor[0], neighbor[1]) != end:
+                continue
+            
+            # Calculate the distance from the start node to the neighbor node
+            cost = distance[current] + 1
+            
+            # Check if the neighbor node has already been visited or if it has a shorter distance from the start node
+            if neighbor not in distance or cost < distance[neighbor]:
+                # Update the distance and path dictionaries
+                distance[neighbor] = cost
+                priority = cost + heuristic(end, neighbor)
+                heapq.heappush(queue, (priority, neighbor))
+                path[neighbor] = path[current] + [neighbor]
+    # If the end node was not found, return None
+    return None
 
-# Change way of counting with game advancement
-                # if move_of_state < 200:
-                #     score[player] += nbr_pieces[player][piece_id]*value
-                # else:
-                #     score[player] += nbr_pieces[player][piece_id]
-
-# Adapt the max_simulation during the game: Useless-sama ?
-            # We adapt the max_simulation parameter to the advancement of the game:
-            # if move == 0 or move==1:
-            #     bot.set_max_simulations(100)
-            # if move == 50 or move == 51:
-            #     bot.set_max_simulations(2000)
+###############################################################################
 
 # Simulation rollout prior random:
                 # # We simulate our moves with prior and simulate ennemy move randomly.
@@ -730,145 +781,19 @@ def updating_knowledge_old(information, state, action):
                 # else:
                 #     action = np.random.choice(working_state.legal_actions())
 
-#####################################################################################################
-
-# Print a graph 
-import pandas as pd
-from matplotlib import pyplot as plt
-import matplotlib
-matplotlib.use('TkAgg')
-def unk_acc_graph(filename):
-    df = pd.read_csv(filename)
-    x = df["move"]
-    y = df["unknow_acc"]
-    plt.plot(x, y)
-    plt.xlabel("Number of moves")
-    plt.ylabel("knowledge accuracy")
-    plt.ylim(0.0, 1.0)
-    plt.show()
-
-def compare_unk_acc_graph(filename1, filename2):
-    df = pd.read_csv(filename1)
-    x = df["move"]
-    y = df["unknow_acc"]
-    plt.plot(x, y)
-    df = pd.read_csv(filename2)
-    x = df["move"]
-    y = df["unknow_acc"]
-    plt.plot(x, y)
-    plt.xlabel("Number of moves")
-    plt.ylabel("knowledge accuracy")
-    plt.legend(['Before', 'After'], loc='upper left')
-    plt.ylim(0.0, 1.0)
-    plt.show()
-
-# compare_unk_acc_graph('bench2-8-April/custom-asmodeus1.csv', 'generate_with_stats/custom-asmodeus4.csv')
-
-
 ###############################################################################
 
-import matplotlib.pyplot as plt
-import seaborn as sns
-import matplotlib.colors as mcolors
+state = pyspiel.load_game("yorktown").new_initial_state("FEBMBEFEEFBGIBHIBEDBGJDDDHCGJGDHDLIFKDDHAA__AA__AAAA__AA__AATPPWRUXPTPSVSOTPPPVSNPQNUTNUSNRQQRQNYNQR r 0")
+nbr_piece_left = np.array([1, 8, 1, 6, 5, 4, 4, 4, 3, 2, 1, 1])
+moved_before = np.zeros((10, 10))
+moved_scout = np.zeros((10, 10))
+information = [0, nbr_piece_left, moved_before, moved_scout, matrix_of_stats(0)]
 
-# TODO THEN: Modifify the print of the benchmark to take into account ties as lose
-# for both and not win for the other...
-# Cause this was working for when we only had one column 'win' for when the player1 won.
-# Now we have 'win_player1' and 'win_player2', that allow to know when tie happen and
-# so we don't give a win to the other player if there was a tie and not a loss.
+# state = pyspiel.load_game("yorktown").new_initial_state("FEBBMFFBDFBHAJDCEGDBHAKEDGJEDGBGEAAXAIDHAI__AA__AAAA__AA__AARANAARPSPSNPWPLASUTVRQPQUQONQNQPPNPTTYNR r 58")
+# eval = CustomEvaluator()
+# eval.set_information(information)
+# prio = eval.prior(state)
+# for i in range(len(prio)):
+#     print("{} -> {}: {}".format(prio[i][0], action_to_coord(state.action_to_string(prio[i][0])), prio[i][1]))
 
-# Do a double entry array and each entry is something of the type  "%win / %tie / %loss" and not only %win
-
-# df = df.loc[df['win'] < 2]  ---->   df = df.loc[df['win_player1'] < 2]
-# Le reste faut tout changer partout avec des win_player1 et win_player2 
-
-def decrypt_benchmark_firstBenchmark(folder):
-    df = pd.read_csv(folder+"stats.csv")
-    df = df.loc[df['win'] < 2]
-
-    # create a copy of the dataframe with the players switched
-    df_switched = df.copy()
-    df_switched['player1'] = df['player2']
-    df_switched['player2'] = df['player1']
-    df_switched['win'] = 1 - df['win']
-    # concatenate the original and switched dataframes
-    df_concat = pd.concat([df, df_switched], ignore_index=True)
-    # create pivot table with win rate for each pair of bots
-    pt = pd.pivot_table(df_concat, values='win', index='player1', columns='player2', aggfunc='mean')
-
-    # Define the custom color map
-    cmap = mcolors.LinearSegmentedColormap.from_list(name='custom_cmap',
-        colors = ['#bf1f1f', '#c93a3a', '#f46d43', '#fdae61', '#94eb94', '#5cdb5c', '#3bc43b', '#24b324'])
-    
-    sns.heatmap(pt, annot=True, cmap=cmap, fmt='.0%')
-    plt.show()
-
-    if False: # Satisfying result to see only win percentage in total
-        # calculate win percentages
-        df2 = df.copy()
-        df2['player1_wins'] = np.where(df2['win'] == 1, 1, 0)
-        df2['player2_wins'] = np.where(df2['win'] == 0, 1, 0)
-        df3 = df2.groupby('player1').sum()[['player1_wins', 'player2_wins']]
-        df3['total_games'] = df3.sum(axis=1)
-        df3['win'] = df3['player1_wins'] / df3['total_games']
-        print(df3)
-
-
-###############################################################################
-
-
-
-# state = pyspiel.load_game("yorktown").new_initial_state("FEBMBEFEEFBGIBHIBEDBGJDDDHCGJGDHDLIFKDDHAA__AA__AAAA__AA__AATPPWRUXPTPSVSOTPPPVSNPQNUTNUSNRQQRQNYNQR r 0")
-# nbr_piece_left = np.array([1, 8, 1, 6, 5, 4, 4, 4, 3, 2, 1, 1])
-# moved_before = np.zeros((10, 10))
-# moved_scout = np.zeros((10, 10))
-# information = [0, nbr_piece_left, moved_before, moved_scout, matrix_of_stats(0)]
-
-# printCharMatrix(state)
-# action = state.legal_actions()[1]
-# updating_knowledge(information, state.clone(), action)
-# state.apply_action(action)
-# printCharMatrix(state)
-# action = state.legal_actions()[3]
-# updating_knowledge(information, state.clone(), action)
-# state.apply_action(action)
-# printCharMatrix(state)
-
-# path = astar(stateIntoCharMatrix(state), (3, 4), (6, 5))
-# print(path)
-# print(len(path)-1)
-
-
-pieces = [["M", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L"],
-          ["Y", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X"]]
-# It is:  [Fl,  Bo,   Sp,  Sc,  Mi,  Sg,  Lt,  Cp,  Mj,  Co,  Ge,  Ms]
-# Nbr     [1,   6,    1,   8,   5,   4,   4,   4,   3,   2,   1,   1]
-
-def proba_win_combat(ally, enemy_pos, state, information):
-    def win_combat(ally, enemy):
-        """Only work on moveable ally at the moment"""
-        allyIdx, _ = pieces_to_index()[ally]
-        enemyIdx, _ = pieces_to_index()[enemy]
-        if enemyIdx == 1:
-            return 1 if allyIdx == 4 else -1
-        if enemyIdx == 11:
-            return 1 if (allyIdx == 2 or allyIdx == 11) else -1
-        return 1 if enemyIdx <= allyIdx else -1
-    player, pieces_left, moved, scout, matrix_of_stats = information
-    enemy_pieces = players_pieces()[1-player]
-    partial_state_str = state.information_state_string(player).upper()
-    if sum(matrix_of_stats[enemy_pos[0]][enemy_pos[1]]) < 0.2:
-        return win_combat(ally, partial_state_str[enemy_pos[0]*10+enemy_pos[1]])
-    if scout[enemy_pos[0]][enemy_pos[1]]:
-        return win_combat(ally, enemy_pieces[3])
-    elif moved[enemy_pos[0]][enemy_pos[1]]:
-        probas = moved_piece_matrix(pieces_left, matrix_of_stats[enemy_pos[0]][enemy_pos[1]])
-    else:
-        probas = no_info_piece_matrix(pieces_left, matrix_of_stats[enemy_pos[0]][enemy_pos[1]])
-    summ = 0
-    for idx in range(12):
-        summ += probas[idx]*win_combat(ally, enemy_pieces[idx])
-    return summ
-
-# t = proba_win_combat("H", (6, 0), state, information)
-# print(t)
+print(str(state)[:100] + str(state)[101])

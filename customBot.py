@@ -4,7 +4,6 @@ from __future__ import print_function
 import pyspiel
 import numpy as np
 import math
-import time
 from statework import *
 
 # Using the Copyright 2019 DeepMind Technologies Limited using modified version of """Monte-Carlo Tree Search algorithm for game play"""
@@ -13,8 +12,9 @@ class CustomEvaluator():
         self.piece_to_index = pieces_to_index()
         self.player_pieces = players_pieces()
 
-    def set_information(self, information):
+    def set_information(self, information, last_moves):
         self.information = information
+        self.last_moves = last_moves
     
     def value_for_piece(self, enemies):
         value = np.array([0.02]*12)
@@ -29,12 +29,12 @@ class CustomEvaluator():
             returns.append((i, value[i]))
         return returns
 
-    def evaluate_state(self, state, move_of_state):
+    def evaluate_state(self, state):
         """Returns evaluation on given state."""
-        state_str = str(state)
+        state_str = str(state)[:100].upper()
 
         nbr_pieces = [[0]*12, [0]*12]
-        for piece in state_str[:100].upper():
+        for piece in state_str:
             if piece not in ["A", "_"]:
                 i, player = self.piece_to_index[piece]
                 nbr_pieces[player][i] += 1
@@ -44,81 +44,56 @@ class CustomEvaluator():
             for piece_id, value in self.value_for_piece(nbr_pieces[1-player]):
                 score[player] += nbr_pieces[player][piece_id]*value
 
-                # make more weight having pieces on the other part of the board, go forward
                 if player:
-                    score[player] += state_str[:40].count(self.player_pieces[player][piece_id]) * 0.01 # (old) 1/40 = 0.025
+                    # make more weight having pieces on the other part of the board, take place
+                    score[player] += state_str[:40].count(self.player_pieces[player][piece_id]) * 0.01
                 else:
-                    score[player] += state_str[-40:].count(self.player_pieces[player][piece_id]) * 0.01 # Mtn c'est * 0.01 parce 0.02 est la value la plus basse d'une pièce
+                    score[player] += state_str[-40:].count(self.player_pieces[player][piece_id]) * 0.01
             
+            # Make more weight if the flag is protected
+            score[player] += 0.5 if flag_protec(state, player) else 0.0
             if player:
-                # Make more weight if the flag is protected
-                score[player] += 0.5 if flag_protec(state, player) else 0.0
                 # Make more weight to miner to go attack in search of bombs
                 score[player] += 0.02 if self.player_pieces[player][4] in state_str[:50] else 0.0
             else:
-                # Make more weight if the flag is protected
-                score[player] += 0.5 if flag_protec(state, player) else 0.0
                 score[player] += 0.02 if self.player_pieces[player][4] in state_str[-50:] else 0.0
 
         returns = [0, 0]
         for player in [0, 1]:
-            returns[player] = score[player] - score[1-player]   # Re-range with (x - min)/(max-min)
-        # Print for debug
-        # if returns[0] > 1 or returns[0] < -1 or returns[1] > 1 or returns[1] < -1:
-        #     print("==============================")
-        #     print("Here, the returns were strange:", returns, "\n")
-        #     print(state_str)
+            x = score[player] - score[1-player]
+            returns[player] = 2*(x - (-8.5))/(8.5 - (-8.5)) - 1.0   # Rerange -8.5 to 8.5 to -1 to 1
+
+        if returns[0] > 1 or returns[0] < -1 or returns[1] > 1 or returns[1] < -1:
+            # Check if we need to adapt the rescale above
+            print("==============================")
+            print("Returns:", returns, "\n")
+            printCharMatrix(str(state))
+
         return returns    
 
     def evaluate(self, state):
         """Returns evaluation on given state."""
         result = None
-        move_of_state = int(str(state)[103-len(str(state)):])
-        
-        # TODO: Tweak pour réduire les n_moves_before ?
-        # Regarde les distances avec des entitées enemy et augmenter par rapport à ça
-        # Obvious kill not taken and instead moving forward
-        # Lots of parasite move on the sides. Moving instead of taking pieces ??
-        # Spy devrait chase le marshall s'il est découvert et pas loin
-        if move_of_state < 50:
-            n_rollouts = 8
-            n_moves_before = 4
-        if move_of_state < 100:
-            n_rollouts = 8
-            n_moves_before = 8
-        elif move_of_state < 150:
-            n_rollouts = 8
-            n_moves_before = 10
-        else:
-            n_rollouts = 10
-            n_moves_before = 16
+        n_rollouts = 9
+        n_moves_before = 3
 
         for _ in range(n_rollouts):
             working_state = state.clone()
             i = 0
-            # TODO: Add one more condition to early stop
             while not working_state.is_terminal() and i < n_moves_before:
-                # We simulate our moves AND enemy moves with our prior
+                # We simulate moves with prior
                 legal_actions = self.prior(working_state)
                 actions, proba = list(zip(*legal_actions))
-
-                # Transform proba to delete values below a treshold and help converge the results
-                # TODO: Do this in the prior function directly ?
-                # proba = np.array(proba)
-                # if np.max(proba) > 0.045: #(move_of_state+i) > 100
-                #     proba[proba <= 0.045] = 0
-                #     proba = proba/np.sum(proba)
-
                 action = np.random.choice(actions, p=proba)
                 working_state.apply_action(action)
                 i += 1
-            # We sum the returns with terminal*5 if the last state is terminal, the evaluation of the state if it's not
-            returns = np.array(working_state.returns())*40 if working_state.is_terminal() else np.array(self.evaluate_state(working_state, move_of_state+i))
+            # Returns (1/-1/0)*10 if last state is terminal, otherwise the evaluation of the state
+            returns = np.array(working_state.returns())*10 if working_state.is_terminal() else np.array(self.evaluate_state(working_state))
             result = returns if result is None else result + returns
         return result / n_rollouts
     
     def toward_flag(self, state, player, coord):
-        flag_str_pos = str(state).find(players_pieces()[1-player][0])
+        flag_str_pos = str(state).find(self.player_pieces[1-player][0])
         flag = [flag_str_pos//10, flag_str_pos%10]
         man_distance_before = abs(flag[0] - coord[1]) + abs(flag[1] - coord[0])
         man_distance_after = abs(flag[0] - coord[3]) + abs(flag[1] - coord[2])
@@ -129,69 +104,98 @@ class CustomEvaluator():
         else: value = 15
         return man_distance_before > man_distance_after, value
     
-    def proba_win_combat(self, ally, enemy_pos, state, information):
-        # TODO: Multiply by a riskScore when not fully known. Risk is higher for higher piece and enemy piece that did not move yet
-        def win_combat(ally, enemy):
-            """Only work on moveable ally at the moment"""
-            allyIdx, _ = pieces_to_index()[ally]
-            enemyIdx, _ = pieces_to_index()[enemy]
-            if enemyIdx == 1:
-                return 1 if allyIdx == 4 else -1
-            if enemyIdx == 11:
-                return 1 if (allyIdx == 2 or allyIdx == 11) else -1
-            return 1 if enemyIdx <= allyIdx else -1
-        _, pieces_left, moved, scout, matrix_of_stats = information
+    def win_combat(self, allyIdx, enemy):
+        """Only work on moveable ally at the moment"""
+        # allyIdx, _ = self.piece_to_index[ally]
+        enemyIdx, _ = self.piece_to_index[enemy]
+        if enemyIdx == 1:
+            return 1 if allyIdx == 4 else -1
+        if enemyIdx == 11:
+            return 1 if (allyIdx == 2 or allyIdx == 11) else -1
+        return 1 if enemyIdx <= allyIdx else -1
+
+    def proba_win_combat(self, allyIdx, enemy_pos, state, move_of_state):
+        _, pieces_left, moved, scout, matrix_of_stats = self.information
         player = state.current_player()
-        enemy_pieces = players_pieces()[1-player]
-        state_str = str(state).upper()
         if sum(matrix_of_stats[enemy_pos[0]][enemy_pos[1]]) < 0.2:
-            return win_combat(ally, state_str[enemy_pos[0]*10+enemy_pos[1]])
+            return self.win_combat(allyIdx, str(state)[enemy_pos[0]*10+enemy_pos[1]].upper())
         elif scout[enemy_pos[0]][enemy_pos[1]]:
-            return win_combat(ally, enemy_pieces[3])
+            return self.win_combat(allyIdx, self.player_pieces[1-player][3])
         elif moved[enemy_pos[0]][enemy_pos[1]]:
             probas = moved_piece_matrix(pieces_left, matrix_of_stats[enemy_pos[0]][enemy_pos[1]])
         else:
             probas = no_info_piece_matrix(pieces_left, matrix_of_stats[enemy_pos[0]][enemy_pos[1]])
         summ = 0
         for idx in range(12):
-            summ += probas[idx]*win_combat(ally, enemy_pieces[idx])
+            summ += probas[idx]*self.win_combat(allyIdx, self.player_pieces[1-player][idx])
+        # TODO: Multiply by a riskScore when not fully known. Risk is higher for higher piece and enemy piece that did not move yet
+        # RiskScore if not fully known only for big pieces to not suicide important on bombs
+        if allyIdx > 8 and not moved[enemy_pos[0]][enemy_pos[1]] and summ > 0 and move_of_state < 500:
+            return -1
         return summ
+
+    def rescaleProbas(self, array):
+        """Delete values of the array that are too low and rescale to probability after"""
+        array = np.array(array)
+        if len(set(array)) == 1:
+            return np.array([1/len(array) for _ in range(len(array))])
+        mean_value = np.mean(array)
+        threshold = mean_value if mean_value > 0 else np.min(array)
+        # Set low values to zero
+        array[array < threshold] = 0
+        # Scale values between 0 and 1
+        array = (array - np.min(array)) / (np.max(array) - np.min(array))
+        # Make sure array sum to 1
+        array = array / np.sum(array)    
+        return array
 
     def prior(self, state):
         """Returns probability for each actions"""
-        sum = 0.0
-        prio = []
         actions = []
         proba = []
         player = state.current_player()
         state_str = str(state).upper()
+        charMatrix = stateIntoCharMatrix(state)
+        move_of_state = int(str(state)[103-len(str(state)):])
+
+        registered_find = {}
         for action in state.legal_actions(player):
             coord = action_to_coord(state.action_to_string(player, action))
-            # # Prioritize winning attacks / penalize loosing ones
+            # Prioritize winning attacks / penalize loosing ones
             arrival = state_str[coord[3]*10 + coord[2]]
+            allyIdx, _ = self.piece_to_index[state_str[coord[1]*10 + coord[0]]]
+            # 2 squares rules: No two repeating move again
+            if action == self.last_moves[1] and self.last_moves[0] == self.last_moves[2] and self.last_moves[1] == self.last_moves[3] :      
+                value = -30
             # Fight
-            if arrival != "A":
-                ally = state_str[coord[1]*10 + coord[0]]
-                value = self.proba_win_combat(ally, [coord[3], coord[2]], state, self.information)*30
-                if value < 0: value = 1.0
+            elif arrival != "A":
+                value = self.proba_win_combat(allyIdx, [coord[3], coord[2]], state, move_of_state)*30
             else:
-                # Priorize moving toward the ennemy flag
-                toward_flag = self.toward_flag(state, player, coord)
-                value = toward_flag[1] if toward_flag[0] else 1.0
-                # TODO: Prioritize moving toward an enemy piece we win versus
-            sum += value
+                # Prioritize moving toward an enemy piece we win versus
+                if (coord[1], coord[0]) in registered_find:
+                    found, path = registered_find[(coord[1], coord[0])]
+                else:
+                    found, path = find_combat(charMatrix, (coord[1], coord[0]), self.player_pieces[1-player])
+                    registered_find[(coord[1], coord[0])] = [found, path]
+
+                if found:
+                    fight_value = self.proba_win_combat(allyIdx, path[-1], state, move_of_state)*30
+                if found and path[0] == (coord[3], coord[2]) and fight_value > 0:
+                    value = fight_value/(len(path))
+                else:
+                    # Priorize moving toward the ennemy flag
+                    toward_flag = self.toward_flag(state, player, coord)
+                    value = toward_flag[1] if toward_flag[0] else 1.0
             actions.append(action)
             proba.append(value)
+        proba = self.rescaleProbas(proba)
 
-        # Rescale to make the sum equal to 1
-        proba = np.array(proba)
-        proba = proba/np.sum(proba)
+        # Remove completly actions with 0 probability so that it is not selected at all in the mcts search
+        mask = proba != 0
+        actions = np.array(actions)[mask]
+        proba = proba[mask]
 
-        # Do that here if we have a lot of n_moves_before
-        if np.max(proba) > 0.045:
-            proba[proba <= 0.045] = 0
-            proba = proba/np.sum(proba)
-
+        prio = []
         for i in range(len(proba)):
             prio.append([actions[i], proba[i]])
         return prio
@@ -358,15 +362,16 @@ class CustomBot(pyspiel.Bot):
         moved_scout = np.zeros((10, 10))
         matrix_of_stat = matrix_of_stats(self.player_id)
         self.information = [self.player_id, nbr_piece_left, moved_before, moved_scout, matrix_of_stat]
-        self.evaluator.set_information(self.information)
+        self.last_moves = [None, None, None, None, None]
+        self.evaluator.set_information(self.information, self.last_moves) # Make a link so that the evaluator has access to the information
 
     def update_knowledge(self, state, action):
         updating_knowledge(self.information, state, action)
 
     def step(self, state):
         root = self.mcts_search(state)
-        best = root.best_child()
-        mcts_action = best.action
+        mcts_action = root.best_child().action
+        self.last_moves = [mcts_action, self.last_moves[0], self.last_moves[1], self.last_moves[2], self.last_moves[3]]
         return mcts_action
 
     def _apply_tree_policy(self, root, state):
@@ -391,11 +396,14 @@ class CustomBot(pyspiel.Bot):
             if not current_node.children:
                 # For a new node, initialize its state, then choose a child as normal.
                 legal_actions = self.evaluator.prior(working_state)
-                if current_node is root and self._dirichlet_noise:
-                    epsilon, alpha = self._dirichlet_noise
-                    noise = self._random_state.dirichlet([alpha] * len(legal_actions))
-                    legal_actions = [(a, (1 - epsilon) * p + epsilon * n)
-                                for (a, p), n in zip(legal_actions, noise)]
+                # # Since dirichlet_noise is set to None, this will never be true.
+                # if current_node is root and self._dirichlet_noise:
+                #     print("test")
+                #     epsilon, alpha = self._dirichlet_noise
+                #     noise = self._random_state.dirichlet([alpha] * len(legal_actions))
+                #     legal_actions = [(a, (1 - epsilon) * p + epsilon * n)
+                #                 for (a, p), n in zip(legal_actions, noise)]
+
                 # Reduce bias from move generation order
                 self._random_state.shuffle(legal_actions)
                 player = working_state.current_player()
