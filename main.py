@@ -359,18 +359,18 @@ def evaluate_bot(bot, num_games):
 
 if __name__ == "__main__":
     ###### Launch only n games, params: player1, player2, game_nums, replay, auto
-    play_n_games("custom", "hunter", 5, replay=False, auto=False)
+    # play_n_games("custom", "hunter", 10, replay=False, auto=False)
 
-    # evaluate_bot("custom", 10)
+    evaluate_bot("custom", 10)
     # script_md_evaluate_bot("games/riskScore/")
     # play_n_games("custom", "basic", 20, replay=False, auto=False)
 
     # benchmark(5)
 
-    ###### Watch a game played
+    ###### Watch a game played:
     # player1 = "custom"
     # player2 = "hunter"
-    # game_num = 0
+    # game_num = 3
     # folder = "games/"
     # wrapper(print_board, getGame(folder+player1+"-"+player2+str(game_num)), [player1, player2], auto=False)
     

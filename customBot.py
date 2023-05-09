@@ -11,10 +11,15 @@ class CustomEvaluator():
     def __init__(self):
         self.piece_to_index = pieces_to_index()
         self.player_pieces = players_pieces()
+        self.stateHashPrior = {}
 
     def set_information(self, information, last_moves):
         self.information = information
         self.last_moves = last_moves
+
+    def hash_state(self, state):
+        state_str = str(state)
+        return state_str[:100].upper() + state_str[101]
     
     def value_for_piece(self, enemies):
         value = np.array([0.02]*12)
@@ -68,8 +73,7 @@ class CustomEvaluator():
             print("==============================")
             print("Returns:", returns, "\n")
             printCharMatrix(str(state))
-
-        return returns    
+        return returns
 
     def evaluate(self, state):
         """Returns evaluation on given state."""
@@ -106,7 +110,6 @@ class CustomEvaluator():
     
     def win_combat(self, allyIdx, enemy):
         """Only work on moveable ally at the moment"""
-        # allyIdx, _ = self.piece_to_index[ally]
         enemyIdx, _ = self.piece_to_index[enemy]
         if enemyIdx == 1:
             return 1 if allyIdx == 4 else -1
@@ -151,6 +154,9 @@ class CustomEvaluator():
 
     def prior(self, state):
         """Returns probability for each actions"""
+        if self.hash_state(state) in self.stateHashPrior:
+            return self.stateHashPrior[self.hash_state(state)]
+
         actions = []
         proba = []
         player = state.current_player()
@@ -198,6 +204,9 @@ class CustomEvaluator():
         prio = []
         for i in range(len(proba)):
             prio.append([actions[i], proba[i]])
+
+        if player == self.information[0]:
+            self.stateHashPrior[self.hash_state(state)] = prio
         return prio
 
 class SearchNode(object):

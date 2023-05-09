@@ -796,4 +796,8 @@ information = [0, nbr_piece_left, moved_before, moved_scout, matrix_of_stats(0)]
 # for i in range(len(prio)):
 #     print("{} -> {}: {}".format(prio[i][0], action_to_coord(state.action_to_string(prio[i][0])), prio[i][1]))
 
-print(str(state)[:100] + str(state)[101])
+def hash_state(state):
+    state_str = str(state)
+    return state_str[:100].upper() + state_str[101]
+
+print(hash_state(state))
