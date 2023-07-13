@@ -204,6 +204,8 @@ def _init_bot(bot_type, game, player_id):
         return hunterBot.hunterBot(player_id)
     if bot_type == "gpt":
         return gptBot.gptBot(player_id)
+    if bot_type == "doi":
+        return human.HumanBot()
     raise ValueError("Invalid bot type: %s" % bot_type)
 
 def _play_game(game, bots, game_num):
@@ -278,6 +280,140 @@ def _play_game(game, bots, game_num):
         bot.restart()
     return returns, history, allStates, move, [pieces0, pieces1]
 
+def play_game_versus_doi():
+    """Plays one game."""
+    # Delete t.txt data before starting
+    try:
+        open("t.txt", 'w').close()
+    except IOError:
+        print('Failure')
+    game_num = 5
+    game = pyspiel.load_game("yorktown")
+    player1 = "doi"
+    player2 = "custom"
+    bots = [
+        _init_bot(player1, game, 0),
+        _init_bot(player2, game, 1),
+    ]
+
+    player_pieces = players_pieces()
+    setups = [
+        # [Fl,  Bo,   Sp,  Sc,  Mi,  Sg,  Lt,  Cp,  Mj,  Co,  Ge,  Ms]
+        [5, 4, 1, 0, 1, 4, 5, 4, 4, 5, 
+         1, 6, 8, 1, 7, 8, 1, 4, 3, 1, 
+         6, 9, 3, 3, 3, 7, 2, 6, 9, 6, 
+         3, 7, 3, 11, 8, 5, 10, 3, 3, 7], # Base p1 Full protec, well spread
+        [3, 8, 0, 7, 5, 5, 4, 1, 7, 3, 
+         9, 1, 6, 4, 1, 1, 2, 4, 1, 5, 
+         8, 3, 11, 3, 5, 9, 3, 10, 3, 8, 
+         6, 7, 3, 4, 6, 1, 3, 4, 7, 6] # Base p2 0 protec, well spread
+        ]
+    # player_pieces[0] means that it's the red player pieces
+    s1T = "".join([player_pieces[0][x] for x in setups[0]])
+    s2T = "".join([player_pieces[0][x] for x in setups[1]])
+    s1B = [""]*40
+    s2B = [""]*40
+    for i in range(4):
+        for j in range(10):
+            s1B[i*10+j] = player_pieces[1][setups[0][(3-i)*10+j]]
+            s2B[i*10+j] = player_pieces[1][setups[1][(3-i)*10+j]]
+    s1B = "".join(s1B)
+    s2B = "".join(s2B)
+
+
+    setup = s1T + "AA__AA__AAAA__AA__AA" + s2B + " r 0"
+    state = game.new_initial_state(setup)
+    # wrapper(print_board, [stateIntoCharMatrix(state)], [player1, player2], auto=False)
+    history = []
+    allStates = []
+
+    for i, bot in enumerate(bots):
+        if str(bot) == "custom" or str(bot) == "hunter" or str(bot) == "mcts":
+            bot.init_knowledge()
+
+    move = 0
+    play = 0
+    while not state.is_terminal():
+        print("====================== " + ("TOP" if state.current_player() == 0 else "BOTTOM") + " ======================\n")
+        printCharMatrix(state)
+        # Draw by the rules
+        if move == 1501: # 2001
+            pieces0 = 0
+            pieces1 = 0
+            players_piece = players_pieces()
+            for i in str(state)[:100].upper():
+                if i in players_piece[0]:
+                    pieces0 += 1
+                if i in players_piece[1]:
+                    pieces1 += 1
+            returns = state.returns()
+            print("\nReturns:", " ".join(map(str, returns)), "\n# moves:", len(history))
+            for bot in bots:
+                bot.restart()
+            saveGame("games/"+player1+"-"+player2+str(game_num), allStates)
+            # In case of tie, both win_1 and win_2 are equal to 0, otherwise the winner is 1, the other is 0
+            data = {'player1': [player1], 'player2': [player2], 'game_num': [game_num], 'time_taken': [0], 'moves': [move], 'win_1': 1 if returns[0]==1.0 else 0, 'win_2': 1 if returns[1]==1.0 else 0, 'pieces_1': [pieces0], 'pieces_2': [pieces1]}
+            save_to_csv("./games/stats.csv", data)
+            return returns, history, allStates, move, [pieces0, pieces1]
+
+        current_player = state.current_player()
+        bot = bots[current_player]
+
+        if str(bot) == "custom" or str(bot) == "mcts":
+            start = time.time()
+            generated = game.new_initial_state(generate_state(state, bot.information))
+            # Test the generate time for anomaly
+            if time.time()-start > 2:
+                print("Time for generate was", round(time.time()-start, 2))
+            action = bot.step(generated)
+            # print("time for generate and play a move:", time.time()-start)
+            save_to_csv("./games/"+player1+"-"+player2+str(game_num)+".csv", data_for_games(move, state, generated, customBot.CustomEvaluator()))
+        else:
+            while True:
+                try:
+                    with open(('t.txt'), 'r') as file:
+                        lines = file.readlines()
+                        if len(lines) > play:
+                            break
+                except:
+                    pass
+                time.sleep(2)
+            action = bot.step(state)
+            play += 1
+        action_str = state.action_to_string(current_player, action)
+        for i, bot in enumerate(bots):
+            if i != current_player:
+                bot.inform_action(state, current_player, action)
+            if str(bot) == "custom" or str(bot) == "hunter" or str(bot) == "mcts":
+                bot.update_knowledge(state.clone(), action)
+
+        history.append(action_str)
+        allStates.append(stateIntoCharMatrix(state))
+        move+=1
+        state.apply_action(action)
+        print()
+        print(action_str)
+
+    pieces0 = 0
+    pieces1 = 0
+    players_piece = players_pieces()
+    for i in str(state)[:100].upper():
+        if i in players_piece[0]:
+            pieces0 += 1
+        if i in players_piece[1]:
+            pieces1 += 1
+    # Game is now done
+    returns = state.returns()
+    print("\nReturns:", 
+        " ".join(map(str, returns)), "\n# moves:", len(history))
+    for bot in bots:
+        bot.restart()
+    saveGame("games/"+player1+"-"+player2+str(game_num), allStates)
+    # In case of tie, both win_1 and win_2 are equal to 0, otherwise the winner is 1, the other is 0
+    data = {'player1': [player1], 'player2': [player2], 'game_num': [game_num], 'time_taken': [0], 'moves': [move], 'win_1': 1 if returns[0]==1.0 else 0, 'win_2': 1 if returns[1]==1.0 else 0, 'pieces_1': [pieces0], 'pieces_2': [pieces1]}
+    save_to_csv("./games/stats.csv", data)
+    return returns, history, allStates, move, [pieces0, pieces1]
+
 def play_n_games(player1, player2, num_games, replay=False, auto=False):
     game = pyspiel.load_game("yorktown")
     bots = [
@@ -342,7 +478,7 @@ def benchmark(num_games):
 def evaluate_bot(bot, num_games):
     """Evaluate the bot against all the other bots"""
     # bots_to_play = ["custom", "asmodeus", "hunter", "rnad", "mcts", "basic"]
-    bots_to_play = ["hunter", "asmodeus", "basic"]
+    bots_to_play = ["asmodeus", "hunter", "basic"]
     win = 0
     for i in range(len(bots_to_play)):
         player2 = bots_to_play[i]
@@ -361,8 +497,8 @@ if __name__ == "__main__":
     ###### Launch only n games, params: player1, player2, game_nums, replay, auto
     # play_n_games("custom", "hunter", 10, replay=False, auto=False)
 
-    evaluate_bot("custom", 10)
-    # script_md_evaluate_bot("games/riskScore/")
+    # evaluate_bot("custom", 10) # Lancé à 18h08
+    # script_md_evaluate_bot("games/")
     # play_n_games("custom", "basic", 20, replay=False, auto=False)
 
     # benchmark(5)
@@ -377,4 +513,6 @@ if __name__ == "__main__":
     ###### Train the Rnad a number of steps
     # everythingEverywhereAllAtOnce("states/state.pkl", 10000) # 100000, 3sec/step
 
+    play_game_versus_doi()
+    # /bin/python3 /home/thomas/Bureau/tfe/main.py < t.txt
 

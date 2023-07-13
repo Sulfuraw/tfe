@@ -12,6 +12,7 @@ class CustomEvaluator():
         self.piece_to_index = pieces_to_index()
         self.player_pieces = players_pieces()
         self.stateHashPrior = {}
+        self.stateHashEvaluate = {}
 
     def set_information(self, information, last_moves):
         self.information = information
@@ -77,6 +78,9 @@ class CustomEvaluator():
 
     def evaluate(self, state):
         """Returns evaluation on given state."""
+        if self.hash_state(state) in self.stateHashEvaluate:
+            return self.stateHashEvaluate[self.hash_state(state)]
+
         result = None
         n_rollouts = 9
         n_moves_before = 3
@@ -94,7 +98,9 @@ class CustomEvaluator():
             # Returns (1/-1/0)*10 if last state is terminal, otherwise the evaluation of the state
             returns = np.array(working_state.returns())*10 if working_state.is_terminal() else np.array(self.evaluate_state(working_state))
             result = returns if result is None else result + returns
-        return result / n_rollouts
+        result = result / n_rollouts
+        self.stateHashEvaluate[self.hash_state(state)] = result
+        return result
     
     def toward_flag(self, state, player, coord):
         flag_str_pos = str(state).find(self.player_pieces[1-player][0])
@@ -108,12 +114,25 @@ class CustomEvaluator():
         else: value = 15
         return man_distance_before > man_distance_after, value
     
+    def dangerous_place(self, coord, matrix, allyIdx, player):
+        # y, x = coord
+        players_piece = players_pieces()
+        to_check = [[coord[0]+1, coord[1]], [coord[0]-1, coord[1]], [coord[0], coord[1]+1], [coord[0], coord[1]-1]]
+        for pos in to_check:
+            if is_valid_coord(pos) and matrix[pos[0]][pos[1]] in players_piece[1-player] and self.win_combat(allyIdx, matrix[pos[0]][pos[1]]) == -1:
+                return True
+        return False
+    
     def win_combat(self, allyIdx, enemy):
         """Only work on moveable ally at the moment"""
         enemyIdx, _ = self.piece_to_index[enemy]
         if enemyIdx == 1:
             return 1 if allyIdx == 4 else -1
+        # TODO: Marshal Vs Espy should win only if in a odd manhattan distance, else it lose.
+        if enemyIdx == 2:
+            return 1 if (allyIdx != 11 and allyIdx != 0) else -1
         if enemyIdx == 11:
+            # TODO: Could make that we check that we have advantage in trading Marshal or not (enough piece of lower value)
             return 1 if (allyIdx == 2 or allyIdx == 11) else -1
         return 1 if enemyIdx <= allyIdx else -1
 
@@ -131,9 +150,11 @@ class CustomEvaluator():
         summ = 0
         for idx in range(12):
             summ += probas[idx]*self.win_combat(allyIdx, self.player_pieces[1-player][idx])
-        # TODO: Multiply by a riskScore when not fully known. Risk is higher for higher piece and enemy piece that did not move yet
+        # TODO: Multiply by a riskScore when not fully known. [0, 0, 0.1, 10, 1, 5, 4, 3, 2, 0.3, 0.2, 0.1] ?
+        # TODO: Can risk if we gain information by it
+
         # RiskScore if not fully known only for big pieces to not suicide important on bombs
-        if allyIdx > 8 and not moved[enemy_pos[0]][enemy_pos[1]] and summ > 0 and move_of_state < 500:
+        if allyIdx > 8 and not moved[enemy_pos[0]][enemy_pos[1]] and summ > 0 and move_of_state < 300:
             return -1
         return summ
 
@@ -164,10 +185,13 @@ class CustomEvaluator():
         charMatrix = stateIntoCharMatrix(state)
         move_of_state = int(str(state)[103-len(str(state)):])
 
+        Ms_str_pos = str(state).find(self.player_pieces[1-player][11])
+        Ms = [Ms_str_pos//10, Ms_str_pos%10]
+
         registered_find = {}
         for action in state.legal_actions(player):
             coord = action_to_coord(state.action_to_string(player, action))
-            # Prioritize winning attacks / penalize loosing ones
+            # Prioritize winning attacks / penalize loosing ones: Only the attacks
             arrival = state_str[coord[3]*10 + coord[2]]
             allyIdx, _ = self.piece_to_index[state_str[coord[1]*10 + coord[0]]]
             # 2 squares rules: No two repeating move again
@@ -176,8 +200,22 @@ class CustomEvaluator():
             # Fight
             elif arrival != "A":
                 value = self.proba_win_combat(allyIdx, [coord[3], coord[2]], state, move_of_state)*30
+            # Not move the spy till the marshal was near
+            elif allyIdx == 2 and abs(Ms[0] - coord[1]) + abs(Ms[1] - coord[0]) > 3:
+                value = -30
+            # Not move the scout for more than 1 case too fast
+            elif allyIdx == 3 and move_of_state < 150 and (abs(coord[1]-coord[3]) > 1 or abs(coord[0]-coord[2]) > 1):
+                value = -30
+            # TODO: Limit moving high piece if not necessary because they run left right next to pieces they cannot attack because of RiskScore
+            # TODO: Don't move Marshal till the enemy spy is discovered or some special cases
+            # elif
+            # The place we move to must be safe (not ennemy piece can kill it)
+            elif self.dangerous_place((coord[3], coord[2]), charMatrix, allyIdx, player):
+                value = -30
             else:
                 # Prioritize moving toward an enemy piece we win versus
+                # TODO: Check all pieces in a range of 3-4 instead of just 1
+                # TODO: Fleeing strategy if pieces are too menacing
                 if (coord[1], coord[0]) in registered_find:
                     found, path = registered_find[(coord[1], coord[0])]
                 else:
@@ -186,6 +224,7 @@ class CustomEvaluator():
 
                 if found:
                     fight_value = self.proba_win_combat(allyIdx, path[-1], state, move_of_state)*30
+                # Ally go in the direction of the first enemy
                 if found and path[0] == (coord[3], coord[2]) and fight_value > 0:
                     value = fight_value/(len(path))
                 else:
