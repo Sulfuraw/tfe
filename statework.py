@@ -326,7 +326,7 @@ def updating_knowledge(information, state, action):
                 moved_scout[coord[3]][coord[2]] = 1
 
 # Path Search over 4 moves max
-def find_combat(matrix, start, pieces):
+def find_combat(matrix, start, pieces, limit=4):
     """ Find if there is a piece from pieces in the matrix within the range of 4 moves from the start """
     visited = {start}
     queue = [(start, [])]
@@ -336,7 +336,7 @@ def find_combat(matrix, start, pieces):
         if matrix[pos[0]][pos[1]] in pieces:
             return True, path
         # If further than 4 moves, stop
-        if len(path) >= 4:
+        if len(path) >= limit:
             continue
         # Expand
         for row, col in [(pos[0]-1, pos[1]), (pos[0]+1, pos[1]), (pos[0], pos[1]-1), (pos[0], pos[1]+1)]:
@@ -424,11 +424,12 @@ def flag_protec(state, player):
         for j in range(10):
             if matrix[i][j] == players_piece[player][0]:
                 coord = [i, j]
+    number_of_bad_pieces = 0
     to_check = [[coord[0]+1, coord[1]], [coord[0]-1, coord[1]], [coord[0], coord[1]+1], [coord[0], coord[1]-1]]
     for pos in to_check:
         if is_valid_coord(pos) and not matrix[pos[0]][pos[1]] in players_piece[player]:
-            return False
-    return True
+            number_of_bad_pieces += 1
+    return number_of_bad_pieces
     
 def stateIntoCharMatrix(state):
     """Transform a state into a Matrix of Character inside the str(state)"""
