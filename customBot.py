@@ -71,7 +71,7 @@ class CustomEvaluator():
         returns = [0, 0]
         for player in [0, 1]:
             x = score[player] - score[1-player]
-            returns[player] = 2*(x - (-8.5))/(8.5 - (-8.5)) - 1.0   # Rerange -8.5 to 8.5 to -1 to 1
+            returns[player] = 2*(x - (-8.5))/(8.5 - (-8.5)) - 1.0   # Rerange -8.5 to 8.5 into -1 to 1
 
         if returns[0] > 1 or returns[0] < -1 or returns[1] > 1 or returns[1] < -1:
             # Check if we need to adapt the rescale above
@@ -82,15 +82,10 @@ class CustomEvaluator():
 
     def evaluate(self, state):
         """Returns evaluation on given state."""
-        # if self.hash_state(state) in self.stateHashEvaluate:
-        #     return self.stateHashEvaluate[self.hash_state(state)]
-
         result = None
         n_rollouts = 9
         move_of_state = int(str(state)[103-len(str(state)):])
-        # IDEE DE MODIF: Refaire un autre agent carrément avec des parties similaire et d'autre non, et voir si ca marche ou pas.
-        # On peut enlever le evaluate et le remplacer par le evaluate_state puis mettre les paramètres 0.99 et 500 par example.
-        n_moves_before = 6
+        n_moves_before = 3
 
         for _ in range(n_rollouts):
             working_state = state.clone()
@@ -102,7 +97,6 @@ class CustomEvaluator():
                 action = np.random.choice(actions, p=proba)
                 working_state.apply_action(action)
                 i += 1
-            # Returns (1/-1/0)*10 if last state is terminal, otherwise the evaluation of the state
             returns = np.array(working_state.returns())*10 if working_state.is_terminal() else np.array(self.evaluate_state(working_state))
             result = returns if result is None else result + returns
         result = result / n_rollouts
@@ -165,7 +159,7 @@ class CustomEvaluator():
         # TODO: Can risk if we gain information by it
 
         # RiskScore if not fully known only for big pieces to not suicide important on bombs
-        if allyIdx > 8 and not moved[enemy_pos[0]][enemy_pos[1]] and summ > 0 and move_of_state < 300:
+        if allyIdx > 8 and not moved[enemy_pos[0]][enemy_pos[1]] and summ > 0 and move_of_state < 350:
             return -1
         return summ
 
@@ -186,9 +180,6 @@ class CustomEvaluator():
 
     def prior(self, state, where):
         """Returns probability for each actions"""
-        # if self.hash_state(state) in self.stateHashPrior:
-        #     return self.stateHashPrior[self.hash_state(state)]
-
         actions = []
         proba = []
         player = state.current_player()
@@ -201,7 +192,7 @@ class CustomEvaluator():
 
         registered_find = {}
         for action in state.legal_actions(player):
-            # TODO: Make so that after 700 moves every moves needs to go toward the enemy flag with a search unlimited ?
+            # TODO: Make so that after 700 moves every moves needs to go toward the enemy flag with a search unlimited to avoid being stopped by a wall
 
             coord = action_to_coord(state.action_to_string(player, action))
             # Take winning attacks / penalize loosing ones: Only the attacks
@@ -214,15 +205,17 @@ class CustomEvaluator():
             elif arrival != "A":
                 value = self.proba_win_combat(allyIdx, [coord[3], coord[2]], state, move_of_state)*30
             # Not move the spy till the marshal was near
+            # TODO: Encourage the movement toward Marshal otherwise for allyIdx == 2 and not that
             elif allyIdx == 2 and abs(Ms[0] - coord[1]) + abs(Ms[1] - coord[0]) > 3:
                 value = -30
-            # Not move the scout for more than 1 case too fast
+            # Not move the scout for more than 1 case too fast in the game
             elif allyIdx == 3 and move_of_state < 150 and (abs(coord[1]-coord[3]) > 1 or abs(coord[0]-coord[2]) > 1):
                 value = -30
             # TODO: Limit moving high piece if not necessary because they run left right next to pieces they cannot attack because of RiskScore
             # TODO: Don't move Marshal till the enemy spy is discovered or some special cases
 
-            # The place we move to must be safe (not ennemy piece can kill it)
+            # The place we move to must be safe (no ennemy piece around can kill it)
+            # TODO: Need to verify dangerous_place, test with print
             elif self.dangerous_place((coord[3], coord[2]), charMatrix, allyIdx, player):
                 value = -30
             else:
@@ -230,14 +223,14 @@ class CustomEvaluator():
                 if (coord[1], coord[0]) in registered_find:
                     found, path = registered_find[(coord[1], coord[0])]
                 else:
-                    limit = 7-where if where < 3 else 3
+                    limit = 6  # 7-where if where < 3 else 3
                     found, path = find_combat(charMatrix, (coord[1], coord[0]), self.player_pieces[1-player], limit)
                     registered_find[(coord[1], coord[0])] = [found, path]
 
                 if found:
                     fight_value = self.proba_win_combat(allyIdx, path[-1], state, move_of_state)*30
                 # Move toward an enemy piece we win versus, Ally go in the direction of the first enemy
-                if found and path[0] == (coord[3], coord[2]) and fight_value > 0:
+                if found and path[0] == (coord[3], coord[2]) and fight_value >= 0:
                     value = fight_value/(len(path))
                 # Do the same with direction to flee
                 elif found and path[0] != (coord[3], coord[2]) and fight_value < 0:
@@ -246,14 +239,13 @@ class CustomEvaluator():
                     if len(path) > 2:
                         value = value/2
                 # TODO: If big piece and go toward a piece that can kill him (not specially the first we see), don't go
-                # TODO: Move the miner forward only when there is a Sum of proba in the other side that is lower than a certain value. Or other things like sum moved under threshold
+                # TODO: Move the miner forward only when for unmoved pieces, check the proba or sum of proba to decide that
                 else:
                     # Take moving toward the ennemy flag
                     toward_flag = self.toward_flag(state, player, coord)
                     value = toward_flag[1] if toward_flag[0] else 1.0
-            # On joue bcp trop les grosses pièces et pas assez les petites
             # TODO: Move small piece toward the flag to discover more before moving big pieces: Faire un multiplicateur en plus pour les probas par rapprot a la piece que c'est
-            # TODO: Before subimiting the value, we can trick the things by adding value if the piece playing is smaller no ? Or at the end of proba_win_combat
+            # TODO: Before submiting the value, we can trick the things by adding value if the piece playing is smaller no ? Or at the end of proba_win_combat
             actions.append(action)
             proba.append(value)
         proba = self.rescaleProbas(proba)
@@ -267,8 +259,6 @@ class CustomEvaluator():
         for i in range(len(proba)):
             prio.append([actions[i], proba[i]])
 
-        # if player == self.information[0]:
-        #     self.stateHashPrior[self.hash_state(state)] = prio
         return prio
 
 class SearchNode(object):

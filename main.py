@@ -188,7 +188,9 @@ def _init_bot(bot_type, game, player_id):
         # 0.5 give the same weight to the two part
         # 0.1 give more weight to the win
         # 0.9 give more weight to the number of time visited
-        return customBot.CustomBot(game, 0.6, 100, customBot.CustomEvaluator(), player_id)
+        # 0.8: 40% on both lots of equal
+        # 0.6: Did 90% and 30% but a rerun gave 20% sooooo
+        return customBot.CustomBot(game, 0.5, 100, customBot.CustomEvaluator(), player_id)
     if bot_type == "mcts":
         return mctsBot.mctsBot(game, 0.75, 100, mctsBot.RandomRolloutEvaluator(), player_id)
     if bot_type == "rnad":
@@ -499,17 +501,17 @@ def evaluate_bot(bot, num_games):
 
 if __name__ == "__main__":
     ###### Launch only n games, params: player1, player2, game_nums, replay, auto
-    # play_n_games("custom", "asmodeus", 1, replay=False, auto=False)
+    play_n_games("custom", "asmodeus", 10, replay=False, auto=False)
 
-    evaluate_bot("custom", 10)
-    # script_md_evaluate_bot("games/last-commit-0.8/")
+    # evaluate_bot("custom", 10)
+    # script_md_evaluate_bot("games/")
     # play_n_games("custom", "basic", 20, replay=False, auto=False)
 
     # benchmark(5)
 
     ###### Watch a game played: Le 1 c'est avec 0.1 et le 0 c'est avec 0.9. On a aussi modif de reduire la fleeing value si trop loin
     # player1 = "custom"
-    # player2 = "asmodeus"
+    # player2 = "asmodeus" # "basic"
     # game_num = 0
     # folder = "games/"
     # wrapper(print_board, getGame(folder+player1+"-"+player2+str(game_num)), [player1, player2], auto=False)
