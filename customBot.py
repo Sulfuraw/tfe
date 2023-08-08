@@ -8,70 +8,72 @@ from statework import *
 
 # Using the Copyright 2019 DeepMind Technologies Limited using modified version of """Monte-Carlo Tree Search algorithm for game play"""
 class CustomEvaluator():
-    def __init__(self):
+    def __init__(self, n_rollouts, n_moves_before):
         self.piece_to_index = pieces_to_index()
         self.player_pieces = players_pieces()
+        self.n_rollouts = n_rollouts
+        self.n_moves_before = n_moves_before
         self.stateHashPrior = {}
         self.stateHashEvaluate = {}
+        self.hash_count = [0, 0, 0, 0]
 
     def set_information(self, information, last_moves):
         self.information = information
         self.last_moves = last_moves
+        self.stateHashPrior = {}
+        self.stateHashEvaluate = {}
+        self.hash_count = [0, 0, 0, 0]
 
     def hash_state(self, state):
         state_str = str(state)
         return state_str[:100].upper() + state_str[101]
-    
-    def value_for_piece(self, enemies):
-        value = np.array([0.02]*12)
-        for i in range(4, 12):
-            value[i] = value[i-1]*1.6
-        value[0] = 1.0
-        value[1] = 0.9 if enemies[4] == 0 else 0.8
-        value[2] = 0.6 if enemies[11] else 0.02
-        value[4] += 0.032 if enemies[1] < 3 else 0.6
-        returns = []
-        for i in range(12):
-            returns.append((i, value[i]))
-        return returns
 
+    # TODO: Make more weight for information we have
+    # TODO: Make more weight for information they have
     def evaluate_state(self, state):
         """Returns evaluation on given state."""
         state_str = str(state)[:100].upper()
+        move_of_state = int(str(state)[103-len(str(state)):])
 
         nbr_pieces = [[0]*12, [0]*12]
+        advanced_pieces = [0, 0]
+        advanced_miner = [0, 0]
+        place = 0
         for piece in state_str:
             if piece not in ["A", "_"]:
                 i, player = self.piece_to_index[piece]
                 nbr_pieces[player][i] += 1
+                if player and place < 40:
+                    advanced_pieces[player] += 1
+                    if i == 4:
+                        advanced_miner[player] += 1
+                if not player and place > 59:
+                    advanced_pieces[player] += 1
+                    if i == 4:
+                        advanced_miner[player] += 1
+            place += 1
 
         score = [0, 0]
         for player in [0, 1]:
-            for piece_id, value in self.value_for_piece(nbr_pieces[1-player]):
+            piece_values = value_for_piece(nbr_pieces[1-player], nbr_pieces[player])
+            for piece_id, value in piece_values:
                 score[player] += nbr_pieces[player][piece_id]*value
-
-                if player:
-                    # make more weight having pieces on the other part of the board, take place
-                    score[player] += state_str[:40].count(self.player_pieces[player][piece_id]) * 0.01
-                else:
-                    score[player] += state_str[-40:].count(self.player_pieces[player][piece_id]) * 0.01
             
-            # Make more weight if the flag is protected, 1/4 of 0.5 per side
-            score[player] += (0.5/4)*(4 - flag_protec(state, player))
-            if player:
-                # Make more weight to miner to go attack in search of bombs
-                score[player] += 0.02 if self.player_pieces[player][4] in state_str[:50] else 0.0
-            else:
-                score[player] += 0.02 if self.player_pieces[player][4] in state_str[-50:] else 0.0
+            # Make more weight if the flag is protected, 1/4 per side
+            score[player] += (0.5/4) * (4 - flag_protec(state, player))
 
-            # TODO: Make more weight for information we have
-            # TODO: Make more weight for information they have
-            # Do this there or in evaluate, check discovery of pieces, idk
+            # More weight having piece on the other side
+            score[player] += advanced_pieces[player] * 0.02
+
+            # Make more weight to miner to go attack in search of bombs
+            score[player] += advanced_miner[player] * 0.02
 
         returns = [0, 0]
         for player in [0, 1]:
             x = score[player] - score[1-player]
-            returns[player] = 2*(x - (-8.5))/(8.5 - (-8.5)) - 1.0   # Rerange -8.5 to 8.5 into -1 to 1
+            # returns[player] = 2*(x - (-8.5))/(8.5 - (-8.5)) - 1.0     # Rerange -8.5 to 8.5 into -1 to 1
+            # returns[player] = 2*(x - (-5))/(5 - (-5)) - 1.0           # Value for piece advanced array
+            returns[player] = 2*(x - (-9.2))/(9.2 - (-9.2)) - 1.0             # Value for best result so far
 
         if returns[0] > 1 or returns[0] < -1 or returns[1] > 1 or returns[1] < -1:
             # Check if we need to adapt the rescale above
@@ -81,71 +83,36 @@ class CustomEvaluator():
         return returns
 
     def evaluate(self, state):
-        """Returns evaluation on given state."""
-        result = None
-        n_rollouts = 9
-        move_of_state = int(str(state)[103-len(str(state)):])
-        n_moves_before = 3
+        """Returns evaluation on given state by doing simulations."""
 
-        for _ in range(n_rollouts):
+        result = None
+        # move_of_state = int(str(state)[103-len(str(state)):])
+        for _ in range(self.n_rollouts):
             working_state = state.clone()
             i = 0
-            while not working_state.is_terminal() and i < n_moves_before:
-                # We simulate moves with the function for both
+            while not working_state.is_terminal() and i < self.n_moves_before:
+                # We simulate moves with the prior function for both
                 legal_actions = self.prior(working_state, i)
                 actions, proba = list(zip(*legal_actions))
                 action = np.random.choice(actions, p=proba)
                 working_state.apply_action(action)
                 i += 1
-            returns = np.array(working_state.returns())*10 if working_state.is_terminal() else np.array(self.evaluate_state(working_state))
+            returns = np.array(working_state.returns())*3 if working_state.is_terminal() else np.array(self.evaluate_state(working_state))
             result = returns if result is None else result + returns
-        result = result / n_rollouts
-        # self.stateHashEvaluate[self.hash_state(state)] = result
+        result = result / self.n_rollouts
         return result
     
-    def toward_flag(self, state, player, coord):
-        flag_str_pos = str(state).find(self.player_pieces[1-player][0])
-        flag = [flag_str_pos//10, flag_str_pos%10]
-        man_distance_before = abs(flag[0] - coord[1]) + abs(flag[1] - coord[0])
-        man_distance_after = abs(flag[0] - coord[3]) + abs(flag[1] - coord[2])
-        # Categorize the weight
-        value = 21-man_distance_after
-        if value < 11: value = 5
-        elif value < 16: value = 10
-        else: value = 15
-        return man_distance_before > man_distance_after, value
-    
-    def dangerous_place(self, coord, matrix, allyIdx, player):
-        # y, x = coord
-        players_piece = players_pieces()
-        to_check = [[coord[0]+1, coord[1]], [coord[0]-1, coord[1]], [coord[0], coord[1]+1], [coord[0], coord[1]-1]]
-        for pos in to_check:
-            if is_valid_coord(pos) and matrix[pos[0]][pos[1]] in players_piece[1-player] and self.win_combat(allyIdx, matrix[pos[0]][pos[1]]) == -1:
-                return True
-        return False
-    
-    def win_combat(self, allyIdx, enemy):
-        """Only work on moveable ally at the moment"""
-        enemyIdx, _ = self.piece_to_index[enemy]
-        if enemyIdx == 1:
-            return 1 if allyIdx == 4 else -1
-        # TODO: Marshal Vs Espy should win only if in a odd manhattan distance, else it lose.
-        if enemyIdx == 2:
-            return 1 if (allyIdx != 11 and allyIdx != 0) else -1
-        if enemyIdx == 11:
-            # TODO: Could make that we check that we have advantage in trading Marshal or not (enough piece of lower value 2-3)
-            return 1 if (allyIdx == 2 or allyIdx == 11) else -1
-        return 1 if enemyIdx <= allyIdx else -1
-
+    # TODO: Multiply by a riskScore if we gain information on unknown [0, 0, 0.1, 10, 1, 5, 4, 3, 2, 0.3, 0.2, 0.1] ?
+    # TODO: Multiply by the value of the piece that win/lose. 
     def proba_win_combat(self, allyIdx, enemy_pos, state, move_of_state):
         _, pieces_left, moved, scout, matrix_of_stats = self.information
         player = state.current_player()
         # Sure of the enemy piece
         if sum(matrix_of_stats[enemy_pos[0]][enemy_pos[1]]) < 0.2:
-            return self.win_combat(allyIdx, str(state)[enemy_pos[0]*10+enemy_pos[1]].upper())
+            return win_combat(allyIdx, str(state)[enemy_pos[0]*10+enemy_pos[1]].upper())
         # Sure it's a scout
         elif scout[enemy_pos[0]][enemy_pos[1]]:
-            return self.win_combat(allyIdx, self.player_pieces[1-player][3])
+            return win_combat(allyIdx, self.player_pieces[1-player][3])
         # Know it moved before
         elif moved[enemy_pos[0]][enemy_pos[1]]:
             probas = moved_piece_matrix(pieces_left, matrix_of_stats[enemy_pos[0]][enemy_pos[1]])
@@ -154,36 +121,34 @@ class CustomEvaluator():
             probas = no_info_piece_matrix(pieces_left, matrix_of_stats[enemy_pos[0]][enemy_pos[1]])
         summ = 0
         for idx in range(12):
-            summ += probas[idx]*self.win_combat(allyIdx, self.player_pieces[1-player][idx])
-        # TODO: Multiply by a riskScore when not fully known. [0, 0, 0.1, 10, 1, 5, 4, 3, 2, 0.3, 0.2, 0.1] ?
-        # TODO: Can risk if we gain information by it
+            summ += probas[idx]*win_combat(allyIdx, self.player_pieces[1-player][idx])
 
         # RiskScore if not fully known only for big pieces to not suicide important on bombs
-        if allyIdx > 8 and not moved[enemy_pos[0]][enemy_pos[1]] and summ > 0 and move_of_state < 350:
+        if allyIdx > 8 and not moved[enemy_pos[0]][enemy_pos[1]] and summ > 0 and (move_of_state < 200 or probas[1] > 0.2): # or probas[1] > 0.4 # for after the move 350
             return -1
         return summ
 
-    def rescaleProbas(self, array):
-        """Delete values of the array that are too low and rescale to probability after"""
-        array = np.array(array)
-        if len(set(array)) == 1:
-            return np.array([1/len(array) for _ in range(len(array))])
-        mean_value = np.mean(array)
-        threshold = mean_value if mean_value > 0 else np.min(array)
-        # Set low values to zero
-        array[array < threshold] = 0
-        # Scale values between 0 and 1
-        array = (array - np.min(array)) / (np.max(array) - np.min(array))
-        # Make sure array sum to 1
-        array = array / np.sum(array)    
-        return array
-
+    # TODO: Make so that after 700 moves every moves needs to go toward the enemy flag with a search unlimited to avoid being stopped by a wall
+    # TODO: Limit moving high piece if not necessary because they run left right next to pieces they cannot attack because of RiskScore
+    # TODO: Limit moving Marshal till the enemy spy is discovered or if big piece to take / defend
+    # TODO: Search: check all pieces in a range of 3-4 instead of just 1
+    # TODO: Search: alternative if the allyIdx == 4 (miner), to go in search / direction of unmoved pieces. check the proba or sum of proba to decide that
+    # TODO: Search: alternative for big pieces like 9, 10, 11 to search all pieces and make a better choice. Don't go toward a piece that can kill him (not specially the first we see)
+    # TODO: Flee only in a direction that get us away from the enemy, manhanttan distance
+    # TODO: More weight if goes toward the flag
+    # TODO: Keep only one move with same piece same direction (scout) because they spam the probabilities otherwise ? But we lose the diversity and potential better moves that temporize the game
+    # TODO: When we authorized to move to a dangerous place when the place it's on is already dangerous, it should be only if there is unkown piece to discover there. Otherwise it's useless.
     def prior(self, state, where):
         """Returns probability for each actions"""
+        self.hash_count[2] += 1
+        if self.hash_state(state) in self.stateHashPrior and not (self.last_moves[0] == self.last_moves[2] and self.last_moves[1] == self.last_moves[3]):
+            self.hash_count[3] += 1
+            return self.stateHashPrior[self.hash_state(state)]
+
         actions = []
         proba = []
         player = state.current_player()
-        state_str = str(state).upper()
+        state_str = str(state)[:100].upper()
         charMatrix = stateIntoCharMatrix(state)
         move_of_state = int(str(state)[103-len(str(state)):])
 
@@ -191,39 +156,45 @@ class CustomEvaluator():
         Ms = [Ms_str_pos//10, Ms_str_pos%10]
 
         registered_find = {}
+        two_square_rule = False
         for action in state.legal_actions(player):
-            # TODO: Make so that after 700 moves every moves needs to go toward the enemy flag with a search unlimited to avoid being stopped by a wall
 
             coord = action_to_coord(state.action_to_string(player, action))
-            # Take winning attacks / penalize loosing ones: Only the attacks
             arrival = state_str[coord[3]*10 + coord[2]]
             allyIdx, _ = self.piece_to_index[state_str[coord[1]*10 + coord[0]]]
             # 2 squares rules: No two repeating move again
-            if action == self.last_moves[1] and self.last_moves[0] == self.last_moves[2] and self.last_moves[1] == self.last_moves[3] :      
+            if action == self.last_moves[1] and self.last_moves[0] == self.last_moves[2] and self.last_moves[1] == self.last_moves[3]:
+                two_square_rule = True
+                value = -30
+            # Don't go if dangerous place unless your actual place is also dangerous
+            elif dangerous_place([coord[3], coord[2]], charMatrix, allyIdx, player) and not dangerous_place([coord[1], coord[0]], charMatrix, allyIdx, player):
                 value = -30
             # Fight
             elif arrival != "A":
-                value = self.proba_win_combat(allyIdx, [coord[3], coord[2]], state, move_of_state)*30
-            # Not move the spy till the marshal was near
-            # TODO: Encourage the movement toward Marshal otherwise for allyIdx == 2 and not that
-            elif allyIdx == 2 and abs(Ms[0] - coord[1]) + abs(Ms[1] - coord[0]) > 3:
+                # The scout needs to scout new pieces. 
+                if allyIdx == 3 and sum(self.information[4][coord[3]][coord[2]]) > 0.2:
+                    value = 15
+                else:
+                    value = self.proba_win_combat(allyIdx, [coord[3], coord[2]], state, move_of_state)*30
+            # Not move the spy till the marshal is near
+            # Encourage the movement toward Marshal otherwise: Manhattan distance so not 100% safe
+            elif allyIdx == 2:
+                Ms_dist_before = (abs(Ms[0] - coord[1]) + abs(Ms[1] - coord[0]))
+                if Ms_dist_before < 4 and (abs(Ms[0] - coord[3]) + abs(Ms[1] - coord[2])) < Ms_dist_before:
+                    value = 15
+                else:
+                    value = -30
+            # Not move the scout for more than 1 case too fast in the game.
+            elif move_of_state < 150 and (abs(coord[1]-coord[3]) > 1 or abs(coord[0]-coord[2]) > 1):
                 value = -30
-            # Not move the scout for more than 1 case too fast in the game
-            elif allyIdx == 3 and move_of_state < 150 and (abs(coord[1]-coord[3]) > 1 or abs(coord[0]-coord[2]) > 1):
-                value = -30
-            # TODO: Limit moving high piece if not necessary because they run left right next to pieces they cannot attack because of RiskScore
-            # TODO: Don't move Marshal till the enemy spy is discovered or some special cases
-
-            # The place we move to must be safe (no ennemy piece around can kill it)
-            # TODO: Need to verify dangerous_place, test with print
-            elif self.dangerous_place((coord[3], coord[2]), charMatrix, allyIdx, player):
+            # Not move the miner too early in the game
+            elif move_of_state < 200 and (allyIdx == 4):
                 value = -30
             else:
-                # TODO: Check all pieces in a range of 3-4 instead of just 1
                 if (coord[1], coord[0]) in registered_find:
                     found, path = registered_find[(coord[1], coord[0])]
                 else:
-                    limit = 6  # 7-where if where < 3 else 3
+                    limit = 5
                     found, path = find_combat(charMatrix, (coord[1], coord[0]), self.player_pieces[1-player], limit)
                     registered_find[(coord[1], coord[0])] = [found, path]
 
@@ -231,25 +202,28 @@ class CustomEvaluator():
                     fight_value = self.proba_win_combat(allyIdx, path[-1], state, move_of_state)*30
                 # Move toward an enemy piece we win versus, Ally go in the direction of the first enemy
                 if found and path[0] == (coord[3], coord[2]) and fight_value >= 0:
-                    value = fight_value/(len(path))
-                # Do the same with direction to flee
-                elif found and path[0] != (coord[3], coord[2]) and fight_value < 0:
-                    value = (-fight_value)/(len(path))
+                    value = fight_value/np.sqrt(len(path))  # (len(path))
+                # Do the same with direction to flee. Flee only big lose
+                elif found and path[0] != (coord[3], coord[2]) and fight_value < -9:
+                    value = (-fight_value)/np.sqrt(len(path))   # (len(path))
                     # Reduce the value of fleeing for len(path) > 2
                     if len(path) > 2:
                         value = value/2
-                # TODO: If big piece and go toward a piece that can kill him (not specially the first we see), don't go
-                # TODO: Move the miner forward only when for unmoved pieces, check the proba or sum of proba to decide that
                 else:
                     # Take moving toward the ennemy flag
-                    toward_flag = self.toward_flag(state, player, coord)
-                    value = toward_flag[1] if toward_flag[0] else 1.0
-            # TODO: Move small piece toward the flag to discover more before moving big pieces: Faire un multiplicateur en plus pour les probas par rapprot a la piece que c'est
-            # TODO: Before submiting the value, we can trick the things by adding value if the piece playing is smaller no ? Or at the end of proba_win_combat
+                    towards_flag = toward_flag(state, player, coord)
+                    value = towards_flag[1] if towards_flag[0] else 0
+
+            if dangerous_place([coord[1], coord[0]], charMatrix, allyIdx, player) and value < 0 and not two_square_rule:
+                # If sure to loose and doesn't discover anything new, don't change the weight
+                if arrival != "A" and sum(self.information[4][coord[3]][coord[2]]) < 0.2:
+                    pass
+                else:
+                    value = 15
             actions.append(action)
             proba.append(value)
-        proba = self.rescaleProbas(proba)
 
+        proba = rescaleProbas(proba, 5)
         # Remove completly actions with 0 probability so that it is not selected at all in the mcts search
         mask = proba != 0
         actions = np.array(actions)[mask]
@@ -259,6 +233,7 @@ class CustomEvaluator():
         for i in range(len(proba)):
             prio.append([actions[i], proba[i]])
 
+        self.stateHashPrior[self.hash_state(state)] = prio
         return prio
 
 class SearchNode(object):
@@ -310,18 +285,17 @@ class SearchNode(object):
 
         # MODIFIED HERE, The left part was always way smaller not matter the value of uct_c [0, 1] because the returns are in [-1, 1]
         # The modification switch the left part bound from [-1, 1] (what we have in returns) to [0, 1] (what they are waiting for in this function)
-        # print("reward/explore", (self.total_reward / self.explore_count)/2 + 1/2)
-        # print("uct_c use", uct_c*math.sqrt(math.log(parent_explore_count)/self.explore_count))
-        return (self.total_reward / self.explore_count)/2 + 1/2 + uct_c * math.sqrt(math.log(parent_explore_count) / self.explore_count)
+        # print("win/game, right part:", (self.total_reward / self.explore_count), ((self.total_reward / self.explore_count)/2 + 1/2), uct_c*math.sqrt(math.log(parent_explore_count)/self.explore_count))
+        return ((self.total_reward / self.explore_count)/2 + 1/2 + 
+            uct_c * math.sqrt(math.log(parent_explore_count) / self.explore_count))
 
     def puct_value(self, parent_explore_count, uct_c):
         """Returns the PUCT value of child."""
         if self.outcome is not None:
             return self.outcome[self.player]
 
-        return ((self.explore_count and self.total_reward / self.explore_count) +
-                uct_c * self.prior * math.sqrt(parent_explore_count) /
-                (self.explore_count + 1))
+        return ((self.explore_count and self.total_reward / self.explore_count) +     # (self.explore_count and self.total_reward / self.explore_count)/2 + 1/2 +
+                uct_c * self.prior * math.sqrt(parent_explore_count) / (self.explore_count + 1))
 
     def sort_key(self):
         """Returns the best action from this node, either proven or most visited.
@@ -368,11 +342,11 @@ class SearchNode(object):
             state.action_to_string(state.current_player(), self.action)
             if state and self.action is not None else str(self.action))
         return ("{:>6}: player: {}, prior: {:5.3f}, value: {:6.3f}, sims: {:5d}, "
-                "outcome: {}, {:3d} children").format(
+                "outcome: {}, reward: {:4.1f}, {:3d} children").format(
                     action, self.player, self.prior, self.explore_count and
                     self.total_reward / self.explore_count, self.explore_count,
                     ("{:4.1f}".format(self.outcome[self.player])
-                    if self.outcome else "none"), len(self.children))
+                    if self.outcome else "none"), self.total_reward, len(self.children))
 
     def __str__(self):
         return self.to_str(None)
@@ -386,7 +360,7 @@ class CustomBot(pyspiel.Bot):
                 max_simulations,
                 evaluator,
                 player_id,
-                child_selection_fn=SearchNode.uct_value,
+                child_selection_fn=SearchNode.puct_value, # SearchNode.uct_value,
                 dirichlet_noise=None):
         """Initializes a MCTS Search algorithm in the form of a bot.
 
@@ -417,9 +391,6 @@ class CustomBot(pyspiel.Bot):
     def __str__(self):
         return "custom"
 
-    def set_max_simulations(self, new_value):
-        self.max_simulations = new_value
-
     def init_knowledge(self):
         nbr_piece_left = np.array([1, 6, 1, 8, 5, 4, 4, 4, 3, 2, 1, 1])
         moved_before = np.zeros((10, 10))
@@ -434,8 +405,10 @@ class CustomBot(pyspiel.Bot):
 
     def step(self, state):
         root = self.mcts_search(state)
+        log(root.children_str(state))
         mcts_action = root.best_child().action
-        self.last_moves = [mcts_action, self.last_moves[0], self.last_moves[1], self.last_moves[2], self.last_moves[3]]
+        self.last_moves[1:] = self.last_moves[:-1]
+        self.last_moves[0] = mcts_action
         return mcts_action
 
     def _apply_tree_policy(self, root, state):

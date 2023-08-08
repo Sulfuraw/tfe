@@ -4,10 +4,81 @@ from __future__ import print_function
 import pyspiel
 import numpy as np
 import math
-import time
 from statework import *
 
 # Using the Copyright 2019 DeepMind Technologies Limited using modified version of """Monte-Carlo Tree Search algorithm for game play"""
+
+class RandomRolloutEvaluator():
+    """A simple evaluator doing random rollouts.
+
+    This evaluator returns the average outcome of playing random actions from the
+    given state until the end of the game.  n_rollouts is the number of random
+    outcomes to be considered.
+    """
+    def __init__(self, n_rollouts=5, n_move_before=10, random_state=None):
+        self.n_rollouts = n_rollouts
+        self.n_moves_before = n_move_before
+        self._random_state = random_state or np.random.RandomState()
+
+    def evaluate_state(self, state):
+        """Returns evaluation on given state."""
+        state_str = str(state)[:100].upper()
+        nbr_pieces = [[0]*12, [0]*12]
+        advanced_pieces = [0, 0]
+        advanced_miner = [0, 0]
+        place = 0
+        for piece in state_str:
+            if piece not in ["A", "_"]:
+                i, player = pieces_to_index()[piece]
+                nbr_pieces[player][i] += 1
+                if player and place < 40:
+                    advanced_pieces[player] += 1
+                    if i == 4:
+                        advanced_miner[player] += 1
+                if not player and place > 60:
+                    advanced_pieces[player] += 1
+                    if i == 4:
+                        advanced_miner[player] += 1
+            place += 1
+
+        score = [0, 0]
+        for player in [0, 1]:
+            for piece_id in range(12):
+                score[player] += nbr_pieces[player][piece_id]
+            # More weight having piece on the other side
+            score[player] += advanced_pieces[player] * 0.02
+
+        returns = [0, 0]
+        for player in [0, 1]:
+            x = score[player] - score[1-player]
+            returns[player] = 2*(x - (-40))/(40 - (-40)) - 1.0 
+
+        if returns[0] > 1 or returns[0] < -1 or returns[1] > 1 or returns[1] < -1:
+            # Check if we need to adapt the rescale above
+            print("==============================")
+            print("Returns:", returns, "\n")
+            printCharMatrix(str(state))
+        return returns
+
+    def evaluate(self, state):
+        """Returns simulations / rollout of a state."""
+        result = None
+        for _ in range(self.n_rollouts):
+            working_state = state.clone()
+            i = 0
+            while not working_state.is_terminal() and i < self.n_moves_before:
+                action = self._random_state.choice(working_state.legal_actions())
+                working_state.apply_action(action)
+                i += 1
+            returns = np.array(working_state.returns()) if working_state.is_terminal() else np.array(self.evaluate_state(working_state))
+            result = returns if result is None else result + returns
+        return result / self.n_rollouts
+
+    def prior(self, state):
+        """Returns equal probability for all actions."""
+        legal_actions = state.legal_actions(state.current_player())
+        return [(action, 1.0 / len(legal_actions)) for action in legal_actions]
+
 class SearchNode(object):
     """A node in the search tree.
 
@@ -47,6 +118,15 @@ class SearchNode(object):
         self.outcome = None
         self.children = []
 
+    def __init__(self, action, player, prior):
+        self.action = action
+        self.player = player
+        self.prior = prior
+        self.explore_count = 0
+        self.total_reward = 0.0
+        self.outcome = None
+        self.children = []
+
     def uct_value(self, parent_explore_count, uct_c):
         """Returns the UCT value of child."""
         if self.outcome is not None:
@@ -55,8 +135,10 @@ class SearchNode(object):
         if self.explore_count == 0:
             return float("inf")
 
-        return self.total_reward / self.explore_count + uct_c * math.sqrt(
-            math.log(parent_explore_count) / self.explore_count)
+        # MODIFIED HERE, The left part was always way smaller not matter the value of uct_c [0, 1] because the returns are in [-1, 1]
+        # The modification switch the left part bound from [-1, 1] (what we have in returns) to [0, 1] (what they are waiting for in this function)
+        # print("win/game, right part:", ((self.total_reward / self.explore_count)/2 + 1/2), uct_c*math.sqrt(math.log(parent_explore_count)/self.explore_count))
+        return (self.total_reward / self.explore_count)/2 + 1/2 + uct_c * math.sqrt(math.log(parent_explore_count) / self.explore_count)
 
     def puct_value(self, parent_explore_count, uct_c):
         """Returns the PUCT value of child."""
@@ -121,35 +203,6 @@ class SearchNode(object):
     def __str__(self):
         return self.to_str(None)
 
-class RandomRolloutEvaluator():
-    """A simple evaluator doing random rollouts.
-
-    This evaluator returns the average outcome of playing random actions from the
-    given state until the end of the game.  n_rollouts is the number of random
-    outcomes to be considered.
-    """
-
-    def __init__(self, n_rollouts=5, random_state=None):
-        self.n_rollouts = n_rollouts
-        self._random_state = random_state or np.random.RandomState()
-
-    def evaluate(self, state):
-        """Returns evaluation on given state."""
-        result = None
-        for _ in range(self.n_rollouts):
-            working_state = state.clone()
-            while not working_state.is_terminal():
-                action = self._random_state.choice(working_state.legal_actions())
-                working_state.apply_action(action)
-            returns = np.array(working_state.returns())
-            result = returns if result is None else result + returns
-
-        return result / self.n_rollouts
-
-    def prior(self, state):
-        """Returns equal probability for all actions."""
-        legal_actions = state.legal_actions(state.current_player())
-        return [(action, 1.0 / len(legal_actions)) for action in legal_actions]
 
 class mctsBot(pyspiel.Bot):
     """Bot that uses Monte-Carlo Tree Search algorithm."""
@@ -160,54 +213,40 @@ class mctsBot(pyspiel.Bot):
                 max_simulations,
                 evaluator,
                 player_id,
-                solve=True,
-                random_state=None,
                 child_selection_fn=SearchNode.uct_value,
-                dirichlet_noise=None,
-                verbose=False):
+                dirichlet_noise=None):
         """Initializes a MCTS Search algorithm in the form of a bot.
 
-        In multiplayer games, or non-zero-sum games, the players will play the
-        greedy strategy.
-
-        Args:
-        game: A pyspiel.Game to play.
         uct_c: The exploration constant for UCT.
         max_simulations: How many iterations of MCTS to perform. Each simulation
             will result in one call to the evaluator. Memory usage should grow
-            linearly with simulations * branching factor. How many nodes in the
-            search tree should be evaluated. This is correlated with memory size and
-            tree depth.
-        evaluator: A `Evaluator` object to use to evaluate a leaf node.
-        solve: Whether to back up solved states.
-        random_state: An optional numpy RandomState to make it deterministic.
+            linearly with simulations * branching factor.
         child_selection_fn: A function to select the child in the descent phase.
             The default is UCT.
         dirichlet_noise: A tuple of (epsilon, alpha) for adding dirichlet noise to
             the policy at the root. This is from the alpha-zero paper.
-        verbose: Whether to print information about the search tree before
-            returning the action. Useful for confirming the search is working
-            sensibly.
 
-        Raises:
-        ValueError: if the game type isn't supported:
-        game.get_type().reward_model != pyspiel.GameType.RewardModel.TERMINAL and game.get_type().dynamics != pyspiel.GameType.Dynamics.SEQUENTIAL
+        ValueError if game.get_type().reward_model != pyspiel.GameType.RewardModel.TERMINAL and game.get_type().dynamics != pyspiel.GameType.Dynamics.SEQUENTIAL
         """
         pyspiel.Bot.__init__(self)
 
-        self._game = game
         self.uct_c = uct_c
         self.max_simulations = max_simulations
         self.evaluator = evaluator
         self.player_id = player_id
-        self.verbose = verbose
-        self.solve = solve
+        self.solve = True # Whether to back up solved states.
         self.max_utility = game.max_utility()
         self._dirichlet_noise = dirichlet_noise
-        self._random_state = random_state or np.random.RandomState()
+        self._random_state = None or np.random.RandomState() # An optional numpy RandomState to make it deterministic.
         self._child_selection_fn = child_selection_fn
-
         self.information = []
+        self.last_moves = [None, None, None, None, None]
+
+    def restart_at(self, state):
+        pass
+
+    def __str__(self):
+        return "mcts"
 
     def set_max_simulations(self, new_value):
         self.max_simulations = new_value
@@ -222,36 +261,11 @@ class mctsBot(pyspiel.Bot):
     def update_knowledge(self, state, action):
         updating_knowledge(self.information, state, action)
 
-    def step_with_policy(self, state):
-        """Returns bot's policy and action at given state."""
-        t1 = time.time()
-        root = self.mcts_search(state)
-
-        best = root.best_child()
-
-        if self.verbose:
-            seconds = time.time() - t1
-            print("Finished {} sims in {:.3f} secs, {:.1f} sims/s".format(
-                root.explore_count, seconds, root.explore_count / seconds))
-            print("Root:")
-            print(root.to_str(state))
-            print("Children:")
-            print(root.children_str(state))
-            if best.children:
-                chosen_state = state.clone()
-                chosen_state.apply_action(best.action)
-                print("Children of chosen:")
-                print(best.children_str(chosen_state))
-
-        mcts_action = best.action
-
-        policy = [(action, (1.0 if action == mcts_action else 0.0))
-                for action in state.legal_actions(state.current_player())]
-
-        return policy, mcts_action
-
     def step(self, state):
-        return self.step_with_policy(state)[1]
+        root = self.mcts_search(state)
+        mcts_action = root.best_child().action
+        self.last_moves = [mcts_action, self.last_moves[0], self.last_moves[1], self.last_moves[2], self.last_moves[3]]
+        return mcts_action
 
     def _apply_tree_policy(self, root, state):
         """Applies the UCT policy to play the game until reaching a leaf node.
@@ -275,11 +289,7 @@ class mctsBot(pyspiel.Bot):
             if not current_node.children:
                 # For a new node, initialize its state, then choose a child as normal.
                 legal_actions = self.evaluator.prior(working_state)
-                if current_node is root and self._dirichlet_noise:
-                    epsilon, alpha = self._dirichlet_noise
-                    noise = self._random_state.dirichlet([alpha] * len(legal_actions))
-                    legal_actions = [(a, (1 - epsilon) * p + epsilon * n)
-                                for (a, p), n in zip(legal_actions, noise)]
+                
                 # Reduce bias from move generation order.
                 self._random_state.shuffle(legal_actions)
                 player = working_state.current_player()
@@ -378,9 +388,4 @@ class mctsBot(pyspiel.Bot):
             if root.outcome is not None:
                 break
         return root
-
-    def restart_at(self, state):
-        pass
-
-    def __str__(self):
-        return "mcts"
+    

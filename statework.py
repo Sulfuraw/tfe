@@ -2,12 +2,17 @@ import curses
 import numpy as np
 import random
 
+piece_to_index = {"M":[0, 0], "B":[1, 0], "C":[2, 0], "D":[3, 0], "E":[4, 0], "F":[5, 0], "G":[6, 0], "H":[7, 0], "I":[8, 0], "J":[9, 0], "K":[10, 0], "L":[11, 0],
+                "Y":[0, 1], "N":[1, 1], "O":[2, 1], "P":[3, 1], "Q":[4, 1], "R":[5, 1], "S":[6, 1], "T":[7, 1], "U":[8, 1], "V":[9, 1], "W":[10, 1], "X":[11, 1]}
+
+player_pieces = [["M", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L"],
+                ["Y", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X"]]
+
 def players_pieces():
-    pieces = [["M", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L"],
-              ["Y", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X"]]
-    # It is:  [Fl,  Bo,   Sp,  Sc,  Mi,  Sg,  Lt,  Cp,  Mj,  Co,  Ge,  Ms]
-    # Nbr     [1,   6,    1,   8,   5,   4,   4,   4,   3,   2,   1,   1]
-    return pieces
+    # Piece [Fl,  Bo,   Sp,  Sc,  Mi,  Sg,  Lt,  Cp,  Mj,  Co,  Ge,  Ms]
+    # Nbr   [1,   6,    1,   8,   5,   4,   4,   4,   3,   2,   1,   1]
+    return [["M", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L"],
+            ["Y", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X"]]
 
 def pieces_to_index():
     # In the form [index_of_piece, id_of_player]
@@ -189,7 +194,7 @@ def coord_to_action(coord):
     return cols[coord[0]] + rows[coord[1]] + cols[coord[2]] + rows[coord[3]]
 
 def create_initial_state_str():
-    player_pieces = players_pieces()
+    # player_pieces = players_pieces()
     setups = [
         [5, 4, 1, 0, 1, 4, 5, 4, 4, 5, 1, 6, 8, 1, 7, 8, 1, 4, 3, 1, 6, 9, 3, 3, 3, 7, 2, 6, 9, 6, 3, 7, 3, 11, 8, 5, 10, 3, 3, 7], # Base p1 Full protec, well spread
         [3, 8, 0, 7, 5, 5, 4, 1, 7, 3, 9, 1, 6, 4, 1, 1, 2, 4, 1, 5, 8, 3, 11, 3, 5, 9, 3, 10, 3, 8, 6, 7, 3, 4, 6, 1, 3, 4, 7, 6], # Base p2 0 protec, well spread
@@ -215,7 +220,7 @@ def generate_state(state, information):
     moved_before = information[2]
     moved_scout = information[3]
     matrix_of_stats = information[4].copy()
-    players_piece = players_pieces()
+    # player_pieces = players_pieces()
 
     state_list = list(partial_state)
 
@@ -240,7 +245,7 @@ def generate_state(state, information):
         piece_id = np.random.choice(np.arange(12), p=proba)
         if not moved_scout[i//10][i%10]:
             piece_left[piece_id] -= 1
-        piece = players_piece[1-player][piece_id]
+        piece = player_pieces[1-player][piece_id]
         state_list[i] = piece
     
     # Comeback to the ones we didn't treat: the one that never moved
@@ -248,7 +253,7 @@ def generate_state(state, information):
         proba = no_info_piece_matrix(piece_left, matrix_of_stats[i//10][i%10])
         piece_id = np.random.choice(np.arange(12), p=proba)
         piece_left[piece_id] -= 1
-        piece = players_piece[1-player][piece_id]
+        piece = player_pieces[1-player][piece_id]
         state_list[i] = piece
     
     state_str = "".join(state_list)
@@ -261,7 +266,7 @@ def updating_knowledge(information, state, action):
         Information : [self.player_id, nbr_piece_left, moved_before, moved_scout]
     """
     player_id, nbr_piece_left, moved_before, moved_scout, matrix_of_stats = information
-    players_piece = players_pieces()
+    # player_pieces = players_pieces()
     current_player = state.current_player()
 
     coord = action_to_coord(state.action_to_string(current_player, action))
@@ -281,7 +286,7 @@ def updating_knowledge(information, state, action):
             # Either win or lose the fight, it will result in the same operation
             # We also delete information of moved piece at this place because it doesnt matter anymore
             for p in range(12):
-                if full_matrix_before[coord[3]][coord[2]] == players_piece[1-player_id][p]:
+                if full_matrix_before[coord[3]][coord[2]] == player_pieces[1-player_id][p]:
                     if not (p==3 and moved_scout[coord[3]][coord[2]]):
                         nbr_piece_left[p] -= 1
                     matrix_of_stats[coord[3]][coord[2]] = np.zeros(12)
@@ -289,7 +294,7 @@ def updating_knowledge(information, state, action):
                     moved_scout[coord[3]][coord[2]] = 0
     else:
         # Fight
-        if arrival in players_piece[player_id]:
+        if arrival in player_pieces[player_id]:
             was_scout = moved_scout[coord[1]][coord[0]]
             matrix_of_stats[coord[1]][coord[0]] = np.zeros(12)
             matrix_of_stats[coord[3]][coord[2]] = np.zeros(12)
@@ -298,16 +303,16 @@ def updating_knowledge(information, state, action):
             moved_scout[coord[1]][coord[0]] = 0
             moved_scout[coord[3]][coord[2]] = 0
             # Ennemy Won: But if he killed our piece, we get information of it
-            if arrival_after in players_piece[current_player]:
+            if arrival_after in player_pieces[current_player]:
                 if start == "?":
                     for p in range(12):
-                        if arrival_after == players_piece[current_player][p]:
+                        if arrival_after == player_pieces[current_player][p]:
                             if not (p==3 and was_scout):
                                 nbr_piece_left[p] -= 1
             # Ennemy lose:
             else:
                 for p in range(12):
-                    if full_matrix_before[coord[1]][coord[0]] == players_piece[current_player][p] and start == "?":
+                    if full_matrix_before[coord[1]][coord[0]] == player_pieces[current_player][p] and start == "?":
                         if not (p==3 and was_scout):
                             nbr_piece_left[p] -= 1
         # Deplacement on empty space: Deplacement of moved and/or get information about moved/scout_moved
@@ -335,7 +340,7 @@ def find_combat(matrix, start, pieces, limit=4):
         # A piece is found
         if matrix[pos[0]][pos[1]] in pieces:
             return True, path
-        # If further than 4 moves, stop
+        # If further than limit moves, stop
         if len(path) >= limit:
             continue
         # Expand
@@ -386,8 +391,8 @@ def data_for_games(move, state, generated, evaluator):
         Ennemy_pieces: The number of pieces the ennemy has still ("?" and known pieces)
     """
     player = state.current_player()
-    players_piece = players_pieces()
-    move_of_state = int(str(state)[103-len(str(state)):])
+    # player_pieces = players_pieces()
+    # move_of_state = int(str(state)[103-len(str(state)):])
     eval_real = round(evaluator.evaluate_state(state)[player], 4)
     eval_generated = round(evaluator.evaluate_state(generated)[player], 4)
     unknow_acc = round(unknown_acc(state, generated), 2)
@@ -395,9 +400,9 @@ def data_for_games(move, state, generated, evaluator):
     our_pieces = 0
     ennemy_pieces = 0
     for i in str(generated)[:100].upper():
-        if i in players_piece[player]:
+        if i in player_pieces[player]:
             our_pieces += 1
-        if i in players_piece[1-player]:
+        if i in player_pieces[1-player]:
             ennemy_pieces += 1
     # print("====================================")
     # print("move:", move)
@@ -417,20 +422,156 @@ def is_valid_coord(pos):
 
 def flag_protec(state, player):
     """Check that the flag is protected all around him (4 positions)"""
-    players_piece = players_pieces()
+    # player_pieces = players_pieces()
     matrix = stateIntoCharMatrix(state)
     coord = [0, 0]
     for i in range(10):
         for j in range(10):
-            if matrix[i][j] == players_piece[player][0]:
+            if matrix[i][j] == player_pieces[player][0]:
                 coord = [i, j]
     number_of_bad_pieces = 0
     to_check = [[coord[0]+1, coord[1]], [coord[0]-1, coord[1]], [coord[0], coord[1]+1], [coord[0], coord[1]-1]]
     for pos in to_check:
-        if is_valid_coord(pos) and not matrix[pos[0]][pos[1]] in players_piece[player]:
+        if is_valid_coord(pos) and not matrix[pos[0]][pos[1]] in player_pieces[player]:
             number_of_bad_pieces += 1
     return number_of_bad_pieces
     
+def toward_flag(state, player, coord):
+    flag_str_pos = str(state).find(player_pieces[1-player][0])
+    flag = [flag_str_pos//10, flag_str_pos%10]
+    man_distance_before = abs(flag[0] - coord[1]) + abs(flag[1] - coord[0])
+    man_distance_after = abs(flag[0] - coord[3]) + abs(flag[1] - coord[2])
+    # Categorize the weight
+    value = 21-man_distance_after
+    if value < 11: value = 5
+    elif value < 16: value = 10
+    else: value = 10
+    return man_distance_before > man_distance_after, value
+
+def dangerous_place(coord, matrix, allyIdx, player):
+    # y, x = coord
+    # player_pieces = players_pieces()
+    to_check = [[coord[0]+1, coord[1]], [coord[0]-1, coord[1]], [coord[0], coord[1]+1], [coord[0], coord[1]-1]]
+    for pos in to_check:
+        # TODO: win_combat could be replace by proba_win_combat
+        if is_valid_coord(pos) and matrix[pos[0]][pos[1]] in player_pieces[1-player] and matrix[pos[0]][pos[1]] != player_pieces[1-player][1] and win_combat(allyIdx, matrix[pos[0]][pos[1]]) == -1:
+            return True
+    return False
+
+def win_combat(allyIdx, enemy):
+    """Only work on moveable ally at the moment"""
+    enemyIdx, _ = piece_to_index[enemy]
+    # TODO: Make so that if two piece of equal rank, check
+    if enemyIdx == 1:
+        return 1 if allyIdx == 4 else -1
+    # TODO: Marshal Vs Espy should win only if in a odd manhattan distance, else it lose.
+    if enemyIdx == 2:
+        return 1 if (allyIdx != 11 and allyIdx != 0) else -1
+    if enemyIdx == 11:
+        # TODO: Could make that we check that we have advantage in trading Marshal or not (enough piece of lower value 2-3)
+        return 1 if (allyIdx == 2 or allyIdx == 11) else -1
+    return 1 if enemyIdx <= allyIdx else -1
+
+def value_for_piece_in_combat(enemies, allies):
+    """Compare the value of the piece at a specific moment in the game, the value may change over it !"""
+    value = np.array([0.02]*12)
+    for rank in range(3, 12):
+        if (enemies[rank-1]+enemies[rank] > 0) and (allies[rank-1]+allies[rank] > 0):
+            value[rank] = value[rank-1]*1.45
+        else:
+            value[rank] = value[rank-1]
+    for rank in range(3, 12):
+        if sum(enemies[:rank]) < sum(allies[:rank]):
+            value[rank] = value[rank]*1.15
+    value /= max(value)
+    # If only few scout left (< 3), make them more valuable
+    value[3] *= (5-allies[3]) if allies[3] < 4 else 1
+    # If only few miner left (< 3), make them more valuable
+    value[4] *= (6-allies[4]) if allies[4] < 4 else 2
+    value[11] *= 0.8 if enemies[2] else 1.0
+    value[0] = sum(allies)
+    value[1] = 0.5
+    value[2] = value[11]/2 # if enemies[11] else 0.02
+
+    returns = []
+    for i in range(12):
+        returns.append((i, value[i]))
+    return returns
+
+# def value_for_piece(enemies, allies):
+#     value = np.array([0.02]*12)
+#     for i in range(4, 12):
+#         value[i] = value[i-1]*1.6
+#     value[0] = 1.0
+#     value[1] = 0.9 if enemies[4] == 0 else 0.8
+#     value[2] = 0.6 if enemies[11] else 0.02
+#     value[4] += 0.032 if enemies[1] < 3 else 0.6
+#     returns = []
+#     for i in range(12):
+#         returns.append((i, value[i]))
+#     return returns
+
+### Best result so far
+def value_for_piece(enemies, allies):
+    """Value of the pieces for the evaluation function"""
+    # TODO: Fadura retenter avec un simple truc qui dit 1/pièce et c'est tout
+    # Ou 1/pièce et 2 pour la pièce la plus grande pas en commun / juste plus grande
+    returns = [[0, 2.0], [1, 0.5], [2, 0.1], 
+                [3, 0.1], [4, 0.3], 
+                [5, 0.3], [6, 0.3], 
+                [7, 0.5], [8, 0.5], 
+                [9, 0.8], [10, 1.0], [11, 1.0]]
+    return returns
+
+#  0    1     2    3    4    5    6    7    8    9    10   11
+# [Fl,  Bo,   Sp,  Sc,  Mi,  Sg,  Lt,  Cp,  Mj,  Co,  Ge,  Ms]
+
+### advanced array
+# def value_for_piece(enemies, allies):
+#     """Value of the pieces for the evaluation function"""
+#     returns = [[0, 2.0], [1, 0.5], [2, 0.2 if enemies[11] else 0.02], 
+#                 [3, 0.051 * ((5-allies[3]) if allies[3] < 4 else 1)], [4, 0.074 * ((6-allies[4]) if allies[4] < 4 else 2)], 
+#                 [5, 0.108], [6, 0.156], 
+#                 [7, 0.226], [8, 0.328], 
+#                 [9, 0.476], [10, 0.690], [11, 1.0]]
+#     return returns
+
+def rescaleProbas(array, limit=7):
+    """Delete values of the array that are too low and rescale to probability after"""
+    array = np.array(array)
+    if len(set(array)) == 1:
+        return np.array([1/len(array) for _ in range(len(array))])
+    mean_value = np.mean(array)
+    threshold = mean_value if mean_value > 0 else np.min(array)
+    # Set low values to zero
+    array[array < threshold] = 0
+
+    # Set more value to low if there remains too much
+    new_array = array[array != 0]
+    if len(new_array) > limit:
+        further_threshold = np.sort(new_array)[-limit]
+        array[array < further_threshold] = 0
+
+    # Scale values between 0 and 1
+    array = (array - np.min(array)) / (np.max(array) - np.min(array))
+    # Make sure array sum to 1
+    proba = array / np.sum(array)
+
+    for i in array:
+        if np.isnan(i) or i < 0 or i > 1 or round(sum(proba)) != 1.0:
+            print("ERROR: rescaleProbas")
+            print(array)
+            print(proba)
+            print("====================================")
+    return proba
+
+def log(text, file_name="log.txt"):
+    """Log text in a file"""
+    # TODO: If you want to have the log, Uncomment below
+    pass
+    # with open(file_name, "a") as file:
+        # file.write(text + "\n")
+
 def stateIntoCharMatrix(state):
     """Transform a state into a Matrix of Character inside the str(state)"""
     stat = str(state).upper().split(" ")[0]
@@ -454,6 +595,21 @@ def printCharMatrix(state):
                 final += char + " "
         final += "\n"
     print(final)
+
+def returnCharMatrix(state):
+    """Print device for the matrix of character generated here: stateIntoCharMatrix(state)"""
+    charMatrix = stateIntoCharMatrix(state)
+    final = ""
+    for line in charMatrix:
+        for char in line:
+            if char == "_":
+                final += "#" + " "
+            elif char == "A":
+                final += "_" + " "
+            else:
+                final += char + " "
+        final += "\n"
+    return final
 
 # wrapper(print_board, getGame("games/0"), ["rnad", "random"])
 # To print only one state simply put it inside [] as states arg

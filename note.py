@@ -765,6 +765,18 @@ def astar(array, start, end):
 
 ###############################################################################
 
+# if False: #move_of_state % 50 == 0 and player == 0:
+#     print("=======================================")
+#     print(move_of_state)
+#     print(piece_values)
+#     print()
+#     print(printCharMatrix(state))
+#     prio = self.prior(state, 0)
+#     for i in range(len(prio)):
+#         print(state.action_to_string(prio[i][0]), prio[i][1])
+
+###############################################################################
+
 # Simulation rollout prior random:
                 # # We simulate our moves with prior and simulate ennemy move randomly.
                 # if (i%2) == 0:
@@ -796,3 +808,13 @@ information = [0, nbr_piece_left, moved_before, moved_scout, matrix_of_stats(0)]
 # for i in range(len(prio)):
 #     print("{} -> {}: {}".format(prio[i][0], action_to_coord(state.action_to_string(prio[i][0])), prio[i][1]))
 
+# print(round(sum(np.array([0.14285714, 0.28571429, 0.04761905, 0.04761905, 0.14285714, 0, 0, 0.14285714,  0, 0.0952381,  0.0952381, 0, 0, 0]))))
+# print(sum(np.array([0.14285714, 0.28571429, 0.04761905, 0.04761905, 0.14285714, 0, 0, 0.14285714,  0, 0.0952381,  0.0952381, 0, 0, 0])) != 1)
+
+
+last_moves = [None, None, None, None, None]
+# last_moves = [1345, last_moves[0], last_moves[1], last_moves[2], last_moves[3]]
+last_moves[1:] = last_moves[:-1]
+last_moves[0] = 1234
+
+print(last_moves)
