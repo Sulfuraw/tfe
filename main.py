@@ -470,7 +470,7 @@ def play_n_games(player1, player2, num_games, replay=False, auto=False):
 def benchmark(num_games):
     """With the num_games with 50, effectively each bot will play 100 games versus other bots"""
     bots_to_play = ["custom", "asmodeus", "hunter", "rnad", "mcts"]
-    for i in range(0, len(bots_to_play)):
+    for i in range(4, len(bots_to_play)):
         for j in range(0, len(bots_to_play)):
             if i != j:
                 player1 = bots_to_play[i]

@@ -73,6 +73,7 @@ class CustomEvaluator():
             x = score[player] - score[1-player]
             # returns[player] = 2*(x - (-8.5))/(8.5 - (-8.5)) - 1.0     # Rerange -8.5 to 8.5 into -1 to 1
             # returns[player] = 2*(x - (-5))/(5 - (-5)) - 1.0           # Value for piece advanced array
+            # TODO: Should scale down by another .2 bc 6 games out of 500 were more than that. Strong destruction
             returns[player] = 2*(x - (-9.2))/(9.2 - (-9.2)) - 1.0             # Value for best result so far
 
         if returns[0] > 1 or returns[0] < -1 or returns[1] > 1 or returns[1] < -1:
@@ -286,7 +287,7 @@ class SearchNode(object):
         # MODIFIED HERE, The left part was always way smaller not matter the value of uct_c [0, 1] because the returns are in [-1, 1]
         # The modification switch the left part bound from [-1, 1] (what we have in returns) to [0, 1] (what they are waiting for in this function)
         # print("win/game, right part:", (self.total_reward / self.explore_count), ((self.total_reward / self.explore_count)/2 + 1/2), uct_c*math.sqrt(math.log(parent_explore_count)/self.explore_count))
-        return ((self.total_reward / self.explore_count)/2 + 1/2 + 
+        return ((self.total_reward / self.explore_count) + 
             uct_c * math.sqrt(math.log(parent_explore_count) / self.explore_count))
 
     def puct_value(self, parent_explore_count, uct_c):
@@ -315,6 +316,8 @@ class SearchNode(object):
 
     def best_child(self):
         """Returns the best child in order of the sort key."""
+        if len(self.children) == 0:
+            return False
         return max(self.children, key=SearchNode.sort_key)
 
     def children_str(self, state=None):
@@ -406,7 +409,11 @@ class CustomBot(pyspiel.Bot):
     def step(self, state):
         root = self.mcts_search(state)
         log(root.children_str(state))
-        mcts_action = root.best_child().action
+        if not root.best_child():
+            print("Error: No result in the best_child !!! Default behavior")
+            mcts_action = state.legal_actions()[0]
+        else:
+            mcts_action = root.best_child().action
         self.last_moves[1:] = self.last_moves[:-1]
         self.last_moves[0] = mcts_action
         return mcts_action
