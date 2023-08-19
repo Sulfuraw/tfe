@@ -812,9 +812,8 @@ information = [0, nbr_piece_left, moved_before, moved_scout, matrix_of_stats(0)]
 # print(sum(np.array([0.14285714, 0.28571429, 0.04761905, 0.04761905, 0.14285714, 0, 0, 0.14285714,  0, 0.0952381,  0.0952381, 0, 0, 0])) != 1)
 
 
-last_moves = [None, None, None, None, None]
-# last_moves = [1345, last_moves[0], last_moves[1], last_moves[2], last_moves[3]]
-last_moves[1:] = last_moves[:-1]
-last_moves[0] = 1234
-
-print(last_moves)
+a = np.array([1.7, 2, 75, 4])
+b = np.array([6.7, 7.7, 50, 9])
+c = (a + b)/2
+print(c)
+print(np.around(c, 0))

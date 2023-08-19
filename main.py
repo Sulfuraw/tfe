@@ -21,6 +21,7 @@ import hunterBot
 import mctsBot
 import gptBot
 from statework import *
+from script import *
 
 def everythingEverywhereAllAtOnce(filename, iterations):
     """Training / actualizing saved weight of the rnadBot"""
@@ -56,139 +57,15 @@ def save_to_csv(path, data):
     else:
         df.to_csv(path, index=False, header=True)
 
-def script_md_evaluate_bot(folder):
-    stats_df = pd.read_csv(folder+"stats.csv")
-    markdown_content = []
 
-    # Create a dictionary to store the game data
-    global_stats = {}
-    eval_matrix_win = None
-    eval_matrix_lose = None
-    unk_acc_win = None
-    unk_acc_lose = None
-    games_stats = {}
-
-    # Iterate over the rows of the stats dataframe and read in the corresponding game csv files
-    for index, row in stats_df.iterrows():
-        player1 = row['player1']
-        player2 = row['player2']
-        game_num = row['game_num']
-        win_1 = row['win_1']
-        win_2 = row['win_2']
-        avg_time = row['time_taken']
-        avg_moves = row['moves']
-        pieces_1 = row['pieces_1']
-        pieces_2 = row['pieces_2']
-
-        if win_1 < 2 and win_2 < 2:
-            filename = f"{player1}-{player2}{game_num}.csv"
-            game_df = pd.read_csv(folder+filename)
-            games_stats[filename] = np.array([avg_moves, win_1-win_2, pieces_1, pieces_2])
-
-            eval_real = np.array(game_df["eval_real"])
-            padded_eval_real = np.pad(eval_real, (0, 1001-len(eval_real)), mode='constant', constant_values=np.nan)
-            unk_acc = np.array(game_df["unknow_acc"])
-            padded_unk_acc = np.pad(unk_acc, (0, 1001-len(unk_acc)), mode='constant', constant_values=np.nan)
-
-            if win_1:
-                if eval_matrix_win is None:
-                    eval_matrix_win = padded_eval_real
-                    unk_acc_win = padded_unk_acc
-                else:
-                    eval_matrix_win = np.vstack((eval_matrix_win, padded_eval_real))
-                    unk_acc_win = np.vstack((unk_acc_win, padded_unk_acc))
-            elif win_2:
-                if eval_matrix_lose is None:
-                    eval_matrix_lose = padded_eval_real
-                    unk_acc_lose = padded_unk_acc
-                else:
-                    eval_matrix_lose = np.vstack((eval_matrix_lose, padded_eval_real))
-                    unk_acc_lose = np.vstack((unk_acc_lose, padded_unk_acc))
-            # Draw not counted, turn the elif above into a if to take them in the lose one
-        else:
-            # Add the stats versus this bot to the global stats
-                                            # Nombre de game, temps moyen, moves moyen, win%, draw%, lose%
-            global_stats[player2] = np.array([game_num, avg_time, avg_moves, win_1, 100-win_1-win_2, win_2])
-
-    for matrix, acc, win in [(eval_matrix_win, unk_acc_win, "win"), (eval_matrix_lose, unk_acc_lose, "lose")]:
-        if acc is None:
-            continue
-        x_values = range(0, 2001, 2)
-        # Compute the mean and standard deviation for each index
-        mean_values = [np.nanmean(matrix, axis=0), np.nanmean(acc, axis=0)]
-
-        above_mean = [matrix[matrix > mean_values[0]], acc[acc > mean_values[1]]]
-        below_mean = [matrix[matrix < mean_values[0]], acc[acc < mean_values[1]]]
-
-        std_values_above = [np.nanstd(above_mean[0], axis=0), np.nanstd(above_mean[1], axis=0)]
-        std_values_below = [np.nanstd(below_mean[0], axis=0), np.nanstd(below_mean[1], axis=0)]
-
-        # Plot the graph
-        fig, axs = plt.subplots(1, 2, figsize=(10, 5))
-        axs[0].plot(x_values, mean_values[0])
-        axs[0].fill_between(x_values, mean_values[0] - std_values_below[0], mean_values[0] + std_values_above[0], alpha=0.3)
-        axs[0].set_xlabel('Moves')
-        axs[0].set_ylabel('Evaluation')
-        axs[0].set_title('Evaluation of the state over the moves: '+win)
-        axs[0].set_ylim(-1, 1)
-
-        axs[1].plot(x_values, mean_values[1])
-        axs[1].fill_between(x_values, mean_values[1] - std_values_below[1], mean_values[1] + std_values_above[1], alpha=0.3)
-        axs[1].set_xlabel('Moves')
-        axs[1].set_ylabel('Unknown accuracy')
-        axs[1].set_title('Accuracy of unknown pieces over the moves: '+win)
-        axs[1].set_ylim(0, 1)
-        
-        # plt.show()
-        fig.savefig(folder+f"eval-{win}.png")
-
-    markdown_content.append(f"# Changement: {folder}\n")
-
-    markdown_content.append("## Evaluation of the state over the moves: win\n")
-    markdown_content.append(f"\n![{folder}eval-win.png Graph](./eval-win.png)\n")
-
-    markdown_content.append("## Evaluation of the state over the moves: lose\n")
-    markdown_content.append(f"\n![{folder}eval-lose.png Graph](./eval-lose.png)\n")
-
-    markdown_content.append("## Win/Draw/Lose versus the bots\n")
-    markdown_content.append(f"\n| ... | {player1} |\n")
-    markdown_content.append(f"| --- | --- |\n")
-    for e_player, information in global_stats.items():
-        game_num, avg_time, avg_moves, win, draw, lose = information
-        markdown_content.append(f"| {e_player} | {win}/{draw}/{lose} |\n")
-
-    markdown_content.append("## Other miscellanous stats versus the bots\n")
-    markdown_content.append(f"\n| {player1} | Nbr Games | Avg_time | Avg_moves |\n")
-    markdown_content.append(f"| --- | --- | --- | --- |\n")
-    for e_player, information in global_stats.items():
-        game_num, avg_time, avg_moves, win, draw, lose = information
-        markdown_content.append(f"| {e_player} | {game_num} | {avg_time} | {avg_moves} |\n")
-
-    markdown_content.append("## Stats per game\n")
-    markdown_content.append(f"\n| Game | Nbr_moves | Win | pieces_1 | pieces_2 |\n")
-    markdown_content.append(f"| --- | --- | --- | --- | --- |\n")
-    for filename, information in games_stats.items():
-        move, win, pieces_1, pieces_2 = information
-        markdown_content.append(f"| {filename} | {move} | {win} | {pieces_1} | {pieces_2} |\n")
-
-    markdown_content.append("## Post-game Observation\n")
-    markdown_content.append("To fill...\n")
-
-    # Write the markdown content to a file
-    with open(folder+'results.md', 'w') as f:
-        f.write(''.join(markdown_content))
-
-def play_game_versus_doi():
+def play_game_versus_doi(game_num, player1, player2):
     """Plays one game."""
     # Delete t.txt data before starting
     try:
         open("t.txt", 'w').close()
     except IOError:
         print('Failure')
-    game_num = 5
     game = pyspiel.load_game("yorktown")
-    player1 = "doi"
-    player2 = "custom"
     bots = [
         _init_bot(player1, game, 0),
         _init_bot(player2, game, 1),
@@ -200,11 +77,11 @@ def play_game_versus_doi():
         [5, 4, 1, 0, 1, 4, 5, 4, 4, 5, 
          1, 6, 8, 1, 7, 8, 1, 4, 3, 1, 
          6, 9, 3, 3, 3, 7, 2, 6, 9, 6, 
-         3, 7, 3, 11, 8, 5, 10, 3, 3, 7], # Base p1 Full protec, well spread
+         3, 7, 3, 11, 8, 5, 10, 3, 3, 7], # Base p1
         [3, 8, 0, 7, 5, 5, 4, 1, 7, 3, 
          9, 1, 6, 4, 1, 1, 2, 4, 1, 5, 
          8, 3, 11, 3, 5, 9, 3, 10, 3, 8, 
-         6, 7, 3, 4, 6, 1, 3, 4, 7, 6] # Base p2 0 protec, well spread
+         6, 7, 3, 4, 6, 1, 3, 4, 7, 6] # Base p2
         ]
     # player_pieces[0] means that it's the red player pieces
     s1T = "".join([player_pieces[0][x] for x in setups[0]])
@@ -219,9 +96,9 @@ def play_game_versus_doi():
     s2B = "".join(s2B)
 
 
-    setup = s1T + "AA__AA__AAAA__AA__AA" + s2B + " r 0"
+    setup = s2T + "AA__AA__AAAA__AA__AA" + s1B + " r 0"
     state = game.new_initial_state(setup)
-    wrapper(print_board, [stateIntoCharMatrix(state)], [player1, player2], auto=False)
+    # wrapper(print_board, [stateIntoCharMatrix(state)], [player1, player2], auto=False)
     history = []
     allStates = []
 
@@ -231,8 +108,10 @@ def play_game_versus_doi():
 
     move = 0
     play = 0
+    nbr_of_prior = 0
+    per_of_hit = 0
     while not state.is_terminal():
-        print("====================== " + ("TOP" if state.current_player() == 0 else "BOTTOM") + " ======================\n")
+        print("====================== " + ("TOP" if state.current_player() == 0 else "BOTTOM") + " " + str(move) + " ======================\n")
         printCharMatrix(state)
         # Draw by the rules
         if move == 1501: # 2001
@@ -271,7 +150,10 @@ def play_game_versus_doi():
                 print("Time for generate was", round(time.time()-start, 2))
             action = bot.step(generated)
             # print("time for generate and play a move:", time.time()-start)
-            save_to_csv("./games/"+player1+"-"+player2+str(game_num)+".csv", data_for_games(move, state, generated, customBot.CustomEvaluator()))
+            if str(bot) == "custom":
+                save_to_csv("./games/"+player1+"-"+player2+str(game_num)+".csv", data_for_games(move, state, generated, bot.evaluator))
+        elif str(bot) == "hunter":
+            action = bot.step(state)
         else:
             while True:
                 try:
@@ -281,7 +163,7 @@ def play_game_versus_doi():
                             break
                 except:
                     pass
-                time.sleep(2)
+                time.sleep(1)
             action = bot.step(state)
             play += 1
         action_str = state.action_to_string(current_player, action)
@@ -535,7 +417,7 @@ def _init_bot(bot_type, game, player_id):
 
 if __name__ == "__main__":
     # evaluate_bot("custom", 10)
-    benchmark(50)
+    # benchmark(50)
 
     # try:
     #     open("log.txt", 'w').close() # Del log file
@@ -557,6 +439,43 @@ if __name__ == "__main__":
     ###### Train the Rnad a number of steps
     # everythingEverywhereAllAtOnce("states/state.pkl", 10000) # 100000, 3sec/step
 
-    # play_game_versus_doi()
+    # play_game_versus_doi(0, "doi", "custom")
     # /bin/python3 /home/thomas/Bureau/tfe/main.py < t.txt
+    # Bureau/stratego-0.13.4/src$ ./run_stratego.sh 
+
+    # script_md_evaluate_benchmark("bench-final-nodoi/")
+    script_md_evaluate_benchmark("games/")
+
+
+# Suicide nos scout sur les scout adverses quand ils sont déjà discover, donc c'est pas l'effet voulu
+# Se serait cool si yavait plus de proba pour scouter les pieces plus loins car elles ont plus de valeur
+
+# Quand Doi essaye de bluffer avec mon ia ca marche pas bien et doi perd un avantage là dans ces situations
+
+# Bcp de moment je vais chase une pièce que j'ai bcp de chance de prendre au lieu de me positionner pour le bloquer par example.
+# Devrait, quand il a le choix pour prendre une pièce chosir l'option qui revele le moins d'info. Ex: Si on a un sergeant connu de l'ennemi et un marshal inconnu qui peuvent prendre un miner, on privilegie le seargeant parce qu'il est connu
+
+# Cette technique est meilleur que l'evaluation simple de tous les coups à un instant T et de prendre le meilleurs, car avec les simulations il permet de faire des plans du futur. Mais le problème est que les plans ne sont pas tjrs respecté, il commence une idée mais s'arrete en chemin, ce qui crée de situation pas favorables.
+
+# Check dans les derniers coups jouer (on garde les 4 ou 5 déjà pour le 2square rule), si on joue pas trop au même endroit, pour permettre de stopper de rester tjrs avec des grosses pièces à hesiter devant des pièces qu'il peut pas trop prendre.
+
+# Je bouge trop mes pièces autour du flag, alors que normalement ya du poids à la protection quoi. Peut etre pas assez
+
+# Ya une game ou j'ai perdu parce que ma pièce qui était sensé chase les enemies et tout gagné était bloqué devant des bombes connues au lieu de chases les pièces qui bougaient encore. On aurait du faire une recherche différentes par rapport à l'avancement de la game aussi. Genre ca encouragerait les grosses pièces pour les combats et les miners pour aller deminer en même temps.
+
+# Tellement de fois Doi attend avec une piece, on va pour aller l'attaquer et pile quand on est à coté, il en profite pour s'echatpper vers nos autres pièces, donc vraiment chiant. On pourrait, quand on chase une piece prioriser les gauches droite au fait d'aller de haut en base pour eviter ça. Dans ce cas, c'est l'algo de search sur le board a modif
+
+# Often not defending enough, because filler option are to go to the enemy fla, so when there is nother around or too dangerous thing, instead of search for solution, it just flee.
+
+# Futur: Manipuler l'information, on prend en compte le fait que l'adversaire va aller vers des pièces qui ont déjà bougé (c'est notre strategie aussi)
+
+# LOTS OF ENDLESS CHASE
+# 1360moves, je devais gagner 1000X mais il a fait que des chases en boucle et a perdu a force
+
+# Sometimes it is more worth it to continue your way past a piece to get some that are behind, hunter do that better than me versus doi.
+
+# Hunter a utiliser une technique où il avance deux pièces en même temps, c'est plutot interessant car ça permet de répondre à plus de situation 
+
+# Comme on peut voir dans doi vs custom, mon bot a surtout du mal à gérer le late game quand il y a bcp de choix. Il ne garde pas un bon contrôle alors qu'il a l'avantage la plupart du temps
+
 
