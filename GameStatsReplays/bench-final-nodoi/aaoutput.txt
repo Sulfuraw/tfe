@@ -1,0 +1,5550 @@
+custom VS asmodeus: Begin
+
+Returns: 1.0 -1.0 
+# moves: 325
+Hit percentage of hash in prior:  41.154 366168
+Time for this game in seconde: 183
+Game Number: 0
+
+Returns: -1.0 1.0 
+# moves: 494
+Hit percentage of hash in prior:  41.282 557842
+Time for this game in seconde: 268
+Game Number: 1
+
+Returns: -1.0 1.0 
+# moves: 368
+Hit percentage of hash in prior:  42.597 406127
+Time for this game in seconde: 195
+Game Number: 2
+
+Returns: 1.0 -1.0 
+# moves: 121
+Hit percentage of hash in prior:  38.97 138433
+Time for this game in seconde: 76
+Game Number: 3
+
+Returns: 1.0 -1.0 
+# moves: 183
+Hit percentage of hash in prior:  40.247 208459
+Time for this game in seconde: 118
+Game Number: 4
+
+Returns: 1.0 -1.0 
+# moves: 309
+Hit percentage of hash in prior:  43.111 344795
+Time for this game in seconde: 164
+Game Number: 5
+
+Returns: 1.0 -1.0 
+# moves: 407
+Hit percentage of hash in prior:  42.228 456892
+Time for this game in seconde: 222
+Game Number: 6
+
+Returns: 1.0 -1.0 
+# moves: 823
+Hit percentage of hash in prior:  32.57 931929
+Time for this game in seconde: 623
+Game Number: 7
+
+Returns: 1.0 -1.0 
+# moves: 371
+Hit percentage of hash in prior:  40.219 415837
+Time for this game in seconde: 219
+Game Number: 8
+
+Returns: 1.0 -1.0 
+# moves: 357
+Hit percentage of hash in prior:  41.81 363708
+Time for this game in seconde: 189
+Game Number: 9
+
+Returns: 0.0 0.0 
+# moves: 1500
+Hit percentage of hash in prior:  32.61 1704740
+Time for this game in seconde: 943
+Game Number: 10
+
+Returns: 1.0 -1.0 
+# moves: 401
+Hit percentage of hash in prior:  44.915 439814
+Time for this game in seconde: 201
+Game Number: 11
+
+Returns: 1.0 -1.0 
+# moves: 497
+Hit percentage of hash in prior:  41.124 554826
+Time for this game in seconde: 292
+Game Number: 12
+
+Returns: 1.0 -1.0 
+# moves: 103
+Hit percentage of hash in prior:  36.15 115881
+Time for this game in seconde: 66
+Game Number: 13
+
+Returns: 1.0 -1.0 
+# moves: 317
+Hit percentage of hash in prior:  37.967 359328
+Time for this game in seconde: 212
+Game Number: 14
+
+Returns: -1.0 1.0 
+# moves: 274
+Hit percentage of hash in prior:  41.505 217067
+Time for this game in seconde: 114
+Game Number: 15
+
+Returns: 1.0 -1.0 
+# moves: 469
+Hit percentage of hash in prior:  37.806 530655
+Time for this game in seconde: 298
+Game Number: 16
+
+Returns: 1.0 -1.0 
+# moves: 209
+Hit percentage of hash in prior:  37.824 238263
+Time for this game in seconde: 154
+Game Number: 17
+
+Returns: 0.0 0.0 
+# moves: 1500
+Hit percentage of hash in prior:  64.396 1689424
+Time for this game in seconde: 473
+Game Number: 18
+
+Returns: -1.0 1.0 
+# moves: 440
+Hit percentage of hash in prior:  37.862 426411
+Time for this game in seconde: 229
+Game Number: 19
+
+Returns: 1.0 -1.0 
+# moves: 389
+Hit percentage of hash in prior:  42.468 417909
+Time for this game in seconde: 202
+Game Number: 20
+
+Returns: -1.0 1.0 
+# moves: 420
+Hit percentage of hash in prior:  40.417 412244
+Time for this game in seconde: 227
+Game Number: 21
+
+Returns: 1.0 -1.0 
+# moves: 321
+Hit percentage of hash in prior:  43.728 365240
+Time for this game in seconde: 150
+Game Number: 22
+
+Returns: -1.0 1.0 
+# moves: 286
+Hit percentage of hash in prior:  40.138 318017
+Time for this game in seconde: 162
+Game Number: 23
+
+Returns: 1.0 -1.0 
+# moves: 379
+Hit percentage of hash in prior:  43.136 430671
+Time for this game in seconde: 188
+Game Number: 24
+
+Returns: -1.0 1.0 
+# moves: 562
+Hit percentage of hash in prior:  40.194 629297
+Time for this game in seconde: 281
+Game Number: 25
+
+Returns: 1.0 -1.0 
+# moves: 273
+Hit percentage of hash in prior:  41.861 306283
+Time for this game in seconde: 148
+Game Number: 26
+
+Returns: 1.0 -1.0 
+# moves: 315
+Hit percentage of hash in prior:  44.011 354507
+Time for this game in seconde: 163
+Game Number: 27
+
+Returns: 1.0 -1.0 
+# moves: 357
+Hit percentage of hash in prior:  43.861 397277
+Time for this game in seconde: 185
+Game Number: 28
+
+Returns: 1.0 -1.0 
+# moves: 389
+Hit percentage of hash in prior:  41.16 436404
+Time for this game in seconde: 220
+Game Number: 29
+
+Returns: 1.0 -1.0 
+# moves: 335
+Hit percentage of hash in prior:  43.084 373271
+Time for this game in seconde: 193
+Game Number: 30
+
+Returns: 1.0 -1.0 
+# moves: 183
+Hit percentage of hash in prior:  39.174 208715
+Time for this game in seconde: 119
+Game Number: 31
+
+Returns: 1.0 -1.0 
+# moves: 345
+Hit percentage of hash in prior:  40.963 388378
+Time for this game in seconde: 201
+Game Number: 32
+
+Returns: 1.0 -1.0 
+# moves: 377
+Hit percentage of hash in prior:  44.089 420418
+Time for this game in seconde: 187
+Game Number: 33
+
+Returns: 1.0 -1.0 
+# moves: 219
+Hit percentage of hash in prior:  38.867 247565
+Time for this game in seconde: 137
+Game Number: 34
+
+Returns: -1.0 1.0 
+# moves: 272
+Hit percentage of hash in prior:  42.529 264230
+Time for this game in seconde: 124
+Game Number: 35
+
+Returns: -1.0 1.0 
+# moves: 208
+Hit percentage of hash in prior:  39.881 234006
+Time for this game in seconde: 138
+Game Number: 36
+
+Returns: -1.0 1.0 
+# moves: 330
+Hit percentage of hash in prior:  40.973 371043
+Time for this game in seconde: 186
+Game Number: 37
+
+Returns: -1.0 1.0 
+# moves: 320
+Hit percentage of hash in prior:  42.447 313038
+Time for this game in seconde: 150
+Game Number: 38
+
+Returns: 1.0 -1.0 
+# moves: 453
+Hit percentage of hash in prior:  41.222 514364
+Time for this game in seconde: 276
+Game Number: 39
+
+Returns: 1.0 -1.0 
+# moves: 137
+Hit percentage of hash in prior:  39.938 156293
+Time for this game in seconde: 97
+Game Number: 40
+
+Returns: 1.0 -1.0 
+# moves: 471
+Hit percentage of hash in prior:  36.257 531627
+Time for this game in seconde: 323
+Game Number: 41
+
+Returns: 1.0 -1.0 
+# moves: 407
+Hit percentage of hash in prior:  40.149 461094
+Time for this game in seconde: 240
+Game Number: 42
+
+Returns: 1.0 -1.0 
+# moves: 343
+Hit percentage of hash in prior:  42.009 387932
+Time for this game in seconde: 204
+Game Number: 43
+
+Returns: -1.0 1.0 
+# moves: 356
+Hit percentage of hash in prior:  41.092 399424
+Time for this game in seconde: 202
+Game Number: 44
+
+Returns: 1.0 -1.0 
+# moves: 355
+Hit percentage of hash in prior:  42.43 381023
+Time for this game in seconde: 198
+Game Number: 45
+
+Returns: 1.0 -1.0 
+# moves: 443
+Hit percentage of hash in prior:  43.365 494124
+Time for this game in seconde: 214
+Game Number: 46
+
+Returns: -1.0 1.0 
+# moves: 272
+Hit percentage of hash in prior:  40.605 306285
+Time for this game in seconde: 166
+Game Number: 47
+
+Returns: 1.0 -1.0 
+# moves: 253
+Hit percentage of hash in prior:  44.421 285396
+Time for this game in seconde: 126
+Game Number: 48
+
+Returns: 1.0 -1.0 
+# moves: 333
+Hit percentage of hash in prior:  37.613 376509
+Time for this game in seconde: 220
+Game Number: 49
+
+Number of games played: 50
+Average number of moves till finish: 391
+Average time till finish: 217
+Players: custom asmodeus
+Overall wins [35, 13]
+custom VS hunter: Begin
+
+Returns: -1.0 1.0 
+# moves: 848
+Hit percentage of hash in prior:  35.968 950883
+Time for this game in seconde: 539
+Game Number: 0
+
+Returns: 0.0 0.0 
+# moves: 1500
+Hit percentage of hash in prior:  32.643 1706386
+Time for this game in seconde: 1274
+Game Number: 1
+
+Returns: 1.0 -1.0 
+# moves: 417
+Hit percentage of hash in prior:  37.998 469110
+Time for this game in seconde: 257
+Game Number: 2
+
+Returns: 1.0 -1.0 
+# moves: 1237
+Hit percentage of hash in prior:  32.826 1396682
+Time for this game in seconde: 904
+Game Number: 3
+
+Returns: 1.0 -1.0 
+# moves: 347
+Hit percentage of hash in prior:  39.498 394626
+Time for this game in seconde: 197
+Game Number: 4
+
+Returns: 0.0 0.0 
+# moves: 1500
+Hit percentage of hash in prior:  31.98 1703487
+Time for this game in seconde: 1115
+Game Number: 5
+
+Returns: -1.0 1.0 
+# moves: 540
+Hit percentage of hash in prior:  42.352 603555
+Time for this game in seconde: 272
+Game Number: 6
+
+Returns: 0.0 0.0 
+# moves: 1500
+Hit percentage of hash in prior:  46.727 1703701
+Time for this game in seconde: 671
+Game Number: 7
+
+Returns: 1.0 -1.0 
+# moves: 541
+Hit percentage of hash in prior:  37.778 613492
+Time for this game in seconde: 374
+Game Number: 8
+
+Returns: 1.0 -1.0 
+# moves: 911
+Hit percentage of hash in prior:  50.115 939485
+Time for this game in seconde: 476
+Game Number: 9
+
+Returns: -1.0 1.0 
+# moves: 442
+Hit percentage of hash in prior:  37.603 497924
+Time for this game in seconde: 260
+Game Number: 10
+
+Returns: 0.0 0.0 
+# moves: 1500
+Hit percentage of hash in prior:  33.766 1705870
+Time for this game in seconde: 948
+Game Number: 11
+
+Returns: -1.0 1.0 
+# moves: 284
+Hit percentage of hash in prior:  40.492 293353
+Time for this game in seconde: 150
+Game Number: 12
+
+Returns: 1.0 -1.0 
+# moves: 655
+Hit percentage of hash in prior:  43.997 710096
+Time for this game in seconde: 369
+Game Number: 13
+
+Returns: -1.0 1.0 
+# moves: 498
+Hit percentage of hash in prior:  41.418 542263
+Time for this game in seconde: 271
+Game Number: 14
+
+Returns: -1.0 1.0 
+# moves: 466
+Hit percentage of hash in prior:  39.403 526038
+Time for this game in seconde: 280
+Game Number: 15
+
+Returns: 1.0 -1.0 
+# moves: 721
+Hit percentage of hash in prior:  37.164 816594
+Time for this game in seconde: 494
+Game Number: 16
+
+Returns: 1.0 -1.0 
+# moves: 1251
+Hit percentage of hash in prior:  35.649 1420913
+Time for this game in seconde: 796
+Game Number: 17
+
+Returns: 1.0 -1.0 
+# moves: 999
+Hit percentage of hash in prior:  42.149 1129564
+Time for this game in seconde: 652
+Game Number: 18
+
+Returns: 1.0 -1.0 
+# moves: 537
+Hit percentage of hash in prior:  38.075 604737
+Time for this game in seconde: 380
+Game Number: 19
+
+Returns: 1.0 -1.0 
+# moves: 599
+Hit percentage of hash in prior:  47.796 656048
+Time for this game in seconde: 296
+Game Number: 20
+
+Returns: 1.0 -1.0 
+# moves: 485
+Hit percentage of hash in prior:  38.917 539151
+Time for this game in seconde: 338
+Game Number: 21
+
+Returns: 1.0 -1.0 
+# moves: 341
+Hit percentage of hash in prior:  39.774 386735
+Time for this game in seconde: 237
+Game Number: 22
+
+Returns: 1.0 -1.0 
+# moves: 863
+Hit percentage of hash in prior:  41.637 971319
+Time for this game in seconde: 442
+Game Number: 23
+
+Returns: -1.0 1.0 
+# moves: 462
+Hit percentage of hash in prior:  44.558 508921
+Time for this game in seconde: 219
+Game Number: 24
+
+Returns: -1.0 1.0 
+# moves: 804
+Hit percentage of hash in prior:  54.057 841558
+Time for this game in seconde: 303
+Game Number: 25
+
+Returns: 1.0 -1.0 
+# moves: 1129
+Hit percentage of hash in prior:  45.936 1273407
+Time for this game in seconde: 525
+Game Number: 26
+
+Returns: 1.0 -1.0 
+# moves: 369
+Hit percentage of hash in prior:  38.124 417924
+Time for this game in seconde: 225
+Game Number: 27
+
+Returns: 1.0 -1.0 
+# moves: 1323
+Hit percentage of hash in prior:  53.387 1464011
+Time for this game in seconde: 513
+Game Number: 28
+
+Returns: 1.0 -1.0 
+# moves: 365
+Hit percentage of hash in prior:  40.71 409694
+Time for this game in seconde: 194
+Game Number: 29
+
+Returns: 1.0 -1.0 
+# moves: 515
+Hit percentage of hash in prior:  39.776 572378
+Time for this game in seconde: 311
+Game Number: 30
+
+Returns: 1.0 -1.0 
+# moves: 253
+Hit percentage of hash in prior:  38.666 284178
+Time for this game in seconde: 150
+Game Number: 31
+
+Returns: -1.0 1.0 
+# moves: 1012
+Hit percentage of hash in prior:  37.462 1145486
+Time for this game in seconde: 606
+Game Number: 32
+
+Returns: -1.0 1.0 
+# moves: 722
+Hit percentage of hash in prior:  38.723 817745
+Time for this game in seconde: 410
+Game Number: 33
+
+Returns: -1.0 1.0 
+# moves: 398
+Hit percentage of hash in prior:  38.114 446996
+Time for this game in seconde: 291
+Game Number: 34
+
+Returns: 1.0 -1.0 
+# moves: 571
+Hit percentage of hash in prior:  40.101 634179
+Time for this game in seconde: 342
+Game Number: 35
+
+Returns: 1.0 -1.0 
+# moves: 453
+Hit percentage of hash in prior:  36.085 512343
+Time for this game in seconde: 338
+Game Number: 36
+
+Returns: -1.0 1.0 
+# moves: 414
+Hit percentage of hash in prior:  38.879 462341
+Time for this game in seconde: 226
+Game Number: 37
+
+Returns: 0.0 0.0 
+# moves: 1500
+Hit percentage of hash in prior:  33.231 1703546
+Time for this game in seconde: 1110
+Game Number: 38
+
+Returns: 1.0 -1.0 
+# moves: 271
+Hit percentage of hash in prior:  38.945 306278
+Time for this game in seconde: 190
+Game Number: 39
+
+Returns: -1.0 1.0 
+# moves: 372
+Hit percentage of hash in prior:  42.557 395738
+Time for this game in seconde: 225
+Game Number: 40
+
+Returns: -1.0 1.0 
+# moves: 134
+Hit percentage of hash in prior:  42.999 144430
+Time for this game in seconde: 74
+Game Number: 41
+
+Returns: 1.0 -1.0 
+# moves: 567
+Hit percentage of hash in prior:  36.492 640277
+Time for this game in seconde: 448
+Game Number: 42
+
+Returns: -1.0 1.0 
+# moves: 536
+Hit percentage of hash in prior:  42.011 580264
+Time for this game in seconde: 305
+Game Number: 43
+
+Returns: -1.0 1.0 
+# moves: 438
+Hit percentage of hash in prior:  42.875 466476
+Time for this game in seconde: 234
+Game Number: 44
+
+Returns: 1.0 -1.0 
+# moves: 807
+Hit percentage of hash in prior:  43.162 910679
+Time for this game in seconde: 437
+Game Number: 45
+
+Returns: -1.0 1.0 
+# moves: 454
+Hit percentage of hash in prior:  39.27 463631
+Time for this game in seconde: 275
+Game Number: 46
+
+Returns: 1.0 -1.0 
+# moves: 489
+Hit percentage of hash in prior:  39.371 553010
+Time for this game in seconde: 322
+Game Number: 47
+
+Returns: -1.0 1.0 
+# moves: 1052
+Hit percentage of hash in prior:  32.795 1187442
+Time for this game in seconde: 799
+Game Number: 48
+
+Returns: 1.0 -1.0 
+# moves: 475
+Hit percentage of hash in prior:  41.946 534566
+Time for this game in seconde: 255
+Game Number: 49
+
+Number of games played: 50
+Average number of moves till finish: 697
+Average time till finish: 426
+Players: custom hunter
+Overall wins [27, 18]
+custom VS rnad: Begin
+Bot rnad loaded
+
+Returns: 1.0 -1.0 
+# moves: 257
+Hit percentage of hash in prior:  42.455 290765
+Time for this game in seconde: 150
+Game Number: 0
+
+Returns: 1.0 -1.0 
+# moves: 411
+Hit percentage of hash in prior:  40.404 467452
+Time for this game in seconde: 256
+Game Number: 1
+
+Returns: 1.0 -1.0 
+# moves: 489
+Hit percentage of hash in prior:  40.718 548974
+Time for this game in seconde: 300
+Game Number: 2
+
+Returns: 1.0 -1.0 
+# moves: 121
+Hit percentage of hash in prior:  38.344 138517
+Time for this game in seconde: 90
+Game Number: 3
+
+Returns: 1.0 -1.0 
+# moves: 435
+Hit percentage of hash in prior:  40.658 487179
+Time for this game in seconde: 300
+Game Number: 4
+
+Returns: 1.0 -1.0 
+# moves: 349
+Hit percentage of hash in prior:  42.675 394658
+Time for this game in seconde: 239
+Game Number: 5
+
+Returns: -1.0 1.0 
+# moves: 620
+Hit percentage of hash in prior:  42.392 681705
+Time for this game in seconde: 410
+Game Number: 6
+
+Returns: 1.0 -1.0 
+# moves: 297
+Hit percentage of hash in prior:  44.541 317923
+Time for this game in seconde: 168
+Game Number: 7
+
+Returns: -1.0 1.0 
+# moves: 610
+Hit percentage of hash in prior:  45.087 665939
+Time for this game in seconde: 347
+Game Number: 8
+
+Returns: 1.0 -1.0 
+# moves: 165
+Hit percentage of hash in prior:  44.403 184370
+Time for this game in seconde: 100
+Game Number: 9
+
+Returns: 1.0 -1.0 
+# moves: 217
+Hit percentage of hash in prior:  41.43 243488
+Time for this game in seconde: 143
+Game Number: 10
+
+Returns: 1.0 -1.0 
+# moves: 821
+Hit percentage of hash in prior:  44.387 931559
+Time for this game in seconde: 530
+Game Number: 11
+
+Returns: 1.0 -1.0 
+# moves: 275
+Hit percentage of hash in prior:  41.896 310321
+Time for this game in seconde: 185
+Game Number: 12
+
+Returns: 1.0 -1.0 
+# moves: 243
+Hit percentage of hash in prior:  39.625 276727
+Time for this game in seconde: 170
+Game Number: 13
+
+Returns: 1.0 -1.0 
+# moves: 279
+Hit percentage of hash in prior:  51.737 313529
+Time for this game in seconde: 131
+Game Number: 14
+
+Returns: 1.0 -1.0 
+# moves: 453
+Hit percentage of hash in prior:  41.251 506545
+Time for this game in seconde: 302
+Game Number: 15
+
+Returns: 1.0 -1.0 
+# moves: 309
+Hit percentage of hash in prior:  39.899 336581
+Time for this game in seconde: 223
+Game Number: 16
+
+Returns: 1.0 -1.0 
+# moves: 309
+Hit percentage of hash in prior:  42.465 347692
+Time for this game in seconde: 200
+Game Number: 17
+
+
+Returns: 1.0 -1.0 
+# moves: 217
+Hit percentage of hash in prior:  41.571 243729
+Time for this game in seconde: 136
+Game Number: 18
+
+Returns: 1.0 -1.0 
+# moves: 559
+Hit percentage of hash in prior:  51.617 626349
+Time for this game in seconde: 279
+Game Number: 19
+
+Returns: 1.0 -1.0 
+# moves: 93
+Hit percentage of hash in prior:  39.858 106642
+Time for this game in seconde: 62
+Game Number: 20
+
+Returns: 1.0 -1.0 
+# moves: 419
+Hit percentage of hash in prior:  44.544 474581
+Time for this game in seconde: 266
+Game Number: 21
+
+Returns: 1.0 -1.0 
+# moves: 373
+Hit percentage of hash in prior:  41.414 402751
+Time for this game in seconde: 230
+Game Number: 22
+
+Returns: 1.0 -1.0 
+# moves: 293
+Hit percentage of hash in prior:  43.306 330744
+Time for this game in seconde: 170
+Game Number: 23
+
+Returns: 1.0 -1.0 
+# moves: 397
+Hit percentage of hash in prior:  46.643 447233
+Time for this game in seconde: 232
+Game Number: 24
+
+Returns: 1.0 -1.0 
+# moves: 151
+Hit percentage of hash in prior:  39.779 172622
+Time for this game in seconde: 105
+Game Number: 25
+
+Returns: 1.0 -1.0 
+# moves: 109
+Hit percentage of hash in prior:  43.158 124697
+Time for this game in seconde: 65
+Game Number: 26
+
+Returns: 1.0 -1.0 
+# moves: 391
+Hit percentage of hash in prior:  43.969 437011
+Time for this game in seconde: 229
+Game Number: 27
+
+Returns: 1.0 -1.0 
+# moves: 589
+Hit percentage of hash in prior:  43.956 665949
+Time for this game in seconde: 383
+Game Number: 28
+
+Returns: 1.0 -1.0 
+# moves: 173
+Hit percentage of hash in prior:  43.825 188953
+Time for this game in seconde: 100
+Game Number: 29
+
+Returns: -1.0 1.0 
+# moves: 590
+Hit percentage of hash in prior:  46.409 665984
+Time for this game in seconde: 374
+Game Number: 30
+
+Returns: 1.0 -1.0 
+# moves: 737
+Hit percentage of hash in prior:  45.475 822661
+Time for this game in seconde: 438
+Game Number: 31
+
+Returns: 1.0 -1.0 
+# moves: 209
+Hit percentage of hash in prior:  41.234 235148
+Time for this game in seconde: 134
+Game Number: 32
+
+Returns: 1.0 -1.0 
+# moves: 537
+Hit percentage of hash in prior:  40.638 611258
+Time for this game in seconde: 370
+Game Number: 33
+
+Returns: 1.0 -1.0 
+# moves: 307
+Hit percentage of hash in prior:  42.231 347796
+Time for this game in seconde: 201
+Game Number: 34
+
+Returns: 1.0 -1.0 
+# moves: 497
+Hit percentage of hash in prior:  44.464 561631
+Time for this game in seconde: 324
+Game Number: 35
+
+Returns: 1.0 -1.0 
+# moves: 383
+Hit percentage of hash in prior:  43.216 436225
+Time for this game in seconde: 241
+Game Number: 36
+
+Returns: 1.0 -1.0 
+# moves: 341
+Hit percentage of hash in prior:  44.424 382149
+Time for this game in seconde: 220
+Game Number: 37
+
+Returns: 1.0 -1.0 
+# moves: 211
+Hit percentage of hash in prior:  41.897 230711
+Time for this game in seconde: 133
+Game Number: 38
+
+Returns: 1.0 -1.0 
+# moves: 507
+Hit percentage of hash in prior:  43.216 565197
+Time for this game in seconde: 313
+Game Number: 39
+
+Returns: 1.0 -1.0 
+# moves: 493
+Hit percentage of hash in prior:  42.205 558078
+Time for this game in seconde: 320
+Game Number: 40
+
+Returns: 1.0 -1.0 
+# moves: 145
+Hit percentage of hash in prior:  41.565 165246
+Time for this game in seconde: 94
+Game Number: 41
+
+Returns: 1.0 -1.0 
+# moves: 381
+Hit percentage of hash in prior:  42.04 431640
+Time for this game in seconde: 262
+Game Number: 42
+
+Returns: 1.0 -1.0 
+# moves: 445
+Hit percentage of hash in prior:  45.754 503976
+Time for this game in seconde: 291
+Game Number: 43
+
+Returns: 1.0 -1.0 
+# moves: 757
+Hit percentage of hash in prior:  44.764 860608
+Time for this game in seconde: 492
+Game Number: 44
+
+Returns: 1.0 -1.0 
+# moves: 265
+Hit percentage of hash in prior:  43.308 298284
+Time for this game in seconde: 175
+Game Number: 45
+
+Returns: 1.0 -1.0 
+# moves: 457
+Hit percentage of hash in prior:  41.033 516750
+Time for this game in seconde: 340
+Game Number: 46
+
+Returns: 1.0 -1.0 
+# moves: 571
+Hit percentage of hash in prior:  48.621 649114
+Time for this game in seconde: 333
+Game Number: 47
+
+Returns: 1.0 -1.0 
+# moves: 341
+Hit percentage of hash in prior:  42.541 344522
+Time for this game in seconde: 214
+Game Number: 48
+
+Returns: 1.0 -1.0 
+# moves: 331
+Hit percentage of hash in prior:  43.683 368682
+Time for this game in seconde: 184
+Game Number: 49
+
+Number of games played: 50
+Average number of moves till finish: 378
+Average time till finish: 239
+Players: custom rnad
+Overall wins [47, 3]
+custom VS mcts: Begin
+
+Returns: -1.0 1.0 
+# moves: 528
+Hit percentage of hash in prior:  59.844 535364
+Time for this game in seconde: 595
+Game Number: 0
+
+Returns: 1.0 -1.0 
+# moves: 407
+Hit percentage of hash in prior:  47.258 435985
+Time for this game in seconde: 600
+Game Number: 1
+
+Returns: -1.0 1.0 
+# moves: 104
+Hit percentage of hash in prior:  40.666 108249
+Time for this game in seconde: 174
+Game Number: 2
+
+Returns: 1.0 -1.0 
+# moves: 399
+Hit percentage of hash in prior:  49.236 441572
+Time for this game in seconde: 610
+Game Number: 3
+
+Returns: 1.0 -1.0 
+# moves: 357
+Hit percentage of hash in prior:  42.249 384852
+Time for this game in seconde: 566
+Game Number: 4
+
+Returns: 1.0 -1.0 
+# moves: 393
+Hit percentage of hash in prior:  47.597 442539
+Time for this game in seconde: 610
+Game Number: 5
+
+Returns: 1.0 -1.0 
+# moves: 517
+Hit percentage of hash in prior:  52.468 580525
+Time for this game in seconde: 787
+Game Number: 6
+
+Returns: 1.0 -1.0 
+# moves: 489
+Hit percentage of hash in prior:  40.301 552001
+Time for this game in seconde: 744
+Game Number: 7
+
+Returns: 1.0 -1.0 
+# moves: 241
+Hit percentage of hash in prior:  42.56 272406
+Time for this game in seconde: 402
+Game Number: 8
+
+Returns: -1.0 1.0 
+# moves: 164
+Hit percentage of hash in prior:  40.136 180366
+Time for this game in seconde: 305
+Game Number: 9
+
+Returns: 1.0 -1.0 
+# moves: 383
+Hit percentage of hash in prior:  43.026 434000
+Time for this game in seconde: 603
+Game Number: 10
+
+Returns: 1.0 -1.0 
+# moves: 605
+Hit percentage of hash in prior:  54.383 634926
+Time for this game in seconde: 825
+Game Number: 11
+
+Returns: 1.0 -1.0 
+# moves: 377
+Hit percentage of hash in prior:  39.918 423023
+Time for this game in seconde: 634
+Game Number: 12
+
+Returns: 1.0 -1.0 
+# moves: 355
+Hit percentage of hash in prior:  42.251 399706
+Time for this game in seconde: 574
+Game Number: 13
+
+Returns: 1.0 -1.0 
+# moves: 409
+Hit percentage of hash in prior:  45.162 458560
+Time for this game in seconde: 615
+Game Number: 14
+
+Returns: 1.0 -1.0 
+# moves: 455
+Hit percentage of hash in prior:  46.377 496530
+Time for this game in seconde: 708
+Game Number: 15
+
+Returns: 1.0 -1.0 
+# moves: 333
+Hit percentage of hash in prior:  43.052 373893
+Time for this game in seconde: 533
+Game Number: 16
+
+Returns: 1.0 -1.0 
+# moves: 443
+Hit percentage of hash in prior:  46.72 480213
+Time for this game in seconde: 665
+Game Number: 17
+
+Returns: 1.0 -1.0 
+# moves: 299
+Hit percentage of hash in prior:  44.128 334662
+Time for this game in seconde: 492
+Game Number: 18
+
+Returns: 1.0 -1.0 
+# moves: 367
+Hit percentage of hash in prior:  46.0 406798
+Time for this game in seconde: 577
+Game Number: 19
+
+Returns: 1.0 -1.0 
+# moves: 391
+Hit percentage of hash in prior:  42.548 444409
+Time for this game in seconde: 602
+Game Number: 20
+
+Returns: 1.0 -1.0 
+# moves: 523
+Hit percentage of hash in prior:  44.332 587180
+Time for this game in seconde: 830
+Game Number: 21
+
+Returns: 1.0 -1.0 
+# moves: 357
+Hit percentage of hash in prior:  47.326 405972
+Time for this game in seconde: 522
+Game Number: 22
+
+Returns: 1.0 -1.0 
+# moves: 335
+Hit percentage of hash in prior:  39.544 381265
+Time for this game in seconde: 576
+Game Number: 23
+
+Returns: 1.0 -1.0 
+# moves: 379
+Hit percentage of hash in prior:  48.011 429967
+Time for this game in seconde: 587
+Game Number: 24
+
+Returns: 1.0 -1.0 
+# moves: 351
+Hit percentage of hash in prior:  46.222 389351
+Time for this game in seconde: 439
+Game Number: 25
+
+Returns: -1.0 1.0 
+# moves: 138
+Hit percentage of hash in prior:  42.228 154081
+Time for this game in seconde: 191
+Game Number: 26
+
+Returns: 1.0 -1.0 
+# moves: 367
+Hit percentage of hash in prior:  41.974 396610
+Time for this game in seconde: 460
+Game Number: 27
+
+Returns: 0.0 0.0 
+# moves: 1500
+Hit percentage of hash in prior:  72.217 1700963
+Time for this game in seconde: 1005
+Game Number: 28
+
+Returns: 1.0 -1.0 
+# moves: 613
+Hit percentage of hash in prior:  61.607 681352
+Time for this game in seconde: 640
+Game Number: 29
+
+Returns: 1.0 -1.0 
+# moves: 423
+Hit percentage of hash in prior:  48.573 473282
+Time for this game in seconde: 512
+Game Number: 30
+
+Returns: 1.0 -1.0 
+# moves: 337
+Hit percentage of hash in prior:  42.98 371244
+Time for this game in seconde: 453
+Game Number: 31
+
+Returns: 1.0 -1.0 
+# moves: 1023
+Hit percentage of hash in prior:  61.643 1148104
+Time for this game in seconde: 1089
+Game Number: 32
+
+Returns: 1.0 -1.0 
+# moves: 321
+Hit percentage of hash in prior:  38.115 363042
+Time for this game in seconde: 468
+Game Number: 33
+
+Returns: 1.0 -1.0 
+# moves: 321
+Hit percentage of hash in prior:  43.165 347907
+Time for this game in seconde: 442
+Game Number: 34
+
+Returns: 1.0 -1.0 
+# moves: 335
+Hit percentage of hash in prior:  39.105 361193
+Time for this game in seconde: 483
+Game Number: 35
+
+Returns: -1.0 1.0 
+# moves: 346
+Hit percentage of hash in prior:  40.9 385837
+Time for this game in seconde: 502
+Game Number: 36
+
+Returns: 1.0 -1.0 
+# moves: 481
+Hit percentage of hash in prior:  44.496 541866
+Time for this game in seconde: 644
+Game Number: 37
+
+Returns: -1.0 1.0 
+# moves: 308
+Hit percentage of hash in prior:  40.55 344099
+Time for this game in seconde: 446
+Game Number: 38
+
+Returns: 1.0 -1.0 
+# moves: 605
+Hit percentage of hash in prior:  53.066 675766
+Time for this game in seconde: 737
+Game Number: 39
+
+Returns: -1.0 1.0 
+# moves: 544
+Hit percentage of hash in prior:  40.684 603605
+Time for this game in seconde: 748
+Game Number: 40
+
+Returns: 1.0 -1.0 
+# moves: 515
+Hit percentage of hash in prior:  45.319 584490
+Time for this game in seconde: 703
+Game Number: 41
+
+Returns: -1.0 1.0 
+# moves: 230
+Hit percentage of hash in prior:  39.989 251000
+Time for this game in seconde: 326
+Game Number: 42
+
+Returns: 1.0 -1.0 
+# moves: 327
+Hit percentage of hash in prior:  39.23 370346
+Time for this game in seconde: 509
+Game Number: 43
+
+Returns: 1.0 -1.0 
+# moves: 385
+Hit percentage of hash in prior:  49.482 428937
+Time for this game in seconde: 494
+Game Number: 44
+
+Returns: 1.0 -1.0 
+# moves: 353
+Hit percentage of hash in prior:  42.568 345247
+Time for this game in seconde: 443
+Game Number: 45
+
+Returns: 1.0 -1.0 
+# moves: 285
+Hit percentage of hash in prior:  45.96 320452
+Time for this game in seconde: 353
+Game Number: 46
+
+Returns: -1.0 1.0 
+# moves: 514
+Hit percentage of hash in prior:  43.946 579360
+Time for this game in seconde: 620
+Game Number: 47
+
+Returns: 1.0 -1.0 
+# moves: 237
+Hit percentage of hash in prior:  41.754 269400
+Time for this game in seconde: 326
+Game Number: 48
+
+Returns: 1.0 -1.0 
+# moves: 453
+Hit percentage of hash in prior:  47.584 507671
+Time for this game in seconde: 603
+Game Number: 49
+
+Number of games played: 50
+Average number of moves till finish: 418
+Average time till finish: 567
+Players: custom mcts
+Overall wins [40, 9]
+asmodeus VS custom: Begin
+
+Returns: 1.0 -1.0 
+# moves: 273
+Hit percentage of hash in prior:  41.438 286933
+Time for this game in seconde: 153
+Game Number: 0
+
+Returns: 0.0 0.0 
+# moves: 1500
+Hit percentage of hash in prior:  67.695 1632025
+Time for this game in seconde: 357
+Game Number: 1
+
+Returns: 1.0 -1.0 
+# moves: 409
+Hit percentage of hash in prior:  41.157 459960
+Time for this game in seconde: 215
+Game Number: 2
+
+Returns: -1.0 1.0 
+# moves: 138
+Hit percentage of hash in prior:  40.432 156687
+Time for this game in seconde: 84
+Game Number: 3
+
+Returns: -1.0 1.0 
+# moves: 330
+Hit percentage of hash in prior:  42.098 373744
+Time for this game in seconde: 162
+Game Number: 4
+
+Returns: -1.0 1.0 
+# moves: 370
+Hit percentage of hash in prior:  43.293 408659
+Time for this game in seconde: 191
+Game Number: 5
+
+Returns: -1.0 1.0 
+# moves: 476
+Hit percentage of hash in prior:  42.901 532054
+Time for this game in seconde: 260
+Game Number: 6
+
+Returns: -1.0 1.0 
+# moves: 356
+Hit percentage of hash in prior:  40.692 388689
+Time for this game in seconde: 199
+Game Number: 7
+
+Returns: -1.0 1.0 
+# moves: 410
+Hit percentage of hash in prior:  43.103 455048
+Time for this game in seconde: 211
+Game Number: 8
+
+Returns: 1.0 -1.0 
+# moves: 457
+Hit percentage of hash in prior:  50.838 505172
+Time for this game in seconde: 183
+Game Number: 9
+
+Returns: 1.0 -1.0 
+# moves: 401
+Hit percentage of hash in prior:  41.987 433770
+Time for this game in seconde: 209
+Game Number: 10
+
+Returns: -1.0 1.0 
+# moves: 386
+Hit percentage of hash in prior:  44.486 435756
+Time for this game in seconde: 189
+Game Number: 11
+
+Returns: -1.0 1.0 
+# moves: 784
+Hit percentage of hash in prior:  36.02 879752
+Time for this game in seconde: 506
+Game Number: 12
+
+Returns: 1.0 -1.0 
+# moves: 523
+Hit percentage of hash in prior:  43.522 556941
+Time for this game in seconde: 296
+Game Number: 13
+
+Returns: -1.0 1.0 
+# moves: 260
+Hit percentage of hash in prior:  42.709 291551
+Time for this game in seconde: 141
+Game Number: 14
+
+Returns: -1.0 1.0 
+# moves: 570
+Hit percentage of hash in prior:  43.064 630742
+Time for this game in seconde: 304
+Game Number: 15
+
+Returns: 0.0 0.0 
+# moves: 1500
+Hit percentage of hash in prior:  63.689 1391590
+Time for this game in seconde: 391
+Game Number: 16
+
+Returns: -1.0 1.0 
+# moves: 338
+Hit percentage of hash in prior:  37.785 380591
+Time for this game in seconde: 218
+Game Number: 17
+
+Returns: -1.0 1.0 
+# moves: 260
+Hit percentage of hash in prior:  45.084 287349
+Time for this game in seconde: 133
+Game Number: 18
+
+Returns: -1.0 1.0 
+# moves: 142
+Hit percentage of hash in prior:  42.507 158601
+Time for this game in seconde: 77
+Game Number: 19
+
+Returns: -1.0 1.0 
+# moves: 424
+Hit percentage of hash in prior:  41.047 479225
+Time for this game in seconde: 252
+Game Number: 20
+
+Returns: 1.0 -1.0 
+# moves: 535
+Hit percentage of hash in prior:  49.495 587513
+Time for this game in seconde: 231
+Game Number: 21
+
+Returns: -1.0 1.0 
+# moves: 308
+Hit percentage of hash in prior:  41.573 344742
+Time for this game in seconde: 163
+Game Number: 22
+
+Returns: -1.0 1.0 
+# moves: 362
+Hit percentage of hash in prior:  38.369 405688
+Time for this game in seconde: 221
+Game Number: 23
+
+Returns: 1.0 -1.0 
+# moves: 311
+Hit percentage of hash in prior:  42.086 265449
+Time for this game in seconde: 138
+Game Number: 24
+
+Returns: -1.0 1.0 
+# moves: 382
+Hit percentage of hash in prior:  45.21 418512
+Time for this game in seconde: 187
+Game Number: 25
+
+Returns: 0.0 0.0 
+# moves: 1500
+Hit percentage of hash in prior:  69.724 1259943
+Time for this game in seconde: 291
+Game Number: 26
+
+Returns: -1.0 1.0 
+# moves: 154
+Hit percentage of hash in prior:  38.384 170918
+Time for this game in seconde: 108
+Game Number: 27
+
+Returns: 1.0 -1.0 
+# moves: 421
+Hit percentage of hash in prior:  42.475 467040
+Time for this game in seconde: 221
+Game Number: 28
+
+Returns: -1.0 1.0 
+# moves: 308
+Hit percentage of hash in prior:  41.883 347344
+Time for this game in seconde: 191
+Game Number: 29
+
+Returns: -1.0 1.0 
+# moves: 706
+Hit percentage of hash in prior:  39.915 797912
+Time for this game in seconde: 458
+Game Number: 30
+
+Returns: 1.0 -1.0 
+# moves: 419
+Hit percentage of hash in prior:  41.205 402915
+Time for this game in seconde: 229
+Game Number: 31
+
+Returns: -1.0 1.0 
+# moves: 160
+Hit percentage of hash in prior:  39.409 180992
+Time for this game in seconde: 112
+Game Number: 32
+
+Returns: -1.0 1.0 
+# moves: 308
+Hit percentage of hash in prior:  38.586 347049
+Time for this game in seconde: 196
+Game Number: 33
+
+Returns: 1.0 -1.0 
+# moves: 685
+Hit percentage of hash in prior:  43.503 750781
+Time for this game in seconde: 370
+Game Number: 34
+
+Returns: 0.0 0.0 
+# moves: 1500
+Hit percentage of hash in prior:  69.146 1630902
+Time for this game in seconde: 404
+Game Number: 35
+
+Returns: -1.0 1.0 
+# moves: 294
+Hit percentage of hash in prior:  40.789 332710
+Time for this game in seconde: 176
+Game Number: 36
+
+Returns: -1.0 1.0 
+# moves: 506
+Hit percentage of hash in prior:  47.845 550661
+Time for this game in seconde: 229
+Game Number: 37
+
+Returns: 1.0 -1.0 
+# moves: 403
+Hit percentage of hash in prior:  43.005 417588
+Time for this game in seconde: 194
+Game Number: 38
+
+Returns: -1.0 1.0 
+# moves: 294
+Hit percentage of hash in prior:  46.121 322500
+Time for this game in seconde: 146
+Game Number: 39
+
+Returns: 0.0 0.0 
+# moves: 1500
+Hit percentage of hash in prior:  45.36 1701373
+Time for this game in seconde: 741
+Game Number: 40
+
+Returns: 1.0 -1.0 
+# moves: 781
+Hit percentage of hash in prior:  34.854 827419
+Time for this game in seconde: 550
+Game Number: 41
+
+Returns: -1.0 1.0 
+# moves: 884
+Hit percentage of hash in prior:  44.477 989266
+Time for this game in seconde: 456
+Game Number: 42
+
+Returns: -1.0 1.0 
+# moves: 264
+Hit percentage of hash in prior:  40.691 294810
+Time for this game in seconde: 159
+Game Number: 43
+
+Returns: -1.0 1.0 
+# moves: 506
+Hit percentage of hash in prior:  47.244 551978
+Time for this game in seconde: 257
+Game Number: 44
+
+Returns: 1.0 -1.0 
+# moves: 531
+Hit percentage of hash in prior:  44.949 564675
+Time for this game in seconde: 243
+Game Number: 45
+
+Returns: 1.0 -1.0 
+# moves: 423
+Hit percentage of hash in prior:  44.109 461110
+Time for this game in seconde: 216
+Game Number: 46
+
+Returns: -1.0 1.0 
+# moves: 168
+Hit percentage of hash in prior:  41.441 187501
+Time for this game in seconde: 97
+Game Number: 47
+
+Returns: -1.0 1.0 
+# moves: 760
+Hit percentage of hash in prior:  54.948 846790
+Time for this game in seconde: 336
+Game Number: 48
+
+Returns: -1.0 1.0 
+# moves: 306
+Hit percentage of hash in prior:  41.09 340899
+Time for this game in seconde: 193
+Game Number: 49
+
+Number of games played: 50
+Average number of moves till finish: 519
+Average time till finish: 244
+Players: asmodeus custom
+Overall wins [14, 31]
+asmodeus VS hunter: Begin
+
+Returns: -1.0 1.0 
+# moves: 298
+Time for this game in seconde: 9
+Game Number: 0
+
+Returns: -1.0 1.0 
+# moves: 422
+Time for this game in seconde: 12
+Game Number: 1
+
+Returns: -1.0 1.0 
+# moves: 360
+Time for this game in seconde: 12
+Game Number: 2
+
+Returns: 0.0 0.0 
+# moves: 1500
+Time for this game in seconde: 34
+Game Number: 3
+
+Returns: 0.0 0.0 
+# moves: 1500
+Time for this game in seconde: 46
+Game Number: 4
+
+Returns: 1.0 -1.0 
+# moves: 577
+Time for this game in seconde: 15
+Game Number: 5
+
+Returns: -1.0 1.0 
+# moves: 180
+Time for this game in seconde: 4
+Game Number: 6
+
+Returns: -1.0 1.0 
+# moves: 258
+Time for this game in seconde: 4
+Game Number: 7
+
+Returns: 1.0 -1.0 
+# moves: 577
+Time for this game in seconde: 15
+Game Number: 8
+
+Returns: 0.0 0.0 
+# moves: 1500
+Time for this game in seconde: 74
+Game Number: 9
+
+Returns: -1.0 1.0 
+# moves: 354
+Time for this game in seconde: 10
+Game Number: 10
+
+Returns: 1.0 -1.0 
+# moves: 453
+Time for this game in seconde: 12
+Game Number: 11
+
+Returns: 0.0 0.0 
+# moves: 1500
+Time for this game in seconde: 34
+Game Number: 12
+
+Returns: -1.0 1.0 
+# moves: 372
+Time for this game in seconde: 10
+Game Number: 13
+
+Returns: 1.0 -1.0 
+# moves: 491
+Time for this game in seconde: 14
+Game Number: 14
+
+Returns: -1.0 1.0 
+# moves: 360
+Time for this game in seconde: 12
+Game Number: 15
+
+Returns: -1.0 1.0 
+# moves: 342
+Time for this game in seconde: 8
+Game Number: 16
+
+Returns: -1.0 1.0 
+# moves: 324
+Time for this game in seconde: 7
+Game Number: 17
+
+Returns: -1.0 1.0 
+# moves: 300
+Time for this game in seconde: 8
+Game Number: 18
+
+Returns: 1.0 -1.0 
+# moves: 551
+Time for this game in seconde: 15
+Game Number: 19
+
+Returns: 0.0 0.0 
+# moves: 1500
+Time for this game in seconde: 34
+Game Number: 20
+
+Returns: -1.0 1.0 
+# moves: 298
+Time for this game in seconde: 9
+Game Number: 21
+
+Returns: -1.0 1.0 
+# moves: 356
+Time for this game in seconde: 8
+Game Number: 22
+
+Returns: 0.0 0.0 
+# moves: 1500
+Time for this game in seconde: 49
+Game Number: 23
+
+Returns: 0.0 0.0 
+# moves: 1500
+Time for this game in seconde: 34
+Game Number: 24
+
+Returns: 1.0 -1.0 
+# moves: 217
+Time for this game in seconde: 6
+Game Number: 25
+
+Returns: 0.0 0.0 
+# moves: 1500
+Time for this game in seconde: 39
+Game Number: 26
+
+Returns: -1.0 1.0 
+# moves: 358
+Time for this game in seconde: 11
+Game Number: 27
+
+Returns: 0.0 0.0 
+# moves: 1500
+Time for this game in seconde: 75
+Game Number: 28
+
+Returns: 0.0 0.0 
+# moves: 1500
+Time for this game in seconde: 29
+Game Number: 29
+
+Returns: 1.0 -1.0 
+# moves: 533
+Time for this game in seconde: 13
+Game Number: 30
+
+Returns: 1.0 -1.0 
+# moves: 261
+Time for this game in seconde: 6
+Game Number: 31
+
+Returns: -1.0 1.0 
+# moves: 356
+Time for this game in seconde: 8
+Game Number: 32
+
+Returns: 0.0 0.0 
+# moves: 1500
+Time for this game in seconde: 47
+Game Number: 33
+
+Returns: -1.0 1.0 
+# moves: 356
+Time for this game in seconde: 8
+Game Number: 34
+
+Returns: 1.0 -1.0 
+# moves: 551
+Time for this game in seconde: 15
+Game Number: 35
+
+Returns: 0.0 0.0 
+# moves: 1500
+Time for this game in seconde: 29
+Game Number: 36
+
+Returns: -1.0 1.0 
+# moves: 324
+Time for this game in seconde: 7
+Game Number: 37
+
+Returns: 1.0 -1.0 
+# moves: 365
+Time for this game in seconde: 10
+Game Number: 38
+
+Returns: -1.0 1.0 
+# moves: 372
+Time for this game in seconde: 10
+Game Number: 39
+
+Returns: 0.0 0.0 
+# moves: 1500
+Time for this game in seconde: 57
+Game Number: 40
+
+Returns: -1.0 1.0 
+# moves: 142
+Time for this game in seconde: 2
+Game Number: 41
+
+Returns: -1.0 1.0 
+# moves: 276
+Time for this game in seconde: 4
+Game Number: 42
+
+Returns: -1.0 1.0 
+# moves: 402
+Time for this game in seconde: 12
+Game Number: 43
+
+Returns: -1.0 1.0 
+# moves: 270
+Time for this game in seconde: 5
+Game Number: 44
+
+Returns: 1.0 -1.0 
+# moves: 333
+Time for this game in seconde: 6
+Game Number: 45
+
+Returns: 1.0 -1.0 
+# moves: 339
+Time for this game in seconde: 11
+Game Number: 46
+
+Returns: 1.0 -1.0 
+# moves: 551
+Time for this game in seconde: 15
+Game Number: 47
+
+Returns: -1.0 1.0 
+# moves: 372
+Time for this game in seconde: 10
+Game Number: 48
+
+Returns: -1.0 1.0 
+# moves: 248
+Time for this game in seconde: 7
+Game Number: 49
+
+Number of games played: 50
+Average number of moves till finish: 659
+Average time till finish: 18
+Players: asmodeus hunter
+Overall wins [13, 24]
+asmodeus VS rnad: Begin
+Bot rnad loaded
+
+Returns: 1.0 -1.0 
+# moves: 203
+Time for this game in seconde: 3
+Game Number: 0
+
+Returns: 1.0 -1.0 
+# moves: 389
+Time for this game in seconde: 5
+Game Number: 1
+
+Returns: 1.0 -1.0 
+# moves: 377
+Time for this game in seconde: 5
+Game Number: 2
+
+Returns: 1.0 -1.0 
+# moves: 317
+Time for this game in seconde: 6
+Game Number: 3
+
+Returns: 1.0 -1.0 
+# moves: 583
+Time for this game in seconde: 8
+Game Number: 4
+
+Returns: 1.0 -1.0 
+# moves: 359
+Time for this game in seconde: 8
+Game Number: 5
+
+Returns: 1.0 -1.0 
+# moves: 369
+Time for this game in seconde: 6
+Game Number: 6
+
+Returns: 1.0 -1.0 
+# moves: 327
+Time for this game in seconde: 3
+Game Number: 7
+
+Returns: 1.0 -1.0 
+# moves: 369
+Time for this game in seconde: 8
+Game Number: 8
+
+Returns: 1.0 -1.0 
+# moves: 331
+Time for this game in seconde: 6
+Game Number: 9
+
+Returns: 1.0 -1.0 
+# moves: 239
+Time for this game in seconde: 3
+Game Number: 10
+
+Returns: 1.0 -1.0 
+# moves: 233
+Time for this game in seconde: 3
+Game Number: 11
+
+Returns: 1.0 -1.0 
+# moves: 357
+Time for this game in seconde: 5
+Game Number: 12
+
+Returns: 1.0 -1.0 
+# moves: 309
+Time for this game in seconde: 5
+Game Number: 13
+
+Returns: 1.0 -1.0 
+# moves: 337
+Time for this game in seconde: 7
+Game Number: 14
+
+Returns: 1.0 -1.0 
+# moves: 443
+Time for this game in seconde: 7
+Game Number: 15
+
+Returns: 1.0 -1.0 
+# moves: 299
+Time for this game in seconde: 6
+Game Number: 16
+
+Returns: 1.0 -1.0 
+# moves: 389
+Time for this game in seconde: 7
+Game Number: 17
+
+Returns: 1.0 -1.0 
+# moves: 349
+Time for this game in seconde: 5
+Game Number: 18
+
+Returns: 1.0 -1.0 
+# moves: 315
+Time for this game in seconde: 6
+Game Number: 19
+
+Returns: 1.0 -1.0 
+# moves: 319
+Time for this game in seconde: 5
+Game Number: 20
+
+Returns: 1.0 -1.0 
+# moves: 349
+Time for this game in seconde: 7
+Game Number: 21
+
+Returns: 1.0 -1.0 
+# moves: 429
+Time for this game in seconde: 7
+Game Number: 22
+
+Returns: 1.0 -1.0 
+# moves: 437
+Time for this game in seconde: 9
+Game Number: 23
+
+Returns: 1.0 -1.0 
+# moves: 405
+Time for this game in seconde: 6
+Game Number: 24
+
+Returns: 1.0 -1.0 
+# moves: 365
+Time for this game in seconde: 5
+Game Number: 25
+
+Returns: 1.0 -1.0 
+# moves: 181
+Time for this game in seconde: 2
+Game Number: 26
+
+Returns: 1.0 -1.0 
+# moves: 361
+Time for this game in seconde: 6
+Game Number: 27
+
+Returns: 1.0 -1.0 
+# moves: 353
+Time for this game in seconde: 4
+Game Number: 28
+
+Returns: 1.0 -1.0 
+# moves: 329
+Time for this game in seconde: 6
+Game Number: 29
+
+Returns: 1.0 -1.0 
+# moves: 313
+Time for this game in seconde: 6
+Game Number: 30
+
+Returns: 1.0 -1.0 
+# moves: 311
+Time for this game in seconde: 5
+Game Number: 31
+
+Returns: 1.0 -1.0 
+# moves: 369
+Time for this game in seconde: 5
+Game Number: 32
+
+Returns: 1.0 -1.0 
+# moves: 619
+Time for this game in seconde: 15
+Game Number: 33
+
+Returns: 1.0 -1.0 
+# moves: 369
+Time for this game in seconde: 7
+Game Number: 34
+
+Returns: 1.0 -1.0 
+# moves: 419
+Time for this game in seconde: 6
+Game Number: 35
+
+Returns: 1.0 -1.0 
+# moves: 505
+Time for this game in seconde: 9
+Game Number: 36
+
+Returns: 1.0 -1.0 
+# moves: 379
+Time for this game in seconde: 4
+Game Number: 37
+
+Returns: 1.0 -1.0 
+# moves: 339
+Time for this game in seconde: 6
+Game Number: 38
+
+Returns: 1.0 -1.0 
+# moves: 329
+Time for this game in seconde: 4
+Game Number: 39
+
+Returns: -1.0 1.0 
+# moves: 184
+Time for this game in seconde: 4
+Game Number: 40
+
+Returns: 1.0 -1.0 
+# moves: 301
+Time for this game in seconde: 3
+Game Number: 41
+
+Returns: 1.0 -1.0 
+# moves: 371
+Time for this game in seconde: 7
+Game Number: 42
+
+Returns: 1.0 -1.0 
+# moves: 451
+Time for this game in seconde: 5
+Game Number: 43
+
+Returns: 1.0 -1.0 
+# moves: 321
+Time for this game in seconde: 6
+Game Number: 44
+
+Returns: 1.0 -1.0 
+# moves: 351
+Time for this game in seconde: 4
+Game Number: 45
+
+Returns: 1.0 -1.0 
+# moves: 337
+Time for this game in seconde: 6
+Game Number: 46
+
+Returns: 1.0 -1.0 
+# moves: 173
+Time for this game in seconde: 2
+Game Number: 47
+
+Returns: 1.0 -1.0 
+# moves: 401
+Time for this game in seconde: 7
+Game Number: 48
+
+Returns: 1.0 -1.0 
+# moves: 309
+Time for this game in seconde: 5
+Game Number: 49
+
+Number of games played: 50
+Average number of moves till finish: 351
+Average time till finish: 5
+Players: asmodeus rnad
+Overall wins [49, 1]
+asmodeus VS mcts: Begin
+
+Returns: -1.0 1.0 
+# moves: 532
+Time for this game in seconde: 489
+Game Number: 0
+
+Returns: 1.0 -1.0 
+# moves: 439
+Time for this game in seconde: 408
+Game Number: 1
+
+Returns: 1.0 -1.0 
+# moves: 445
+Time for this game in seconde: 405
+Game Number: 2
+
+Returns: -1.0 1.0 
+# moves: 328
+Time for this game in seconde: 326
+Game Number: 3
+
+Returns: -1.0 1.0 
+# moves: 706
+Time for this game in seconde: 595
+Game Number: 4
+
+Returns: 1.0 -1.0 
+# moves: 459
+Time for this game in seconde: 429
+Game Number: 5
+
+Returns: 1.0 -1.0 
+# moves: 475
+Time for this game in seconde: 431
+Game Number: 6
+
+Returns: -1.0 1.0 
+# moves: 458
+Time for this game in seconde: 419
+Game Number: 7
+
+Returns: 1.0 -1.0 
+# moves: 299
+Time for this game in seconde: 279
+Game Number: 8
+
+Returns: 1.0 -1.0 
+# moves: 539
+Time for this game in seconde: 476
+Game Number: 9
+
+Returns: 1.0 -1.0 
+# moves: 179
+Time for this game in seconde: 184
+Game Number: 10
+
+Returns: 1.0 -1.0 
+# moves: 207
+Time for this game in seconde: 205
+Game Number: 11
+
+Returns: -1.0 1.0 
+# moves: 444
+Time for this game in seconde: 402
+Game Number: 12
+
+Returns: -1.0 1.0 
+# moves: 434
+Time for this game in seconde: 376
+Game Number: 13
+
+Returns: 1.0 -1.0 
+# moves: 233
+Time for this game in seconde: 236
+Game Number: 14
+
+Returns: -1.0 1.0 
+# moves: 396
+Time for this game in seconde: 358
+Game Number: 15
+
+Returns: -1.0 1.0 
+# moves: 392
+Time for this game in seconde: 356
+Game Number: 16
+
+Returns: -1.0 1.0 
+# moves: 400
+Time for this game in seconde: 370
+Game Number: 17
+
+Returns: 1.0 -1.0 
+# moves: 287
+Time for this game in seconde: 281
+Game Number: 18
+
+Returns: -1.0 1.0 
+# moves: 368
+Time for this game in seconde: 336
+Game Number: 19
+
+Returns: 1.0 -1.0 
+# moves: 369
+Time for this game in seconde: 345
+Game Number: 20
+
+Returns: -1.0 1.0 
+# moves: 436
+Time for this game in seconde: 379
+Game Number: 21
+
+Returns: 1.0 -1.0 
+# moves: 367
+Time for this game in seconde: 342
+Game Number: 22
+
+Returns: -1.0 1.0 
+# moves: 458
+Time for this game in seconde: 386
+Game Number: 23
+
+Returns: -1.0 1.0 
+# moves: 480
+Time for this game in seconde: 422
+Game Number: 24
+
+Returns: 1.0 -1.0 
+# moves: 505
+Time for this game in seconde: 433
+Game Number: 25
+
+Returns: -1.0 1.0 
+# moves: 388
+Time for this game in seconde: 357
+Game Number: 26
+
+Returns: 1.0 -1.0 
+# moves: 369
+Time for this game in seconde: 342
+Game Number: 27
+
+Returns: -1.0 1.0 
+# moves: 372
+Time for this game in seconde: 341
+Game Number: 28
+
+Returns: -1.0 1.0 
+# moves: 1114
+Time for this game in seconde: 889
+Game Number: 29
+
+Returns: 1.0 -1.0 
+# moves: 267
+Time for this game in seconde: 266
+Game Number: 30
+
+Returns: 1.0 -1.0 
+# moves: 347
+Time for this game in seconde: 322
+Game Number: 31
+
+Returns: -1.0 1.0 
+# moves: 476
+Time for this game in seconde: 421
+Game Number: 32
+
+Returns: 0.0 0.0 
+# moves: 1500
+Time for this game in seconde: 1134
+Game Number: 33
+
+Returns: 1.0 -1.0 
+# moves: 445
+Time for this game in seconde: 384
+Game Number: 34
+
+Returns: 0.0 0.0 
+# moves: 1500
+Time for this game in seconde: 1242
+Game Number: 35
+
+Returns: -1.0 1.0 
+# moves: 346
+Time for this game in seconde: 326
+Game Number: 36
+
+Returns: -1.0 1.0 
+# moves: 256
+Time for this game in seconde: 232
+Game Number: 37
+
+Returns: -1.0 1.0 
+# moves: 112
+Time for this game in seconde: 123
+Game Number: 38
+
+Returns: -1.0 1.0 
+# moves: 232
+Time for this game in seconde: 234
+Game Number: 39
+
+Returns: -1.0 1.0 
+# moves: 264
+Time for this game in seconde: 269
+Game Number: 40
+
+Returns: 1.0 -1.0 
+# moves: 451
+Time for this game in seconde: 393
+Game Number: 41
+
+Returns: -1.0 1.0 
+# moves: 342
+Time for this game in seconde: 324
+Game Number: 42
+
+Returns: 0.0 0.0 
+# moves: 1500
+Time for this game in seconde: 895
+Game Number: 43
+
+Returns: -1.0 1.0 
+# moves: 246
+Time for this game in seconde: 236
+Game Number: 44
+
+Returns: -1.0 1.0 
+# moves: 368
+Time for this game in seconde: 333
+Game Number: 45
+
+Returns: -1.0 1.0 
+# moves: 310
+Time for this game in seconde: 313
+Game Number: 46
+
+Returns: -1.0 1.0 
+# moves: 302
+Time for this game in seconde: 291
+Game Number: 47
+
+Returns: -1.0 1.0 
+# moves: 248
+Time for this game in seconde: 237
+Game Number: 48
+
+Returns: -1.0 1.0 
+# moves: 342
+Time for this game in seconde: 335
+Game Number: 49
+
+Number of games played: 50
+Average number of moves till finish: 454
+Average time till finish: 398
+Players: asmodeus mcts
+Overall wins [18, 29]
+hunter VS custom: Begin
+
+Returns: -1.0 1.0 
+# moves: 376
+Hit percentage of hash in prior:  41.436 423162
+Time for this game in seconde: 240
+Game Number: 0
+
+Returns: -1.0 1.0 
+# moves: 498
+Hit percentage of hash in prior:  43.157 551358
+Time for this game in seconde: 276
+Game Number: 1
+
+Returns: 1.0 -1.0 
+# moves: 625
+Hit percentage of hash in prior:  42.202 686324
+Time for this game in seconde: 346
+Game Number: 2
+
+Returns: -1.0 1.0 
+# moves: 710
+Hit percentage of hash in prior:  40.354 770481
+Time for this game in seconde: 457
+Game Number: 3
+
+Returns: 1.0 -1.0 
+# moves: 1443
+Hit percentage of hash in prior:  33.895 1625019
+Time for this game in seconde: 1042
+Game Number: 4
+
+Returns: 1.0 -1.0 
+# moves: 461
+Hit percentage of hash in prior:  38.881 493148
+Time for this game in seconde: 309
+Game Number: 5
+
+Returns: -1.0 1.0 
+# moves: 694
+Hit percentage of hash in prior:  45.541 785947
+Time for this game in seconde: 396
+Game Number: 6
+
+Returns: 0.0 0.0 
+# moves: 1500
+Hit percentage of hash in prior:  36.999 1702294
+Time for this game in seconde: 933
+Game Number: 7
+
+Returns: 1.0 -1.0 
+# moves: 459
+Hit percentage of hash in prior:  41.422 473848
+Time for this game in seconde: 245
+Game Number: 8
+
+Returns: 1.0 -1.0 
+# moves: 413
+Hit percentage of hash in prior:  41.95 440353
+Time for this game in seconde: 238
+Game Number: 9
+
+Returns: -1.0 1.0 
+# moves: 330
+Hit percentage of hash in prior:  40.602 367176
+Time for this game in seconde: 200
+Game Number: 10
+
+Returns: 1.0 -1.0 
+# moves: 861
+Hit percentage of hash in prior:  41.001 912310
+Time for this game in seconde: 425
+Game Number: 11
+
+Returns: 1.0 -1.0 
+# moves: 995
+Hit percentage of hash in prior:  51.552 1032348
+Time for this game in seconde: 460
+Game Number: 12
+
+Returns: 1.0 -1.0 
+# moves: 773
+Hit percentage of hash in prior:  49.559 843556
+Time for this game in seconde: 350
+Game Number: 13
+
+Returns: -1.0 1.0 
+# moves: 728
+Hit percentage of hash in prior:  41.265 821375
+Time for this game in seconde: 448
+Game Number: 14
+
+Returns: -1.0 1.0 
+# moves: 1146
+Hit percentage of hash in prior:  61.428 1294259
+Time for this game in seconde: 419
+Game Number: 15
+
+Returns: -1.0 1.0 
+# moves: 406
+Hit percentage of hash in prior:  39.145 457983
+Time for this game in seconde: 282
+Game Number: 16
+
+Returns: -1.0 1.0 
+# moves: 374
+Hit percentage of hash in prior:  41.853 414386
+Time for this game in seconde: 214
+Game Number: 17
+
+Returns: 1.0 -1.0 
+# moves: 553
+Hit percentage of hash in prior:  36.733 607455
+Time for this game in seconde: 343
+Game Number: 18
+
+Returns: -1.0 1.0 
+# moves: 570
+Hit percentage of hash in prior:  38.43 634048
+Time for this game in seconde: 391
+Game Number: 19
+
+Returns: 1.0 -1.0 
+# moves: 583
+Hit percentage of hash in prior:  45.193 515530
+Time for this game in seconde: 238
+Game Number: 20
+
+Returns: 1.0 -1.0 
+# moves: 333
+Hit percentage of hash in prior:  40.692 359141
+Time for this game in seconde: 203
+Game Number: 21
+
+Returns: 1.0 -1.0 
+# moves: 649
+Hit percentage of hash in prior:  44.817 709852
+Time for this game in seconde: 338
+Game Number: 22
+
+Returns: -1.0 1.0 
+# moves: 524
+Hit percentage of hash in prior:  39.137 588541
+Time for this game in seconde: 329
+Game Number: 23
+
+Returns: -1.0 1.0 
+# moves: 368
+Hit percentage of hash in prior:  38.318 415714
+Time for this game in seconde: 234
+Game Number: 24
+
+Returns: -1.0 1.0 
+# moves: 734
+Hit percentage of hash in prior:  48.38 819824
+Time for this game in seconde: 401
+Game Number: 25
+
+Returns: -1.0 1.0 
+# moves: 364
+Hit percentage of hash in prior:  37.274 369439
+Time for this game in seconde: 211
+Game Number: 26
+
+Returns: -1.0 1.0 
+# moves: 152
+Hit percentage of hash in prior:  37.371 168045
+Time for this game in seconde: 98
+Game Number: 27
+
+Returns: 0.0 0.0 
+# moves: 1500
+Hit percentage of hash in prior:  38.593 1691342
+Time for this game in seconde: 850
+Game Number: 28
+
+Returns: 1.0 -1.0 
+# moves: 431
+Hit percentage of hash in prior:  39.783 467914
+Time for this game in seconde: 272
+Game Number: 29
+
+Returns: 1.0 -1.0 
+# moves: 415
+Hit percentage of hash in prior:  41.048 424983
+Time for this game in seconde: 243
+Game Number: 30
+
+Returns: -1.0 1.0 
+# moves: 606
+Hit percentage of hash in prior:  37.504 685492
+Time for this game in seconde: 406
+Game Number: 31
+
+Returns: -1.0 1.0 
+# moves: 1312
+Hit percentage of hash in prior:  39.645 1420663
+Time for this game in seconde: 681
+Game Number: 32
+
+Returns: -1.0 1.0 
+# moves: 954
+Hit percentage of hash in prior:  62.364 1061389
+Time for this game in seconde: 325
+Game Number: 33
+
+Returns: -1.0 1.0 
+# moves: 896
+Hit percentage of hash in prior:  60.006 1001301
+Time for this game in seconde: 371
+Game Number: 34
+
+Returns: -1.0 1.0 
+# moves: 536
+Hit percentage of hash in prior:  38.757 605556
+Time for this game in seconde: 371
+Game Number: 35
+
+Returns: 1.0 -1.0 
+# moves: 437
+Hit percentage of hash in prior:  42.569 481550
+Time for this game in seconde: 254
+Game Number: 36
+
+Returns: -1.0 1.0 
+# moves: 1062
+Hit percentage of hash in prior:  57.123 1109682
+Time for this game in seconde: 385
+Game Number: 37
+
+Returns: -1.0 1.0 
+# moves: 634
+Hit percentage of hash in prior:  41.555 713784
+Time for this game in seconde: 392
+Game Number: 38
+
+Returns: -1.0 1.0 
+# moves: 516
+Hit percentage of hash in prior:  43.715 568469
+Time for this game in seconde: 312
+Game Number: 39
+
+Returns: 1.0 -1.0 
+# moves: 647
+Hit percentage of hash in prior:  41.293 600767
+Time for this game in seconde: 317
+Game Number: 40
+
+Returns: -1.0 1.0 
+# moves: 624
+Hit percentage of hash in prior:  38.329 697967
+Time for this game in seconde: 405
+Game Number: 41
+
+Returns: -1.0 1.0 
+# moves: 700
+Hit percentage of hash in prior:  39.818 769669
+Time for this game in seconde: 462
+Game Number: 42
+
+Returns: 1.0 -1.0 
+# moves: 951
+Hit percentage of hash in prior:  36.118 1062917
+Time for this game in seconde: 618
+Game Number: 43
+
+Returns: 1.0 -1.0 
+# moves: 1453
+Hit percentage of hash in prior:  68.865 1537812
+Time for this game in seconde: 408
+Game Number: 44
+
+Returns: -1.0 1.0 
+# moves: 1098
+Hit percentage of hash in prior:  42.247 1243406
+Time for this game in seconde: 736
+Game Number: 45
+
+Returns: -1.0 1.0 
+# moves: 818
+Hit percentage of hash in prior:  34.274 921436
+Time for this game in seconde: 549
+Game Number: 46
+
+Returns: -1.0 1.0 
+# moves: 530
+Hit percentage of hash in prior:  43.411 595201
+Time for this game in seconde: 322
+Game Number: 47
+
+Returns: 1.0 -1.0 
+# moves: 495
+Hit percentage of hash in prior:  42.158 494880
+Time for this game in seconde: 268
+Game Number: 48
+
+Returns: 1.0 -1.0 
+# moves: 1027
+Hit percentage of hash in prior:  37.807 1151268
+Time for this game in seconde: 663
+Game Number: 49
+
+Number of games played: 50
+Average number of moves till finish: 705
+Average time till finish: 393
+Players: hunter custom
+Overall wins [20, 28]
+hunter VS asmodeus: Begin
+
+Returns: 0.0 0.0 
+# moves: 1500
+Time for this game in seconde: 57
+Game Number: 0
+
+Returns: -1.0 1.0 
+# moves: 172
+Time for this game in seconde: 3
+Game Number: 1
+
+Returns: -1.0 1.0 
+# moves: 98
+Time for this game in seconde: 1
+Game Number: 2
+
+Returns: -1.0 1.0 
+# moves: 496
+Time for this game in seconde: 18
+Game Number: 3
+
+Returns: -1.0 1.0 
+# moves: 294
+Time for this game in seconde: 9
+Game Number: 4
+
+Returns: -1.0 1.0 
+# moves: 194
+Time for this game in seconde: 4
+Game Number: 5
+
+Returns: 1.0 -1.0 
+# moves: 209
+Time for this game in seconde: 5
+Game Number: 6
+
+Returns: -1.0 1.0 
+# moves: 364
+Time for this game in seconde: 12
+Game Number: 7
+
+Returns: -1.0 1.0 
+# moves: 318
+Time for this game in seconde: 8
+Game Number: 8
+
+Returns: -1.0 1.0 
+# moves: 350
+Time for this game in seconde: 8
+Game Number: 9
+
+Returns: 1.0 -1.0 
+# moves: 361
+Time for this game in seconde: 12
+Game Number: 10
+
+Returns: 1.0 -1.0 
+# moves: 477
+Time for this game in seconde: 14
+Game Number: 11
+
+Returns: 1.0 -1.0 
+# moves: 405
+Time for this game in seconde: 13
+Game Number: 12
+
+Returns: -1.0 1.0 
+# moves: 514
+Time for this game in seconde: 14
+Game Number: 13
+
+Returns: 0.0 0.0 
+# moves: 1500
+Time for this game in seconde: 64
+Game Number: 14
+
+Returns: -1.0 1.0 
+# moves: 130
+Time for this game in seconde: 2
+Game Number: 15
+
+Returns: -1.0 1.0 
+# moves: 162
+Time for this game in seconde: 3
+Game Number: 16
+
+Returns: 0.0 0.0 
+# moves: 1500
+Time for this game in seconde: 64
+Game Number: 17
+
+Returns: 0.0 0.0 
+# moves: 1500
+Time for this game in seconde: 50
+Game Number: 18
+
+Returns: 1.0 -1.0 
+# moves: 337
+Time for this game in seconde: 10
+Game Number: 19
+
+Returns: -1.0 1.0 
+# moves: 350
+Time for this game in seconde: 8
+Game Number: 20
+
+Returns: 1.0 -1.0 
+# moves: 387
+Time for this game in seconde: 14
+Game Number: 21
+
+Returns: 0.0 0.0 
+# moves: 1500
+Time for this game in seconde: 59
+Game Number: 22
+
+Returns: 1.0 -1.0 
+# moves: 335
+Time for this game in seconde: 11
+Game Number: 23
+
+Returns: 1.0 -1.0 
+# moves: 387
+Time for this game in seconde: 13
+Game Number: 24
+
+Returns: -1.0 1.0 
+# moves: 102
+Time for this game in seconde: 1
+Game Number: 25
+
+Returns: 1.0 -1.0 
+# moves: 261
+Time for this game in seconde: 5
+Game Number: 26
+
+Returns: -1.0 1.0 
+# moves: 390
+Time for this game in seconde: 15
+Game Number: 27
+
+Returns: -1.0 1.0 
+# moves: 222
+Time for this game in seconde: 5
+Game Number: 28
+
+Returns: 0.0 0.0 
+# moves: 1500
+Time for this game in seconde: 58
+Game Number: 29
+
+Returns: -1.0 1.0 
+# moves: 116
+Time for this game in seconde: 2
+Game Number: 30
+
+Returns: -1.0 1.0 
+# moves: 362
+Time for this game in seconde: 13
+Game Number: 31
+
+Returns: -1.0 1.0 
+# moves: 476
+Time for this game in seconde: 17
+Game Number: 32
+
+Returns: -1.0 1.0 
+# moves: 490
+Time for this game in seconde: 18
+Game Number: 33
+
+Returns: -1.0 1.0 
+# moves: 328
+Time for this game in seconde: 6
+Game Number: 34
+
+Returns: -1.0 1.0 
+# moves: 212
+Time for this game in seconde: 6
+Game Number: 35
+
+Returns: -1.0 1.0 
+# moves: 500
+Time for this game in seconde: 15
+Game Number: 36
+
+Returns: -1.0 1.0 
+# moves: 102
+Time for this game in seconde: 1
+Game Number: 37
+
+Returns: -1.0 1.0 
+# moves: 172
+Time for this game in seconde: 3
+Game Number: 38
+
+Returns: 1.0 -1.0 
+# moves: 343
+Time for this game in seconde: 9
+Game Number: 39
+
+Returns: 1.0 -1.0 
+# moves: 387
+Time for this game in seconde: 13
+Game Number: 40
+
+Returns: 0.0 0.0 
+# moves: 1500
+Time for this game in seconde: 57
+Game Number: 41
+
+Returns: -1.0 1.0 
+# moves: 102
+Time for this game in seconde: 1
+Game Number: 42
+
+Returns: -1.0 1.0 
+# moves: 246
+Time for this game in seconde: 5
+Game Number: 43
+
+Returns: 1.0 -1.0 
+# moves: 405
+Time for this game in seconde: 7
+Game Number: 44
+
+Returns: -1.0 1.0 
+# moves: 246
+Time for this game in seconde: 5
+Game Number: 45
+
+Returns: -1.0 1.0 
+# moves: 350
+Time for this game in seconde: 8
+Game Number: 46
+
+Returns: -1.0 1.0 
+# moves: 222
+Time for this game in seconde: 5
+Game Number: 47
+
+Returns: 1.0 -1.0 
+# moves: 343
+Time for this game in seconde: 12
+Game Number: 48
+
+Returns: 0.0 0.0 
+# moves: 1500
+Time for this game in seconde: 36
+Game Number: 49
+
+Number of games played: 50
+Average number of moves till finish: 494
+Average time till finish: 16
+Players: hunter asmodeus
+Overall wins [13, 29]
+hunter VS rnad: Begin
+Bot rnad loaded
+
+Returns: 1.0 -1.0 
+# moves: 453
+Time for this game in seconde: 9
+Game Number: 0
+
+Returns: 1.0 -1.0 
+# moves: 1193
+Time for this game in seconde: 22
+Game Number: 1
+
+Returns: 1.0 -1.0 
+# moves: 329
+Time for this game in seconde: 6
+Game Number: 2
+
+Returns: 1.0 -1.0 
+# moves: 277
+Time for this game in seconde: 4
+Game Number: 3
+
+Returns: 1.0 -1.0 
+# moves: 385
+Time for this game in seconde: 5
+Game Number: 4
+
+Returns: 1.0 -1.0 
+# moves: 325
+Time for this game in seconde: 6
+Game Number: 5
+
+Returns: 1.0 -1.0 
+# moves: 275
+Time for this game in seconde: 4
+Game Number: 6
+
+Returns: 1.0 -1.0 
+# moves: 863
+Time for this game in seconde: 11
+Game Number: 7
+
+Returns: 1.0 -1.0 
+# moves: 727
+Time for this game in seconde: 12
+Game Number: 8
+
+Returns: 1.0 -1.0 
+# moves: 243
+Time for this game in seconde: 5
+Game Number: 9
+
+Returns: 1.0 -1.0 
+# moves: 363
+Time for this game in seconde: 6
+Game Number: 10
+
+Returns: 1.0 -1.0 
+# moves: 471
+Time for this game in seconde: 11
+Game Number: 11
+
+Returns: 1.0 -1.0 
+# moves: 319
+Time for this game in seconde: 5
+Game Number: 12
+
+Returns: 1.0 -1.0 
+# moves: 445
+Time for this game in seconde: 10
+Game Number: 13
+
+Returns: 1.0 -1.0 
+# moves: 341
+Time for this game in seconde: 5
+Game Number: 14
+
+Returns: 1.0 -1.0 
+# moves: 335
+Time for this game in seconde: 5
+Game Number: 15
+
+Returns: 1.0 -1.0 
+# moves: 137
+Time for this game in seconde: 2
+Game Number: 16
+
+Returns: 1.0 -1.0 
+# moves: 619
+Time for this game in seconde: 10
+Game Number: 17
+
+Returns: 1.0 -1.0 
+# moves: 321
+Time for this game in seconde: 7
+Game Number: 18
+
+Returns: 1.0 -1.0 
+# moves: 211
+Time for this game in seconde: 4
+Game Number: 19
+
+Returns: 1.0 -1.0 
+# moves: 557
+Time for this game in seconde: 8
+Game Number: 20
+
+Returns: 1.0 -1.0 
+# moves: 331
+Time for this game in seconde: 6
+Game Number: 21
+
+Returns: 1.0 -1.0 
+# moves: 393
+Time for this game in seconde: 7
+Game Number: 22
+
+Returns: 1.0 -1.0 
+# moves: 631
+Time for this game in seconde: 10
+Game Number: 23
+
+Returns: 1.0 -1.0 
+# moves: 631
+Time for this game in seconde: 10
+Game Number: 24
+
+Returns: 1.0 -1.0 
+# moves: 433
+Time for this game in seconde: 7
+Game Number: 25
+
+Returns: 1.0 -1.0 
+# moves: 799
+Time for this game in seconde: 19
+Game Number: 26
+
+Returns: -1.0 1.0 
+# moves: 214
+Time for this game in seconde: 2
+Game Number: 27
+
+Returns: 1.0 -1.0 
+# moves: 131
+Time for this game in seconde: 1
+Game Number: 28
+
+Returns: 1.0 -1.0 
+# moves: 285
+Time for this game in seconde: 5
+Game Number: 29
+
+Returns: 1.0 -1.0 
+# moves: 159
+Time for this game in seconde: 2
+Game Number: 30
+
+Returns: 1.0 -1.0 
+# moves: 335
+Time for this game in seconde: 6
+Game Number: 31
+
+Returns: 1.0 -1.0 
+# moves: 427
+Time for this game in seconde: 5
+Game Number: 32
+
+Returns: 1.0 -1.0 
+# moves: 339
+Time for this game in seconde: 5
+Game Number: 33
+
+Returns: 1.0 -1.0 
+# moves: 185
+Time for this game in seconde: 3
+Game Number: 34
+
+Returns: 1.0 -1.0 
+# moves: 1075
+Time for this game in seconde: 22
+Game Number: 35
+
+Returns: 1.0 -1.0 
+# moves: 319
+Time for this game in seconde: 6
+Game Number: 36
+
+Returns: 1.0 -1.0 
+# moves: 221
+Time for this game in seconde: 3
+Game Number: 37
+
+Returns: 1.0 -1.0 
+# moves: 349
+Time for this game in seconde: 5
+Game Number: 38
+
+Returns: 1.0 -1.0 
+# moves: 279
+Time for this game in seconde: 4
+Game Number: 39
+
+Returns: 1.0 -1.0 
+# moves: 237
+Time for this game in seconde: 5
+Game Number: 40
+
+Returns: 1.0 -1.0 
+# moves: 231
+Time for this game in seconde: 3
+Game Number: 41
+
+Returns: 1.0 -1.0 
+# moves: 145
+Time for this game in seconde: 2
+Game Number: 42
+
+Returns: 1.0 -1.0 
+# moves: 509
+Time for this game in seconde: 9
+Game Number: 43
+
+Returns: 1.0 -1.0 
+# moves: 249
+Time for this game in seconde: 4
+Game Number: 44
+
+Returns: 1.0 -1.0 
+# moves: 615
+Time for this game in seconde: 14
+Game Number: 45
+
+Returns: 1.0 -1.0 
+# moves: 335
+Time for this game in seconde: 5
+Game Number: 46
+
+Returns: 1.0 -1.0 
+# moves: 325
+Time for this game in seconde: 6
+Game Number: 47
+
+Returns: 1.0 -1.0 
+# moves: 351
+Time for this game in seconde: 6
+Game Number: 48
+
+Returns: 1.0 -1.0 
+# moves: 387
+Time for this game in seconde: 7
+Game Number: 49
+
+Number of games played: 50
+Average number of moves till finish: 402
+Average time till finish: 6
+Players: hunter rnad
+Overall wins [49, 1]
+hunter VS mcts: Begin
+
+Returns: 1.0 -1.0 
+# moves: 245
+Time for this game in seconde: 237
+Game Number: 0
+
+Returns: 0.0 0.0 
+# moves: 1500
+Time for this game in seconde: 1238
+Game Number: 1
+
+Returns: -1.0 1.0 
+# moves: 210
+Time for this game in seconde: 229
+Game Number: 2
+
+Returns: 1.0 -1.0 
+# moves: 267
+Time for this game in seconde: 273
+Game Number: 3
+
+Returns: -1.0 1.0 
+# moves: 128
+Time for this game in seconde: 141
+Game Number: 4
+
+Returns: 0.0 0.0 
+# moves: 1500
+Time for this game in seconde: 1134
+Game Number: 5
+
+Returns: 0.0 0.0 
+# moves: 1500
+Time for this game in seconde: 1361
+Game Number: 6
+
+Returns: 1.0 -1.0 
+# moves: 555
+Time for this game in seconde: 519
+Game Number: 7
+
+Returns: 0.0 0.0 
+# moves: 1500
+Time for this game in seconde: 1294
+Game Number: 8
+
+Returns: -1.0 1.0 
+# moves: 160
+Time for this game in seconde: 177
+Game Number: 9
+
+Returns: 0.0 0.0 
+# moves: 1500
+Time for this game in seconde: 1341
+Game Number: 10
+
+Returns: -1.0 1.0 
+# moves: 448
+Time for this game in seconde: 455
+Game Number: 11
+
+Returns: 1.0 -1.0 
+# moves: 255
+Time for this game in seconde: 264
+Game Number: 12
+
+Returns: 1.0 -1.0 
+# moves: 237
+Time for this game in seconde: 236
+Game Number: 13
+
+Returns: 1.0 -1.0 
+# moves: 267
+Time for this game in seconde: 280
+Game Number: 14
+
+Returns: -1.0 1.0 
+# moves: 328
+Time for this game in seconde: 332
+Game Number: 15
+
+Returns: 1.0 -1.0 
+# moves: 225
+Time for this game in seconde: 229
+Game Number: 16
+
+Returns: -1.0 1.0 
+# moves: 308
+Time for this game in seconde: 321
+Game Number: 17
+
+Returns: 1.0 -1.0 
+# moves: 319
+Time for this game in seconde: 318
+Game Number: 18
+
+Returns: 1.0 -1.0 
+# moves: 255
+Time for this game in seconde: 253
+Game Number: 19
+
+Returns: -1.0 1.0 
+# moves: 466
+Time for this game in seconde: 477
+Game Number: 20
+
+Returns: 0.0 0.0 
+# moves: 1500
+Time for this game in seconde: 1371
+Game Number: 21
+
+Returns: 1.0 -1.0 
+# moves: 291
+Time for this game in seconde: 282
+Game Number: 22
+
+Returns: 0.0 0.0 
+# moves: 1500
+Time for this game in seconde: 1379
+Game Number: 23
+
+Returns: 1.0 -1.0 
+# moves: 299
+Time for this game in seconde: 275
+Game Number: 24
+
+Returns: -1.0 1.0 
+# moves: 302
+Time for this game in seconde: 314
+Game Number: 25
+
+Returns: 1.0 -1.0 
+# moves: 323
+Time for this game in seconde: 312
+Game Number: 26
+
+Returns: 1.0 -1.0 
+# moves: 455
+Time for this game in seconde: 445
+Game Number: 27
+
+Returns: 1.0 -1.0 
+# moves: 609
+Time for this game in seconde: 560
+Game Number: 28
+
+Returns: 1.0 -1.0 
+# moves: 1227
+Time for this game in seconde: 954
+Game Number: 29
+
+Returns: -1.0 1.0 
+# moves: 246
+Time for this game in seconde: 256
+Game Number: 30
+
+Returns: 1.0 -1.0 
+# moves: 269
+Time for this game in seconde: 272
+Game Number: 31
+
+Returns: 1.0 -1.0 
+# moves: 379
+Time for this game in seconde: 381
+Game Number: 32
+
+Returns: 1.0 -1.0 
+# moves: 275
+Time for this game in seconde: 281
+Game Number: 33
+
+Returns: 1.0 -1.0 
+# moves: 263
+Time for this game in seconde: 275
+Game Number: 34
+
+Returns: -1.0 1.0 
+# moves: 310
+Time for this game in seconde: 302
+Game Number: 35
+
+Returns: 1.0 -1.0 
+# moves: 431
+Time for this game in seconde: 398
+Game Number: 36
+
+Returns: 1.0 -1.0 
+# moves: 303
+Time for this game in seconde: 288
+Game Number: 37
+
+Returns: 1.0 -1.0 
+# moves: 219
+Time for this game in seconde: 214
+Game Number: 38
+
+Returns: 1.0 -1.0 
+# moves: 385
+Time for this game in seconde: 372
+Game Number: 39
+
+Returns: -1.0 1.0 
+# moves: 622
+Time for this game in seconde: 605
+Game Number: 40
+
+Returns: 1.0 -1.0 
+# moves: 163
+Time for this game in seconde: 167
+Game Number: 41
+
+Returns: 1.0 -1.0 
+# moves: 229
+Time for this game in seconde: 221
+Game Number: 42
+
+Returns: -1.0 1.0 
+# moves: 176
+Time for this game in seconde: 193
+Game Number: 43
+
+Returns: 1.0 -1.0 
+# moves: 381
+Time for this game in seconde: 390
+Game Number: 44
+
+Returns: 1.0 -1.0 
+# moves: 439
+Time for this game in seconde: 391
+Game Number: 45
+
+Returns: 1.0 -1.0 
+# moves: 251
+Time for this game in seconde: 247
+Game Number: 46
+
+Returns: 1.0 -1.0 
+# moves: 297
+Time for this game in seconde: 282
+Game Number: 47
+
+Returns: 1.0 -1.0 
+# moves: 333
+Time for this game in seconde: 328
+Game Number: 48
+
+Returns: 0.0 0.0 
+# moves: 1500
+Time for this game in seconde: 1177
+Game Number: 49
+
+Number of games played: 50
+Average number of moves till finish: 523
+Average time till finish: 480
+Players: hunter mcts
+Overall wins [30, 12]
+rnad VS custom: Begin
+Bot rnad loaded
+
+Returns: -1.0 1.0 
+# moves: 366
+Hit percentage of hash in prior:  45.097 404785
+Time for this game in seconde: 197
+Game Number: 0
+
+Returns: -1.0 1.0 
+# moves: 366
+Hit percentage of hash in prior:  45.171 406821
+Time for this game in seconde: 205
+Game Number: 1
+
+Returns: -1.0 1.0 
+# moves: 160
+Hit percentage of hash in prior:  41.65 165471
+Time for this game in seconde: 94
+Game Number: 2
+
+Returns: -1.0 1.0 
+# moves: 398
+Hit percentage of hash in prior:  40.503 448471
+Time for this game in seconde: 276
+Game Number: 3
+
+Returns: -1.0 1.0 
+# moves: 442
+Hit percentage of hash in prior:  42.37 496362
+Time for this game in seconde: 261
+Game Number: 4
+
+Returns: -1.0 1.0 
+# moves: 348
+Hit percentage of hash in prior:  43.432 386632
+Time for this game in seconde: 206
+Game Number: 5
+
+Returns: -1.0 1.0 
+# moves: 610
+Hit percentage of hash in prior:  47.005 688757
+Time for this game in seconde: 358
+Game Number: 6
+
+Returns: -1.0 1.0 
+# moves: 348
+Hit percentage of hash in prior:  41.194 394783
+Time for this game in seconde: 232
+Game Number: 7
+
+Returns: -1.0 1.0 
+# moves: 366
+Hit percentage of hash in prior:  44.201 398638
+Time for this game in seconde: 226
+Game Number: 8
+
+Returns: -1.0 1.0 
+# moves: 206
+Hit percentage of hash in prior:  43.87 228748
+Time for this game in seconde: 126
+Game Number: 9
+
+Returns: -1.0 1.0 
+# moves: 372
+Hit percentage of hash in prior:  45.645 411383
+Time for this game in seconde: 229
+Game Number: 10
+
+Returns: -1.0 1.0 
+# moves: 420
+Hit percentage of hash in prior:  43.856 473715
+Time for this game in seconde: 253
+Game Number: 11
+
+Returns: -1.0 1.0 
+# moves: 436
+Hit percentage of hash in prior:  42.874 477027
+Time for this game in seconde: 271
+Game Number: 12
+
+Returns: -1.0 1.0 
+# moves: 248
+Hit percentage of hash in prior:  39.427 276733
+Time for this game in seconde: 163
+Game Number: 13
+
+Returns: -1.0 1.0 
+# moves: 456
+Hit percentage of hash in prior:  43.294 509657
+Time for this game in seconde: 270
+Game Number: 14
+
+Returns: -1.0 1.0 
+# moves: 696
+Hit percentage of hash in prior:  44.693 786832
+Time for this game in seconde: 431
+Game Number: 15
+
+Returns: -1.0 1.0 
+# moves: 414
+Hit percentage of hash in prior:  41.455 470563
+Time for this game in seconde: 287
+Game Number: 16
+
+Returns: -1.0 1.0 
+# moves: 256
+Hit percentage of hash in prior:  43.48 288112
+Time for this game in seconde: 150
+Game Number: 17
+
+Returns: -1.0 1.0 
+# moves: 266
+Hit percentage of hash in prior:  43.234 298239
+Time for this game in seconde: 152
+Game Number: 18
+
+Returns: -1.0 1.0 
+# moves: 434
+Hit percentage of hash in prior:  37.712 485222
+Time for this game in seconde: 339
+Game Number: 19
+
+Returns: -1.0 1.0 
+# moves: 1144
+Hit percentage of hash in prior:  60.931 1295853
+Time for this game in seconde: 433
+Game Number: 20
+
+Returns: -1.0 1.0 
+# moves: 268
+Hit percentage of hash in prior:  41.199 297904
+Time for this game in seconde: 165
+Game Number: 21
+
+Returns: -1.0 1.0 
+# moves: 338
+Hit percentage of hash in prior:  37.484 379537
+Time for this game in seconde: 250
+Game Number: 22
+
+Returns: -1.0 1.0 
+# moves: 340
+Hit percentage of hash in prior:  45.262 381962
+Time for this game in seconde: 210
+Game Number: 23
+
+Returns: -1.0 1.0 
+# moves: 342
+Hit percentage of hash in prior:  42.644 386069
+Time for this game in seconde: 219
+Game Number: 24
+
+Returns: -1.0 1.0 
+# moves: 262
+Hit percentage of hash in prior:  42.702 294632
+Time for this game in seconde: 157
+Game Number: 25
+
+Returns: -1.0 1.0 
+# moves: 244
+Hit percentage of hash in prior:  42.478 272899
+Time for this game in seconde: 146
+Game Number: 26
+
+Returns: -1.0 1.0 
+# moves: 582
+Hit percentage of hash in prior:  43.24 654832
+Time for this game in seconde: 357
+Game Number: 27
+
+Returns: -1.0 1.0 
+# moves: 362
+Hit percentage of hash in prior:  43.597 409174
+Time for this game in seconde: 222
+Game Number: 28
+
+Returns: -1.0 1.0 
+# moves: 230
+Hit percentage of hash in prior:  41.454 253107
+Time for this game in seconde: 145
+Game Number: 29
+
+Returns: -1.0 1.0 
+# moves: 310
+Hit percentage of hash in prior:  42.114 351955
+Time for this game in seconde: 180
+Game Number: 30
+
+Returns: -1.0 1.0 
+# moves: 510
+Hit percentage of hash in prior:  42.196 575253
+Time for this game in seconde: 326
+Game Number: 31
+
+Returns: -1.0 1.0 
+# moves: 444
+Hit percentage of hash in prior:  47.47 498172
+Time for this game in seconde: 228
+Game Number: 32
+
+Returns: -1.0 1.0 
+# moves: 304
+Hit percentage of hash in prior:  43.025 334747
+Time for this game in seconde: 176
+Game Number: 33
+
+Returns: -1.0 1.0 
+# moves: 408
+Hit percentage of hash in prior:  45.223 453311
+Time for this game in seconde: 250
+Game Number: 34
+
+Returns: -1.0 1.0 
+# moves: 544
+Hit percentage of hash in prior:  41.231 606798
+Time for this game in seconde: 339
+Game Number: 35
+
+Returns: -1.0 1.0 
+# moves: 382
+Hit percentage of hash in prior:  46.479 430274
+Time for this game in seconde: 254
+Game Number: 36
+
+Returns: -1.0 1.0 
+# moves: 462
+Hit percentage of hash in prior:  41.316 514693
+Time for this game in seconde: 304
+Game Number: 37
+
+Returns: -1.0 1.0 
+# moves: 456
+Hit percentage of hash in prior:  42.676 504461
+Time for this game in seconde: 287
+Game Number: 38
+
+Returns: -1.0 1.0 
+# moves: 924
+Hit percentage of hash in prior:  41.677 1037505
+Time for this game in seconde: 575
+Game Number: 39
+
+Returns: -1.0 1.0 
+# moves: 384
+Hit percentage of hash in prior:  39.746 433842
+Time for this game in seconde: 274
+Game Number: 40
+
+Returns: -1.0 1.0 
+# moves: 506
+Hit percentage of hash in prior:  40.907 575535
+Time for this game in seconde: 356
+Game Number: 41
+
+Returns: -1.0 1.0 
+# moves: 282
+Hit percentage of hash in prior:  45.801 310587
+Time for this game in seconde: 161
+Game Number: 42
+
+Returns: -1.0 1.0 
+# moves: 204
+Hit percentage of hash in prior:  41.607 229449
+Time for this game in seconde: 121
+Game Number: 43
+
+Returns: -1.0 1.0 
+# moves: 476
+Hit percentage of hash in prior:  50.216 538354
+Time for this game in seconde: 240
+Game Number: 44
+
+Returns: -1.0 1.0 
+# moves: 524
+Hit percentage of hash in prior:  38.777 591936
+Time for this game in seconde: 378
+Game Number: 45
+
+Returns: -1.0 1.0 
+# moves: 262
+Hit percentage of hash in prior:  41.763 295260
+Time for this game in seconde: 160
+Game Number: 46
+
+Returns: -1.0 1.0 
+# moves: 548
+Hit percentage of hash in prior:  44.022 615551
+Time for this game in seconde: 318
+Game Number: 47
+
+Returns: 1.0 -1.0 
+# moves: 351
+Hit percentage of hash in prior:  42.995 393177
+Time for this game in seconde: 220
+Game Number: 48
+
+Returns: -1.0 1.0 
+# moves: 486
+Hit percentage of hash in prior:  42.806 530477
+Time for this game in seconde: 299
+Game Number: 49
+
+Number of games played: 50
+Average number of moves till finish: 409
+Average time till finish: 249
+Players: rnad custom
+Overall wins [1, 49]
+rnad VS asmodeus: Begin
+Bot rnad loaded
+
+Returns: -1.0 1.0 
+# moves: 294
+Time for this game in seconde: 4
+Game Number: 0
+
+Returns: -1.0 1.0 
+# moves: 336
+Time for this game in seconde: 5
+Game Number: 1
+
+Returns: -1.0 1.0 
+# moves: 358
+Time for this game in seconde: 5
+Game Number: 2
+
+Returns: -1.0 1.0 
+# moves: 298
+Time for this game in seconde: 6
+Game Number: 3
+
+Returns: -1.0 1.0 
+# moves: 218
+Time for this game in seconde: 3
+Game Number: 4
+
+Returns: -1.0 1.0 
+# moves: 314
+Time for this game in seconde: 5
+Game Number: 5
+
+Returns: -1.0 1.0 
+# moves: 358
+Time for this game in seconde: 4
+Game Number: 6
+
+Returns: -1.0 1.0 
+# moves: 392
+Time for this game in seconde: 7
+Game Number: 7
+
+Returns: -1.0 1.0 
+# moves: 154
+Time for this game in seconde: 1
+Game Number: 8
+
+Returns: -1.0 1.0 
+# moves: 364
+Time for this game in seconde: 6
+Game Number: 9
+
+Returns: -1.0 1.0 
+# moves: 410
+Time for this game in seconde: 8
+Game Number: 10
+
+Returns: -1.0 1.0 
+# moves: 448
+Time for this game in seconde: 8
+Game Number: 11
+
+Returns: -1.0 1.0 
+# moves: 100
+Time for this game in seconde: 1
+Game Number: 12
+
+Returns: -1.0 1.0 
+# moves: 280
+Time for this game in seconde: 4
+Game Number: 13
+
+Returns: -1.0 1.0 
+# moves: 346
+Time for this game in seconde: 7
+Game Number: 14
+
+Returns: -1.0 1.0 
+# moves: 332
+Time for this game in seconde: 6
+Game Number: 15
+
+Returns: -1.0 1.0 
+# moves: 366
+Time for this game in seconde: 6
+Game Number: 16
+
+Returns: -1.0 1.0 
+# moves: 248
+Time for this game in seconde: 4
+Game Number: 17
+
+Returns: -1.0 1.0 
+# moves: 450
+Time for this game in seconde: 5
+Game Number: 18
+
+Returns: -1.0 1.0 
+# moves: 364
+Time for this game in seconde: 7
+Game Number: 19
+
+Returns: -1.0 1.0 
+# moves: 468
+Time for this game in seconde: 6
+Game Number: 20
+
+Returns: -1.0 1.0 
+# moves: 420
+Time for this game in seconde: 8
+Game Number: 21
+
+Returns: -1.0 1.0 
+# moves: 408
+Time for this game in seconde: 7
+Game Number: 22
+
+Returns: -1.0 1.0 
+# moves: 144
+Time for this game in seconde: 1
+Game Number: 23
+
+Returns: -1.0 1.0 
+# moves: 440
+Time for this game in seconde: 6
+Game Number: 24
+
+Returns: -1.0 1.0 
+# moves: 440
+Time for this game in seconde: 8
+Game Number: 25
+
+Returns: -1.0 1.0 
+# moves: 324
+Time for this game in seconde: 5
+Game Number: 26
+
+Returns: -1.0 1.0 
+# moves: 326
+Time for this game in seconde: 7
+Game Number: 27
+
+Returns: -1.0 1.0 
+# moves: 416
+Time for this game in seconde: 8
+Game Number: 28
+
+Returns: -1.0 1.0 
+# moves: 20
+Time for this game in seconde: 0
+Game Number: 29
+
+Returns: -1.0 1.0 
+# moves: 266
+Time for this game in seconde: 4
+Game Number: 30
+
+Returns: -1.0 1.0 
+# moves: 50
+Time for this game in seconde: 0
+Game Number: 31
+
+Returns: -1.0 1.0 
+# moves: 372
+Time for this game in seconde: 7
+Game Number: 32
+
+Returns: -1.0 1.0 
+# moves: 344
+Time for this game in seconde: 4
+Game Number: 33
+
+Returns: -1.0 1.0 
+# moves: 288
+Time for this game in seconde: 5
+Game Number: 34
+
+Returns: -1.0 1.0 
+# moves: 378
+Time for this game in seconde: 7
+Game Number: 35
+
+Returns: -1.0 1.0 
+# moves: 438
+Time for this game in seconde: 7
+Game Number: 36
+
+Returns: -1.0 1.0 
+# moves: 288
+Time for this game in seconde: 4
+Game Number: 37
+
+Returns: -1.0 1.0 
+# moves: 478
+Time for this game in seconde: 7
+Game Number: 38
+
+Returns: -1.0 1.0 
+# moves: 456
+Time for this game in seconde: 9
+Game Number: 39
+
+Returns: -1.0 1.0 
+# moves: 392
+Time for this game in seconde: 6
+Game Number: 40
+
+Returns: -1.0 1.0 
+# moves: 276
+Time for this game in seconde: 5
+Game Number: 41
+
+Returns: -1.0 1.0 
+# moves: 334
+Time for this game in seconde: 5
+Game Number: 42
+
+Returns: -1.0 1.0 
+# moves: 310
+Time for this game in seconde: 5
+Game Number: 43
+
+Returns: -1.0 1.0 
+# moves: 440
+Time for this game in seconde: 8
+Game Number: 44
+
+Returns: -1.0 1.0 
+# moves: 282
+Time for this game in seconde: 3
+Game Number: 45
+
+Returns: -1.0 1.0 
+# moves: 304
+Time for this game in seconde: 5
+Game Number: 46
+
+Returns: -1.0 1.0 
+# moves: 406
+Time for this game in seconde: 6
+Game Number: 47
+
+Returns: -1.0 1.0 
+# moves: 276
+Time for this game in seconde: 4
+Game Number: 48
+
+Returns: -1.0 1.0 
+# moves: 270
+Time for this game in seconde: 5
+Game Number: 49
+
+Number of games played: 50
+Average number of moves till finish: 329
+Average time till finish: 5
+Players: rnad asmodeus
+Overall wins [0, 50]
+rnad VS hunter: Begin
+Bot rnad loaded
+
+Returns: -1.0 1.0 
+# moves: 468
+Time for this game in seconde: 9
+Game Number: 0
+
+Returns: -1.0 1.0 
+# moves: 302
+Time for this game in seconde: 5
+Game Number: 1
+
+Returns: -1.0 1.0 
+# moves: 324
+Time for this game in seconde: 6
+Game Number: 2
+
+Returns: -1.0 1.0 
+# moves: 304
+Time for this game in seconde: 6
+Game Number: 3
+
+Returns: -1.0 1.0 
+# moves: 552
+Time for this game in seconde: 12
+Game Number: 4
+
+Returns: -1.0 1.0 
+# moves: 684
+Time for this game in seconde: 11
+Game Number: 5
+
+Returns: -1.0 1.0 
+# moves: 522
+Time for this game in seconde: 9
+Game Number: 6
+
+Returns: -1.0 1.0 
+# moves: 350
+Time for this game in seconde: 4
+Game Number: 7
+
+Returns: -1.0 1.0 
+# moves: 264
+Time for this game in seconde: 5
+Game Number: 8
+
+Returns: -1.0 1.0 
+# moves: 432
+Time for this game in seconde: 7
+Game Number: 9
+
+Returns: -1.0 1.0 
+# moves: 146
+Time for this game in seconde: 2
+Game Number: 10
+
+Returns: -1.0 1.0 
+# moves: 180
+Time for this game in seconde: 3
+Game Number: 11
+
+Returns: -1.0 1.0 
+# moves: 264
+Time for this game in seconde: 5
+Game Number: 12
+
+Returns: -1.0 1.0 
+# moves: 192
+Time for this game in seconde: 3
+Game Number: 13
+
+Returns: -1.0 1.0 
+# moves: 560
+Time for this game in seconde: 10
+Game Number: 14
+
+Returns: -1.0 1.0 
+# moves: 570
+Time for this game in seconde: 11
+Game Number: 15
+
+Returns: -1.0 1.0 
+# moves: 164
+Time for this game in seconde: 2
+Game Number: 16
+
+Returns: -1.0 1.0 
+# moves: 750
+Time for this game in seconde: 16
+Game Number: 17
+
+Returns: -1.0 1.0 
+# moves: 230
+Time for this game in seconde: 3
+Game Number: 18
+
+Returns: 1.0 -1.0 
+# moves: 373
+Time for this game in seconde: 7
+Game Number: 19
+
+Returns: -1.0 1.0 
+# moves: 380
+Time for this game in seconde: 6
+Game Number: 20
+
+Returns: -1.0 1.0 
+# moves: 482
+Time for this game in seconde: 6
+Game Number: 21
+
+Returns: -1.0 1.0 
+# moves: 226
+Time for this game in seconde: 3
+Game Number: 22
+
+Returns: -1.0 1.0 
+# moves: 612
+Time for this game in seconde: 7
+Game Number: 23
+
+Returns: -1.0 1.0 
+# moves: 204
+Time for this game in seconde: 3
+Game Number: 24
+
+Returns: -1.0 1.0 
+# moves: 252
+Time for this game in seconde: 5
+Game Number: 25
+
+Returns: -1.0 1.0 
+# moves: 178
+Time for this game in seconde: 3
+Game Number: 26
+
+Returns: -1.0 1.0 
+# moves: 182
+Time for this game in seconde: 3
+Game Number: 27
+
+Returns: 1.0 -1.0 
+# moves: 387
+Time for this game in seconde: 4
+Game Number: 28
+
+Returns: -1.0 1.0 
+# moves: 318
+Time for this game in seconde: 4
+Game Number: 29
+
+Returns: -1.0 1.0 
+# moves: 296
+Time for this game in seconde: 6
+Game Number: 30
+
+Returns: -1.0 1.0 
+# moves: 210
+Time for this game in seconde: 3
+Game Number: 31
+
+Returns: -1.0 1.0 
+# moves: 206
+Time for this game in seconde: 4
+Game Number: 32
+
+Returns: -1.0 1.0 
+# moves: 304
+Time for this game in seconde: 5
+Game Number: 33
+
+Returns: -1.0 1.0 
+# moves: 536
+Time for this game in seconde: 12
+Game Number: 34
+
+Returns: -1.0 1.0 
+# moves: 234
+Time for this game in seconde: 4
+Game Number: 35
+
+Returns: -1.0 1.0 
+# moves: 344
+Time for this game in seconde: 6
+Game Number: 36
+
+Returns: -1.0 1.0 
+# moves: 390
+Time for this game in seconde: 6
+Game Number: 37
+
+Returns: -1.0 1.0 
+# moves: 354
+Time for this game in seconde: 5
+Game Number: 38
+
+Returns: -1.0 1.0 
+# moves: 464
+Time for this game in seconde: 4
+Game Number: 39
+
+Returns: -1.0 1.0 
+# moves: 412
+Time for this game in seconde: 7
+Game Number: 40
+
+Returns: -1.0 1.0 
+# moves: 370
+Time for this game in seconde: 6
+Game Number: 41
+
+Returns: -1.0 1.0 
+# moves: 230
+Time for this game in seconde: 4
+Game Number: 42
+
+Returns: -1.0 1.0 
+# moves: 284
+Time for this game in seconde: 4
+Game Number: 43
+
+Returns: -1.0 1.0 
+# moves: 296
+Time for this game in seconde: 3
+Game Number: 44
+
+Returns: -1.0 1.0 
+# moves: 266
+Time for this game in seconde: 3
+Game Number: 45
+
+Returns: -1.0 1.0 
+# moves: 464
+Time for this game in seconde: 7
+Game Number: 46
+
+Returns: -1.0 1.0 
+# moves: 238
+Time for this game in seconde: 4
+Game Number: 47
+
+Returns: -1.0 1.0 
+# moves: 716
+Time for this game in seconde: 12
+Game Number: 48
+
+Returns: -1.0 1.0 
+# moves: 328
+Time for this game in seconde: 7
+Game Number: 49
+
+Number of games played: 50
+Average number of moves till finish: 355
+Average time till finish: 5
+Players: rnad hunter
+Overall wins [2, 48]
+rnad VS mcts: Begin
+Bot rnad loaded
+
+Returns: -1.0 1.0 
+# moves: 310
+Time for this game in seconde: 313
+Game Number: 0
+
+Returns: -1.0 1.0 
+# moves: 214
+Time for this game in seconde: 218
+Game Number: 1
+
+Returns: -1.0 1.0 
+# moves: 298
+Time for this game in seconde: 314
+Game Number: 2
+
+Returns: -1.0 1.0 
+# moves: 288
+Time for this game in seconde: 299
+Game Number: 3
+
+Returns: -1.0 1.0 
+# moves: 318
+Time for this game in seconde: 360
+Game Number: 4
+
+Returns: -1.0 1.0 
+# moves: 324
+Time for this game in seconde: 323
+Game Number: 5
+
+Returns: -1.0 1.0 
+# moves: 488
+Time for this game in seconde: 461
+Game Number: 6
+
+Returns: -1.0 1.0 
+# moves: 486
+Time for this game in seconde: 506
+Game Number: 7
+
+Returns: -1.0 1.0 
+# moves: 602
+Time for this game in seconde: 574
+Game Number: 8
+
+Returns: -1.0 1.0 
+# moves: 258
+Time for this game in seconde: 271
+Game Number: 9
+
+Returns: -1.0 1.0 
+# moves: 1426
+Time for this game in seconde: 1373
+Game Number: 10
+
+Returns: -1.0 1.0 
+# moves: 132
+Time for this game in seconde: 144
+Game Number: 11
+
+Returns: -1.0 1.0 
+# moves: 468
+Time for this game in seconde: 462
+Game Number: 12
+
+Returns: -1.0 1.0 
+# moves: 670
+Time for this game in seconde: 676
+Game Number: 13
+
+Returns: -1.0 1.0 
+# moves: 448
+Time for this game in seconde: 462
+Game Number: 14
+
+Returns: -1.0 1.0 
+# moves: 744
+Time for this game in seconde: 716
+Game Number: 15
+
+Returns: -1.0 1.0 
+# moves: 484
+Time for this game in seconde: 512
+Game Number: 16
+
+Returns: -1.0 1.0 
+# moves: 828
+Time for this game in seconde: 807
+Game Number: 17
+
+Returns: -1.0 1.0 
+# moves: 298
+Time for this game in seconde: 310
+Game Number: 18
+
+Returns: -1.0 1.0 
+# moves: 376
+Time for this game in seconde: 400
+Game Number: 19
+
+Returns: -1.0 1.0 
+# moves: 794
+Time for this game in seconde: 757
+Game Number: 20
+
+Returns: -1.0 1.0 
+# moves: 578
+Time for this game in seconde: 533
+Game Number: 21
+
+Returns: -1.0 1.0 
+# moves: 320
+Time for this game in seconde: 331
+Game Number: 22
+
+Returns: -1.0 1.0 
+# moves: 124
+Time for this game in seconde: 131
+Game Number: 23
+
+Returns: -1.0 1.0 
+# moves: 280
+Time for this game in seconde: 305
+Game Number: 24
+
+Returns: -1.0 1.0 
+# moves: 346
+Time for this game in seconde: 347
+Game Number: 25
+
+Returns: -1.0 1.0 
+# moves: 344
+Time for this game in seconde: 364
+Game Number: 26
+
+Returns: -1.0 1.0 
+# moves: 440
+Time for this game in seconde: 423
+Game Number: 27
+
+Returns: -1.0 1.0 
+# moves: 498
+Time for this game in seconde: 529
+Game Number: 28
+
+Returns: -1.0 1.0 
+# moves: 274
+Time for this game in seconde: 280
+Game Number: 29
+
+Returns: -1.0 1.0 
+# moves: 426
+Time for this game in seconde: 433
+Game Number: 30
+
+Returns: -1.0 1.0 
+# moves: 826
+Time for this game in seconde: 774
+Game Number: 31
+
+Returns: -1.0 1.0 
+# moves: 54
+Time for this game in seconde: 61
+Game Number: 32
+
+Returns: -1.0 1.0 
+# moves: 466
+Time for this game in seconde: 452
+Game Number: 33
+
+Returns: -1.0 1.0 
+# moves: 674
+Time for this game in seconde: 636
+Game Number: 34
+
+Returns: -1.0 1.0 
+# moves: 346
+Time for this game in seconde: 348
+Game Number: 35
+
+Returns: -1.0 1.0 
+# moves: 680
+Time for this game in seconde: 691
+Game Number: 36
+
+Returns: -1.0 1.0 
+# moves: 304
+Time for this game in seconde: 311
+Game Number: 37
+
+Returns: -1.0 1.0 
+# moves: 528
+Time for this game in seconde: 536
+Game Number: 38
+
+Returns: -1.0 1.0 
+# moves: 492
+Time for this game in seconde: 469
+Game Number: 39
+
+Returns: -1.0 1.0 
+# moves: 340
+Time for this game in seconde: 347
+Game Number: 40
+
+Returns: -1.0 1.0 
+# moves: 176
+Time for this game in seconde: 193
+Game Number: 41
+
+Returns: -1.0 1.0 
+# moves: 126
+Time for this game in seconde: 144
+Game Number: 42
+
+Returns: -1.0 1.0 
+# moves: 148
+Time for this game in seconde: 165
+Game Number: 43
+
+Returns: -1.0 1.0 
+# moves: 340
+Time for this game in seconde: 331
+Game Number: 44
+
+Returns: -1.0 1.0 
+# moves: 472
+Time for this game in seconde: 441
+Game Number: 45
+
+Returns: -1.0 1.0 
+# moves: 208
+Time for this game in seconde: 224
+Game Number: 46
+
+Returns: -1.0 1.0 
+# moves: 314
+Time for this game in seconde: 308
+Game Number: 47
+
+Returns: -1.0 1.0 
+# moves: 470
+Time for this game in seconde: 455
+Game Number: 48
+
+Returns: -1.0 1.0 
+# moves: 926
+Time for this game in seconde: 856
+Game Number: 49
+
+Number of games played: 50
+Average number of moves till finish: 435
+Average time till finish: 433
+Players: rnad mcts
+Overall wins [0, 50]
+mcts VS custom: Begin
+
+Returns: -1.0 1.0 
+# moves: 562
+Hit percentage of hash in prior:  46.775 632426
+Time for this game in seconde: 860
+Game Number: 0
+
+Returns: -1.0 1.0 
+# moves: 384
+Hit percentage of hash in prior:  44.085 401376
+Time for this game in seconde: 567
+Game Number: 1
+
+Returns: 0.0 0.0 
+# moves: 1500
+Hit percentage of hash in prior:  61.041 1691042
+Time for this game in seconde: 1848
+Game Number: 2
+
+Returns: -1.0 1.0 
+# moves: 306
+Hit percentage of hash in prior:  42.357 328948
+Time for this game in seconde: 497
+Game Number: 3
+
+Returns: -1.0 1.0 
+# moves: 652
+Hit percentage of hash in prior:  52.516 730876
+Time for this game in seconde: 886
+Game Number: 4
+
+Returns: -1.0 1.0 
+# moves: 606
+Hit percentage of hash in prior:  58.082 683271
+Time for this game in seconde: 784
+Game Number: 5
+
+Returns: 1.0 -1.0 
+# moves: 247
+Hit percentage of hash in prior:  42.889 272311
+Time for this game in seconde: 420
+Game Number: 6
+
+Returns: -1.0 1.0 
+# moves: 440
+Hit percentage of hash in prior:  46.23 496306
+Time for this game in seconde: 717
+Game Number: 7
+
+Returns: -1.0 1.0 
+# moves: 174
+Hit percentage of hash in prior:  40.296 190506
+Time for this game in seconde: 312
+Game Number: 8
+
+Returns: -1.0 1.0 
+# moves: 386
+Hit percentage of hash in prior:  42.772 373384
+Time for this game in seconde: 606
+Game Number: 9
+
+Returns: -1.0 1.0 
+# moves: 364
+Hit percentage of hash in prior:  41.914 379676
+Time for this game in seconde: 623
+Game Number: 10
+
+Returns: -1.0 1.0 
+# moves: 536
+Hit percentage of hash in prior:  51.511 600589
+Time for this game in seconde: 777
+Game Number: 11
+
+Returns: 0.0 0.0 
+# moves: 1500
+Hit percentage of hash in prior:  81.089 1712898
+Time for this game in seconde: 1659
+Game Number: 12
+
+Returns: -1.0 1.0 
+# moves: 488
+Hit percentage of hash in prior:  57.292 542415
+Time for this game in seconde: 626
+Game Number: 13
+
+Returns: -1.0 1.0 
+# moves: 494
+Hit percentage of hash in prior:  45.114 552809
+Time for this game in seconde: 797
+Game Number: 14
+
+Returns: -1.0 1.0 
+# moves: 234
+Hit percentage of hash in prior:  38.982 257785
+Time for this game in seconde: 423
+Game Number: 15
+
+Returns: -1.0 1.0 
+# moves: 750
+Hit percentage of hash in prior:  62.331 852025
+Time for this game in seconde: 978
+Game Number: 16
+
+Returns: -1.0 1.0 
+# moves: 322
+Hit percentage of hash in prior:  43.42 356621
+Time for this game in seconde: 521
+Game Number: 17
+
+Returns: 1.0 -1.0 
+# moves: 863
+Hit percentage of hash in prior:  56.075 972310
+Time for this game in seconde: 1068
+Game Number: 18
+
+Returns: -1.0 1.0 
+# moves: 156
+Hit percentage of hash in prior:  41.4 176994
+Time for this game in seconde: 285
+Game Number: 19
+
+Returns: -1.0 1.0 
+# moves: 304
+Hit percentage of hash in prior:  48.557 333219
+Time for this game in seconde: 449
+Game Number: 20
+
+Returns: -1.0 1.0 
+# moves: 486
+Hit percentage of hash in prior:  45.924 543628
+Time for this game in seconde: 769
+Game Number: 21
+
+Returns: 1.0 -1.0 
+# moves: 317
+Hit percentage of hash in prior:  44.97 350772
+Time for this game in seconde: 489
+Game Number: 22
+
+Returns: -1.0 1.0 
+# moves: 428
+Hit percentage of hash in prior:  49.241 471115
+Time for this game in seconde: 646
+Game Number: 23
+
+Returns: -1.0 1.0 
+# moves: 512
+Hit percentage of hash in prior:  53.586 554691
+Time for this game in seconde: 727
+Game Number: 24
+
+Returns: -1.0 1.0 
+# moves: 286
+Hit percentage of hash in prior:  43.828 322209
+Time for this game in seconde: 495
+Game Number: 25
+
+Returns: 1.0 -1.0 
+# moves: 367
+Hit percentage of hash in prior:  48.859 400279
+Time for this game in seconde: 549
+Game Number: 26
+
+Returns: -1.0 1.0 
+# moves: 358
+Hit percentage of hash in prior:  40.078 396617
+Time for this game in seconde: 626
+Game Number: 27
+
+Returns: -1.0 1.0 
+# moves: 442
+Hit percentage of hash in prior:  40.031 490910
+Time for this game in seconde: 761
+Game Number: 28
+
+Returns: -1.0 1.0 
+# moves: 382
+Hit percentage of hash in prior:  43.478 413684
+Time for this game in seconde: 609
+Game Number: 29
+
+Returns: -1.0 1.0 
+# moves: 390
+Hit percentage of hash in prior:  40.828 437669
+Time for this game in seconde: 630
+Game Number: 30
+
+Returns: -1.0 1.0 
+# moves: 288
+Hit percentage of hash in prior:  43.596 325057
+Time for this game in seconde: 457
+Game Number: 31
+
+Returns: -1.0 1.0 
+# moves: 444
+Hit percentage of hash in prior:  53.254 483719
+Time for this game in seconde: 631
+Game Number: 32
+
+Returns: -1.0 1.0 
+# moves: 484
+Hit percentage of hash in prior:  46.452 540154
+Time for this game in seconde: 745
+Game Number: 33
+
+Returns: 1.0 -1.0 
+# moves: 357
+Hit percentage of hash in prior:  40.832 399643
+Time for this game in seconde: 626
+Game Number: 34
+
+Returns: -1.0 1.0 
+# moves: 606
+Hit percentage of hash in prior:  45.591 656873
+Time for this game in seconde: 974
+Game Number: 35
+
+Returns: -1.0 1.0 
+# moves: 302
+Hit percentage of hash in prior:  42.117 335779
+Time for this game in seconde: 505
+Game Number: 36
+
+Returns: -1.0 1.0 
+# moves: 376
+Hit percentage of hash in prior:  47.718 419495
+Time for this game in seconde: 558
+Game Number: 37
+
+Returns: -1.0 1.0 
+# moves: 206
+Hit percentage of hash in prior:  40.489 231233
+Time for this game in seconde: 349
+Game Number: 38
+
+Returns: -1.0 1.0 
+# moves: 388
+Hit percentage of hash in prior:  45.129 431656
+Time for this game in seconde: 647
+Game Number: 39
+
+Returns: -1.0 1.0 
+# moves: 488
+Hit percentage of hash in prior:  49.062 540464
+Time for this game in seconde: 749
+Game Number: 40
+
+Returns: -1.0 1.0 
+# moves: 486
+Hit percentage of hash in prior:  53.303 544404
+Time for this game in seconde: 673
+Game Number: 41
+
+Returns: 1.0 -1.0 
+# moves: 305
+Hit percentage of hash in prior:  39.83 333205
+Time for this game in seconde: 524
+Game Number: 42
+
+Returns: -1.0 1.0 
+# moves: 336
+Hit percentage of hash in prior:  42.04 374100
+Time for this game in seconde: 550
+Game Number: 43
+
+Returns: -1.0 1.0 
+# moves: 344
+Hit percentage of hash in prior:  37.905 390590
+Time for this game in seconde: 619
+Game Number: 44
+
+Returns: -1.0 1.0 
+# moves: 302
+Hit percentage of hash in prior:  41.422 335274
+Time for this game in seconde: 517
+Game Number: 45
+
+Returns: -1.0 1.0 
+# moves: 394
+Hit percentage of hash in prior:  50.152 421470
+Time for this game in seconde: 575
+Game Number: 46
+
+Returns: -1.0 1.0 
+# moves: 464
+Hit percentage of hash in prior:  46.187 488996
+Time for this game in seconde: 742
+Game Number: 47
+
+Returns: -1.0 1.0 
+# moves: 238
+Hit percentage of hash in prior:  41.566 263034
+Time for this game in seconde: 382
+Game Number: 48
+
+Returns: -1.0 1.0 
+# moves: 302
+Hit percentage of hash in prior:  41.909 329488
+Time for this game in seconde: 509
+Game Number: 49
+
+Number of games played: 50
+Average number of moves till finish: 446
+Average time till finish: 666
+Players: mcts custom
+Overall wins [6, 42]
+mcts VS asmodeus: Begin
+
+Returns: -1.0 1.0 
+# moves: 352
+Time for this game in seconde: 351
+Game Number: 0
+
+Returns: 1.0 -1.0 
+# moves: 267
+Time for this game in seconde: 276
+Game Number: 1
+
+Returns: -1.0 1.0 
+# moves: 342
+Time for this game in seconde: 347
+Game Number: 2
+
+Returns: -1.0 1.0 
+# moves: 272
+Time for this game in seconde: 290
+Game Number: 3
+
+Returns: 1.0 -1.0 
+# moves: 121
+Time for this game in seconde: 135
+Game Number: 4
+
+Returns: 1.0 -1.0 
+# moves: 43
+Time for this game in seconde: 55
+Game Number: 5
+
+Returns: 1.0 -1.0 
+# moves: 365
+Time for this game in seconde: 358
+Game Number: 6
+
+Returns: 1.0 -1.0 
+# moves: 475
+Time for this game in seconde: 463
+Game Number: 7
+
+Returns: 1.0 -1.0 
+# moves: 69
+Time for this game in seconde: 81
+Game Number: 8
+
+Returns: -1.0 1.0 
+# moves: 32
+Time for this game in seconde: 39
+Game Number: 9
+
+Returns: 1.0 -1.0 
+# moves: 301
+Time for this game in seconde: 318
+Game Number: 10
+
+Returns: 1.0 -1.0 
+# moves: 393
+Time for this game in seconde: 386
+Game Number: 11
+
+Returns: 1.0 -1.0 
+# moves: 263
+Time for this game in seconde: 280
+Game Number: 12
+
+Returns: 1.0 -1.0 
+# moves: 399
+Time for this game in seconde: 384
+Game Number: 13
+
+Returns: -1.0 1.0 
+# moves: 462
+Time for this game in seconde: 444
+Game Number: 14
+
+Returns: 1.0 -1.0 
+# moves: 99
+Time for this game in seconde: 116
+Game Number: 15
+
+Returns: 1.0 -1.0 
+# moves: 171
+Time for this game in seconde: 185
+Game Number: 16
+
+Returns: -1.0 1.0 
+# moves: 370
+Time for this game in seconde: 364
+Game Number: 17
+
+Returns: 1.0 -1.0 
+# moves: 469
+Time for this game in seconde: 449
+Game Number: 18
+
+Returns: -1.0 1.0 
+# moves: 360
+Time for this game in seconde: 340
+Game Number: 19
+
+Returns: -1.0 1.0 
+# moves: 262
+Time for this game in seconde: 283
+Game Number: 20
+
+Returns: -1.0 1.0 
+# moves: 414
+Time for this game in seconde: 378
+Game Number: 21
+
+Returns: -1.0 1.0 
+# moves: 486
+Time for this game in seconde: 449
+Game Number: 22
+
+Returns: -1.0 1.0 
+# moves: 194
+Time for this game in seconde: 214
+Game Number: 23
+
+Returns: 1.0 -1.0 
+# moves: 267
+Time for this game in seconde: 279
+Game Number: 24
+
+Returns: 1.0 -1.0 
+# moves: 263
+Time for this game in seconde: 262
+Game Number: 25
+
+Returns: 1.0 -1.0 
+# moves: 317
+Time for this game in seconde: 318
+Game Number: 26
+
+Returns: -1.0 1.0 
+# moves: 152
+Time for this game in seconde: 171
+Game Number: 27
+
+Returns: 1.0 -1.0 
+# moves: 69
+Time for this game in seconde: 84
+Game Number: 28
+
+Returns: -1.0 1.0 
+# moves: 394
+Time for this game in seconde: 400
+Game Number: 29
+
+Returns: 1.0 -1.0 
+# moves: 369
+Time for this game in seconde: 375
+Game Number: 30
+
+Returns: -1.0 1.0 
+# moves: 494
+Time for this game in seconde: 477
+Game Number: 31
+
+Returns: -1.0 1.0 
+# moves: 170
+Time for this game in seconde: 190
+Game Number: 32
+
+Returns: 1.0 -1.0 
+# moves: 349
+Time for this game in seconde: 346
+Game Number: 33
+
+Returns: 0.0 0.0 
+# moves: 1500
+Time for this game in seconde: 885
+Game Number: 34
+
+Returns: 1.0 -1.0 
+# moves: 443
+Time for this game in seconde: 432
+Game Number: 35
+
+Returns: -1.0 1.0 
+# moves: 208
+Time for this game in seconde: 234
+Game Number: 36
+
+Returns: -1.0 1.0 
+# moves: 824
+Time for this game in seconde: 702
+Game Number: 37
+
+Returns: 1.0 -1.0 
+# moves: 275
+Time for this game in seconde: 285
+Game Number: 38
+
+Returns: 1.0 -1.0 
+# moves: 263
+Time for this game in seconde: 281
+Game Number: 39
+
+Returns: 1.0 -1.0 
+# moves: 89
+Time for this game in seconde: 107
+Game Number: 40
+
+Returns: -1.0 1.0 
+# moves: 380
+Time for this game in seconde: 371
+Game Number: 41
+
+Returns: 1.0 -1.0 
+# moves: 163
+Time for this game in seconde: 185
+Game Number: 42
+
+Returns: -1.0 1.0 
+# moves: 392
+Time for this game in seconde: 372
+Game Number: 43
+
+Returns: 1.0 -1.0 
+# moves: 207
+Time for this game in seconde: 230
+Game Number: 44
+
+Returns: 1.0 -1.0 
+# moves: 445
+Time for this game in seconde: 408
+Game Number: 45
+
+Returns: -1.0 1.0 
+# moves: 88
+Time for this game in seconde: 105
+Game Number: 46
+
+Returns: 1.0 -1.0 
+# moves: 253
+Time for this game in seconde: 276
+Game Number: 47
+
+Returns: 0.0 0.0 
+# moves: 1500
+Time for this game in seconde: 904
+Game Number: 48
+
+Returns: 1.0 -1.0 
+# moves: 751
+Time for this game in seconde: 653
+Game Number: 49
+
+Number of games played: 50
+Average number of moves till finish: 352
+Average time till finish: 326
+Players: mcts asmodeus
+Overall wins [28, 20]
+mcts VS hunter: Begin
+
+Returns: -1.0 1.0 
+# moves: 362
+Time for this game in seconde: 371
+Game Number: 0
+
+Returns: -1.0 1.0 
+# moves: 306
+Time for this game in seconde: 321
+Game Number: 1
+
+Returns: 1.0 -1.0 
+# moves: 383
+Time for this game in seconde: 402
+Game Number: 2
+
+Returns: -1.0 1.0 
+# moves: 354
+Time for this game in seconde: 372
+Game Number: 3
+
+Returns: 1.0 -1.0 
+# moves: 475
+Time for this game in seconde: 492
+Game Number: 4
+
+Returns: -1.0 1.0 
+# moves: 344
+Time for this game in seconde: 342
+Game Number: 5
+
+Returns: -1.0 1.0 
+# moves: 254
+Time for this game in seconde: 273
+Game Number: 6
+
+Returns: -1.0 1.0 
+# moves: 284
+Time for this game in seconde: 287
+Game Number: 7
+
+Returns: 1.0 -1.0 
+# moves: 685
+Time for this game in seconde: 659
+Game Number: 8
+
+Returns: 1.0 -1.0 
+# moves: 117
+Time for this game in seconde: 138
+Game Number: 9
+
+Returns: 1.0 -1.0 
+# moves: 33
+Time for this game in seconde: 42
+Game Number: 10
+
+Returns: -1.0 1.0 
+# moves: 270
+Time for this game in seconde: 283
+Game Number: 11
+
+Returns: 1.0 -1.0 
+# moves: 89
+Time for this game in seconde: 107
+Game Number: 12
+
+Returns: -1.0 1.0 
+# moves: 240
+Time for this game in seconde: 261
+Game Number: 13
+
+Returns: -1.0 1.0 
+# moves: 282
+Time for this game in seconde: 292
+Game Number: 14
+
+Returns: -1.0 1.0 
+# moves: 360
+Time for this game in seconde: 344
+Game Number: 15
+
+Returns: -1.0 1.0 
+# moves: 264
+Time for this game in seconde: 285
+Game Number: 16
+
+Returns: 1.0 -1.0 
+# moves: 127
+Time for this game in seconde: 145
+Game Number: 17
+
+Returns: 0.0 0.0 
+# moves: 1500
+Time for this game in seconde: 1311
+Game Number: 18
+
+Returns: -1.0 1.0 
+# moves: 468
+Time for this game in seconde: 450
+Game Number: 19
+
+Returns: -1.0 1.0 
+# moves: 280
+Time for this game in seconde: 294
+Game Number: 20
+
+Returns: 1.0 -1.0 
+# moves: 381
+Time for this game in seconde: 380
+Game Number: 21
+
+Returns: -1.0 1.0 
+# moves: 312
+Time for this game in seconde: 332
+Game Number: 22
+
+Returns: -1.0 1.0 
+# moves: 298
+Time for this game in seconde: 306
+Game Number: 23
+
+Returns: 1.0 -1.0 
+# moves: 245
+Time for this game in seconde: 271
+Game Number: 24
+
+Returns: -1.0 1.0 
+# moves: 148
+Time for this game in seconde: 172
+Game Number: 25
+
+Returns: -1.0 1.0 
+# moves: 368
+Time for this game in seconde: 400
+Game Number: 26
+
+Returns: -1.0 1.0 
+# moves: 266
+Time for this game in seconde: 273
+Game Number: 27
+
+Returns: -1.0 1.0 
+# moves: 206
+Time for this game in seconde: 227
+Game Number: 28
+
+Returns: -1.0 1.0 
+# moves: 906
+Time for this game in seconde: 713
+Game Number: 29
+
+Returns: -1.0 1.0 
+# moves: 350
+Time for this game in seconde: 357
+Game Number: 30
+
+Returns: -1.0 1.0 
+# moves: 248
+Time for this game in seconde: 273
+Game Number: 31
+
+Returns: -1.0 1.0 
+# moves: 326
+Time for this game in seconde: 335
+Game Number: 32
+
+Returns: -1.0 1.0 
+# moves: 272
+Time for this game in seconde: 291
+Game Number: 33
+
+Returns: -1.0 1.0 
+# moves: 276
+Time for this game in seconde: 296
+Game Number: 34
+
+Returns: -1.0 1.0 
+# moves: 340
+Time for this game in seconde: 359
+Game Number: 35
+
+Returns: 1.0 -1.0 
+# moves: 213
+Time for this game in seconde: 239
+Game Number: 36
+
+Returns: -1.0 1.0 
+# moves: 278
+Time for this game in seconde: 295
+Game Number: 37
+
+Returns: -1.0 1.0 
+# moves: 252
+Time for this game in seconde: 264
+Game Number: 38
+
+Returns: -1.0 1.0 
+# moves: 320
+Time for this game in seconde: 344
+Game Number: 39
+
+Returns: 1.0 -1.0 
+# moves: 813
+Time for this game in seconde: 755
+Game Number: 40
+
+Returns: -1.0 1.0 
+# moves: 336
+Time for this game in seconde: 352
+Game Number: 41
+
+Returns: 1.0 -1.0 
+# moves: 107
+Time for this game in seconde: 127
+Game Number: 42
+
+Returns: 1.0 -1.0 
+# moves: 33
+Time for this game in seconde: 42
+Game Number: 43
+
+Returns: 1.0 -1.0 
+# moves: 463
+Time for this game in seconde: 468
+Game Number: 44
+
+Returns: -1.0 1.0 
+# moves: 230
+Time for this game in seconde: 249
+Game Number: 45
+
+Returns: -1.0 1.0 
+# moves: 296
+Time for this game in seconde: 301
+Game Number: 46
+
+Returns: -1.0 1.0 
+# moves: 190
+Time for this game in seconde: 212
+Game Number: 47
+
+Returns: -1.0 1.0 
+# moves: 238
+Time for this game in seconde: 248
+Game Number: 48
+
+Returns: 1.0 -1.0 
+# moves: 243
+Time for this game in seconde: 271
+Game Number: 49
+
+Number of games played: 50
+Average number of moves till finish: 328
+Average time till finish: 332
+Players: mcts hunter
+Overall wins [15, 34]
+mcts VS rnad: Begin
+Bot rnad loaded
+
+Returns: 1.0 -1.0 
+# moves: 593
+Time for this game in seconde: 632
+Game Number: 0
+
+Returns: 1.0 -1.0 
+# moves: 311
+Time for this game in seconde: 355
+Game Number: 1
+
+Returns: 1.0 -1.0 
+# moves: 265
+Time for this game in seconde: 297
+Game Number: 2
+
+Returns: 1.0 -1.0 
+# moves: 77
+Time for this game in seconde: 88
+Game Number: 3
+
+Returns: 1.0 -1.0 
+# moves: 139
+Time for this game in seconde: 164
+Game Number: 4
+
+Returns: 1.0 -1.0 
+# moves: 325
+Time for this game in seconde: 345
+Game Number: 5
+
+Returns: 1.0 -1.0 
+# moves: 583
+Time for this game in seconde: 591
+Game Number: 6
+
+Returns: 1.0 -1.0 
+# moves: 713
+Time for this game in seconde: 697
+Game Number: 7
+
+Returns: 1.0 -1.0 
+# moves: 547
+Time for this game in seconde: 595
+Game Number: 8
+
+Returns: 1.0 -1.0 
+# moves: 821
+Time for this game in seconde: 808
+Game Number: 9
+
+Returns: 1.0 -1.0 
+# moves: 15
+Time for this game in seconde: 18
+Game Number: 10
+
+Returns: 1.0 -1.0 
+# moves: 405
+Time for this game in seconde: 456
+Game Number: 11
+
+Returns: 1.0 -1.0 
+# moves: 583
+Time for this game in seconde: 605
+Game Number: 12
+
+Returns: 1.0 -1.0 
+# moves: 793
+Time for this game in seconde: 780
+Game Number: 13
+
+Returns: 1.0 -1.0 
+# moves: 545
+Time for this game in seconde: 551
+Game Number: 14
+
+Returns: 1.0 -1.0 
+# moves: 383
+Time for this game in seconde: 398
+Game Number: 15
+
+Returns: 1.0 -1.0 
+# moves: 201
+Time for this game in seconde: 229
+Game Number: 16
+
+Returns: 1.0 -1.0 
+# moves: 501
+Time for this game in seconde: 500
+Game Number: 17
+
+Returns: 1.0 -1.0 
+# moves: 351
+Time for this game in seconde: 359
+Game Number: 18
+
+Returns: 1.0 -1.0 
+# moves: 445
+Time for this game in seconde: 476
+Game Number: 19
+
+Returns: 1.0 -1.0 
+# moves: 447
+Time for this game in seconde: 482
+Game Number: 20
+
+Returns: 1.0 -1.0 
+# moves: 947
+Time for this game in seconde: 934
+Game Number: 21
+
+Returns: 1.0 -1.0 
+# moves: 363
+Time for this game in seconde: 404
+Game Number: 22
+
+Returns: 1.0 -1.0 
+# moves: 425
+Time for this game in seconde: 430
+Game Number: 23
+
+Returns: 1.0 -1.0 
+# moves: 271
+Time for this game in seconde: 278
+Game Number: 24
+
+Returns: 1.0 -1.0 
+# moves: 315
+Time for this game in seconde: 335
+Game Number: 25
+
+Returns: 1.0 -1.0 
+# moves: 243
+Time for this game in seconde: 272
+Game Number: 26
+
+Returns: 1.0 -1.0 
+# moves: 459
+Time for this game in seconde: 485
+Game Number: 27
+
+Returns: 1.0 -1.0 
+# moves: 707
+Time for this game in seconde: 708
+Game Number: 28
+
+Returns: 1.0 -1.0 
+# moves: 297
+Time for this game in seconde: 322
+Game Number: 29
+
+Returns: 1.0 -1.0 
+# moves: 589
+Time for this game in seconde: 593
+Game Number: 30
+
+Returns: 1.0 -1.0 
+# moves: 495
+Time for this game in seconde: 516
+Game Number: 31
+
+Returns: 1.0 -1.0 
+# moves: 591
+Time for this game in seconde: 590
+Game Number: 32
+
+Returns: 1.0 -1.0 
+# moves: 299
+Time for this game in seconde: 312
+Game Number: 33
+
+Returns: 1.0 -1.0 
+# moves: 359
+Time for this game in seconde: 392
+Game Number: 34
+
+Returns: 1.0 -1.0 
+# moves: 245
+Time for this game in seconde: 271
+Game Number: 35
+
+Returns: 1.0 -1.0 
+# moves: 433
+Time for this game in seconde: 446
+Game Number: 36
+
+Returns: 1.0 -1.0 
+# moves: 249
+Time for this game in seconde: 283
+Game Number: 37
+
+Returns: 1.0 -1.0 
+# moves: 343
+Time for this game in seconde: 355
+Game Number: 38
+
+Returns: 1.0 -1.0 
+# moves: 409
+Time for this game in seconde: 397
+Game Number: 39
+
+Returns: 1.0 -1.0 
+# moves: 319
+Time for this game in seconde: 364
+Game Number: 40
+
+Returns: 1.0 -1.0 
+# moves: 553
+Time for this game in seconde: 562
+Game Number: 41
+
+Returns: 1.0 -1.0 
+# moves: 477
+Time for this game in seconde: 501
+Game Number: 42
+
+Returns: 1.0 -1.0 
+# moves: 259
+Time for this game in seconde: 290
+Game Number: 43
+
+Returns: 1.0 -1.0 
+# moves: 53
+Time for this game in seconde: 65
+Game Number: 44
+
+Returns: 1.0 -1.0 
+# moves: 427
+Time for this game in seconde: 445
+Game Number: 45
+
+Returns: 1.0 -1.0 
+# moves: 391
+Time for this game in seconde: 410
+Game Number: 46
+
+Returns: 1.0 -1.0 
+# moves: 293
+Time for this game in seconde: 302
+Game Number: 47
+
+Returns: 1.0 -1.0 
+# moves: 449
+Time for this game in seconde: 467
+Game Number: 48
+
+Returns: 1.0 -1.0 
+# moves: 595
+Time for this game in seconde: 616
+Game Number: 49
+
+Number of games played: 50
+Average number of moves till finish: 417
+Average time till finish: 435
+Players: mcts rnad
+Overall wins [50, 0]
+Benchmark finished its execution, congratulation !

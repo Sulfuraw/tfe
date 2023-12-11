@@ -1,7 +1,12 @@
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+import os
+import numpy as np
 
+######################################################
+# Script to evaluate a benchmark creating a markdown file
+######################################################
 
 def script_md_evaluate_bot(folder):
     stats_df = pd.read_csv(folder+"stats.csv")
@@ -125,7 +130,9 @@ def script_md_evaluate_bot(folder):
     with open(folder+'results.md', 'w') as f:
         f.write(''.join(markdown_content))
 
-##########################################################################
+######################################################
+# Helper function to get data globally
+######################################################
 
 def get_stats(stats_df, folder, bot):
     # Create a dictionary to store the game data
@@ -203,6 +210,9 @@ def get_stats(stats_df, folder, bot):
             unk_acc_lose = np.around(unk_acc_lose, 2)
     return global_stats, eval_matrix_win, eval_matrix_lose, unk_acc_win, unk_acc_lose, games_stats
 
+######################################################
+# Helper function to get data per bot
+######################################################
 
 def get_stats_per_bot(stats_df, folder, bot, bot2):
     # Create a dictionary to store the game data
@@ -280,6 +290,10 @@ def get_stats_per_bot(stats_df, folder, bot, bot2):
         if unk_acc_lose is not None:
             unk_acc_lose = np.around(unk_acc_lose, 2)
     return global_stats, eval_matrix_win, eval_matrix_lose, unk_acc_win, unk_acc_lose, games_stats
+
+######################################################
+# Script to evaluate a benchmark creating a markdown file
+######################################################
 
 def script_md_evaluate_benchmark(folder):
     stats_df = pd.read_csv(folder+"stats.csv")
@@ -411,3 +425,57 @@ def script_md_evaluate_benchmark(folder):
     # Write the markdown content to a file
     with open(folder+'results.md', 'w') as f:
         f.write(''.join(markdown_content))
+
+
+######################################################
+# Get the data from the games of the site Gravon:
+######################################################
+
+directory = 'game'
+players_piece = [["M", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L"],
+                 ["Y", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X"]]
+# It is:         [Fl,  Bo,   Sp,  Sc,  Mi,  Sg,  Lt,  Cp,  Mj,  Co,  Ge,  Ms]
+# Nbr of each:   [1,   6,    1,   8,   5,   4,   4,   4,   3,   2,   1,   1]
+
+def starter_state_stats():
+    matrix_of_stats = np.array(np.zeros((4, 10, 12)))
+    for filename in os.listdir(directory):
+        f = os.path.join(directory, filename)
+        # checking if it is a file
+        if os.path.isfile(f):
+            with open(f, 'r') as file:
+                state = file.read()[94:94+100]
+                # Collect data from top side player
+                for letter in range(40):
+                    for piece in range(12):
+                        if players_piece[0][piece] == state[letter]:
+                            matrix_of_stats[letter//10][letter%10][piece] += 1
+                # Collect data from bottom side player
+                for letter in range(-41, 0):
+                    for piece in range(12):
+                        if players_piece[1][piece] == state[letter]:
+                            matrix_of_stats[(-letter-1)//10][(-letter-1)%10][piece] += 1
+    print(matrix_of_stats)
+    print("==============:==================================")
+    # Normalization to sum up to one
+    for i in range(len(matrix_of_stats)):
+        for j in range(len(matrix_of_stats[i])):
+            array = matrix_of_stats[i:i+1, j:j+1]
+            matrix_of_stats[i:i+1, j:j+1] = array / np.sum(array)
+    return matrix_of_stats
+
+# Average of 330.4 moves played in games
+def nbr_moves_stats():
+    summ = 0
+    total_nbr = 0
+    for filename in os.listdir(directory):
+        f = os.path.join(directory, filename)
+        # checking if it is a file
+        if os.path.isfile(f):
+            with open(f, 'r') as file:
+                for count, line in enumerate(file):
+                    pass
+            summ += count-9
+            total_nbr += 1
+    avg = summ / total_nbr
+    return avg
