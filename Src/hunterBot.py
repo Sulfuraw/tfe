@@ -1,4 +1,5 @@
 # https://github.com/braathwaate/strategoevaluator/blob/master/agents/hunter/hunter.py
+# The implementation of this bot is a try to reimplement it inside our code structure while conserving the most of its workflow
 
 from __future__ import absolute_import
 from __future__ import division

@@ -35,3 +35,7 @@ To generate these plots we used the following parameters:
 
 Finally, the seed used were in [0, 1, 2, 3, 4] and the learning lasted for at
 most than 7M steps.
+
+## Modification and used By Thomas Robert:
+
+These file where used to train 100'000 steps and did not give any satisfying result

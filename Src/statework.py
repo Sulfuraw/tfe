@@ -565,9 +565,9 @@ def rescaleProbas(array, limit=7):
             print("====================================")
     return proba
 
-def log(text, file_name="log.txt"):
+def log(text, file_name="temp/log.txt"):
     """Log text in a file"""
-    # TODO: If you want to have the log, Uncomment below
+    # If you want to have the log, Uncomment below, delete the "pass"
     pass
     # with open(file_name, "a") as file:
         # file.write(text + "\n")

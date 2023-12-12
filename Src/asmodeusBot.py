@@ -6,6 +6,9 @@ import basicAIBot
 import numpy as np
 from statework import *
 
+# The implementation of this bot is a try to reimplement it inside our code structure while conserving the most of its workflow
+# The basicAIBot follow the same logic but it is not relevant
+
 class asmodeusBot(basicAIBot.basicAIBot):
     def __init__(self, player):
         super().__init__(player)

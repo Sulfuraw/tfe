@@ -2,7 +2,6 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import os
-import numpy as np
 
 ######################################################
 # Script to evaluate a benchmark creating a markdown file

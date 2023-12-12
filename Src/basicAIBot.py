@@ -12,6 +12,8 @@ import numpy as np
 # {"M":[0, 0], "B":[1, 0], "C":[2, 0], "D":[3, 0], "E":[4, 0], "F":[5, 0], "G":[6, 0], "H":[7, 0], "I":[8, 0], "J":[9, 0], "K":[10, 0], "L":[11, 0],
 #  "Y":[0, 1], "N":[1, 1], "O":[2, 1], "P":[3, 1], "Q":[4, 1], "R":[5, 1], "S":[6, 1], "T":[7, 1], "U":[8, 1], "V":[9, 1], "W":[10, 1], "X":[11, 1]}
 
+# The implementation of this bot is a try to reimplement it inside our code structure while conserving the most of its workflow
+
 class basicAIBot(pyspiel.Bot):
     def __init__(self, player):
         pyspiel.Bot.__init__(self)

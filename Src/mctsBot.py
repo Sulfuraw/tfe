@@ -7,6 +7,7 @@ import math
 from statework import *
 
 # Using the Copyright 2019 DeepMind Technologies Limited using modified version of """Monte-Carlo Tree Search algorithm for game play"""
+# More basic mcts with fewer evaluation, allowing more simulations, parameters, etc...
 
 class RandomRolloutEvaluator():
     """A simple evaluator doing random rollouts.

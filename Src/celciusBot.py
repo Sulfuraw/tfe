@@ -1,8 +1,8 @@
 # Celcius1.1
-import random
+# This implementation is not working, it was a work in progress but the
+# transition to the new structure did not happend
 
-# He knowns when it has moved, it's not a bomb "!"
-# He knowns when it has move like a scout '9'
+import random
 
 ranks = ['B','1','2','3','4','5','6','7','8','9','s','F', '?', '!', '+']
 
@@ -61,8 +61,6 @@ class Piece:
 		self.lastMoved = -1
 		self.beenRevealed = False
 		self.positions = [(x, y)]
-		
-
 
 		self.heatmap = []
 		self.turnCount = 0
@@ -131,8 +129,6 @@ class Piece:
 			p = self.positions[len(self.positions)-1-i]
 			if board[p[0]][p[1]] != None:
 				self.heatmap[p[0]][p[1]] += 0.2 * ((50 - i)/50)
-				
-
 
 		for n in range(0,8):
 			for x in range(0,width):
@@ -195,16 +191,12 @@ def MakeMove(self):
                         if (self.total_turns % 250 < 15) and (self.total_turns > 250):
                             scare += random.randint(0, 5)
 
-
                         if override == 1:
                             scare = 999
                         elif override == -1:
                             piece.turnCount = 0
                             print(str(piece.x) + " " + str(piece.y) + " " + directions[dirIndex])
                             return True
-
-
-                        
 
                         if scare < bestScare:
                             bestdir = dirIndex

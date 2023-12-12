@@ -6,7 +6,9 @@ import numpy as np
 import math
 from statework import *
 
-# Using the Copyright 2019 DeepMind Technologies Limited using modified version of """Monte-Carlo Tree Search algorithm for game play"""
+# "Monte-Carlo Tree Search algorithm for game play" from DeepMind's pyspiel mcts
+# Modified and enhanced by Thomas Robert to fit and competitively play the Stratego
+
 class CustomEvaluator():
     def __init__(self, n_rollouts, n_moves_before):
         self.piece_to_index = pieces_to_index()
@@ -33,8 +35,6 @@ class CustomEvaluator():
     def evaluate_state(self, state):
         """Returns evaluation on given state."""
         state_str = str(state)[:100].upper()
-        move_of_state = int(str(state)[103-len(str(state)):])
-
         nbr_pieces = [[0]*12, [0]*12]
         advanced_pieces = [0, 0]
         advanced_miner = [0, 0]
@@ -58,36 +58,23 @@ class CustomEvaluator():
             piece_values = value_for_piece(nbr_pieces[1-player], nbr_pieces[player])
             for piece_id, value in piece_values:
                 score[player] += nbr_pieces[player][piece_id]*value
-            
             # Make more weight if the flag is protected, 1/4 per side
             score[player] += (0.5/4) * (4 - flag_protec(state, player))
-
             # More weight having piece on the other side
             score[player] += advanced_pieces[player] * 0.02
-
             # Make more weight to miner to go attack in search of bombs
             score[player] += advanced_miner[player] * 0.02
 
         returns = [0, 0]
         for player in [0, 1]:
-            x = score[player] - score[1-player]
-            # returns[player] = 2*(x - (-8.5))/(8.5 - (-8.5)) - 1.0     # Rerange -8.5 to 8.5 into -1 to 1
-            # returns[player] = 2*(x - (-5))/(5 - (-5)) - 1.0           # Value for piece advanced array
-            # TODO: Should scale down by another .2 bc 6 games out of 500 were more than that. Strong destruction
-            returns[player] = 2*(x - (-9.2))/(9.2 - (-9.2)) - 1.0             # Value for best result so far
-
-        if returns[0] > 1 or returns[0] < -1 or returns[1] > 1 or returns[1] < -1:
-            # Check if we need to adapt the rescale above
-            print("==============================")
-            print("Returns:", returns, "\n")
-            printCharMatrix(str(state))
+            x = score[player] - score[1-player]  
+            # TODO: Should scale down by another .2 bc 6 games out of 500 exceeded the threshold (really strong advantage to one side)
+            returns[player] = 2*(x - (-9.2))/(9.2 - (-9.2)) - 1.0     # Rerange -9.2 to 9.2 into -1 to 1
         return returns
 
     def evaluate(self, state):
         """Returns evaluation on given state by doing simulations."""
-
         result = None
-        # move_of_state = int(str(state)[103-len(str(state)):])
         for _ in range(self.n_rollouts):
             working_state = state.clone()
             i = 0
@@ -159,7 +146,6 @@ class CustomEvaluator():
         registered_find = {}
         two_square_rule = False
         for action in state.legal_actions(player):
-
             coord = action_to_coord(state.action_to_string(player, action))
             arrival = state_str[coord[3]*10 + coord[2]]
             allyIdx, _ = self.piece_to_index[state_str[coord[1]*10 + coord[0]]]
@@ -201,6 +187,7 @@ class CustomEvaluator():
 
                 if found:
                     fight_value = self.proba_win_combat(allyIdx, path[-1], state, move_of_state)*30
+                    
                 # Move toward an enemy piece we win versus, Ally go in the direction of the first enemy
                 if found and path[0] == (coord[3], coord[2]) and fight_value >= 0:
                     value = fight_value/np.sqrt(len(path))  # (len(path))
@@ -440,14 +427,6 @@ class CustomBot(pyspiel.Bot):
             if not current_node.children:
                 # For a new node, initialize its state, then choose a child as normal.
                 legal_actions = self.evaluator.prior(working_state, 0)
-                # # Since dirichlet_noise is set to None, this will never be true.
-                # if current_node is root and self._dirichlet_noise:
-                #     print("test")
-                #     epsilon, alpha = self._dirichlet_noise
-                #     noise = self._random_state.dirichlet([alpha] * len(legal_actions))
-                #     legal_actions = [(a, (1 - epsilon) * p + epsilon * n)
-                #                 for (a, p), n in zip(legal_actions, noise)]
-
                 # Reduce bias from move generation order
                 self._random_state.shuffle(legal_actions)
                 player = working_state.current_player()

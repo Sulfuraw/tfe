@@ -7,7 +7,6 @@ import time
 import pickle
 import os.path
 from curses import wrapper
-# from absl import app
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -62,7 +61,7 @@ def play_game_versus_doi(game_num, player1, player2):
     """Plays one game."""
     # Delete t.txt data before starting
     try:
-        open("t.txt", 'w').close()
+        open("temp/t.txt", 'w').close()
     except IOError:
         print('Failure')
     game = pyspiel.load_game("yorktown")
@@ -136,7 +135,7 @@ def play_game_versus_doi(game_num, player1, player2):
             saveGame("games/"+player1+"-"+player2+str(game_num), allStates)
             # In case of tie, both win_1 and win_2 are equal to 0, otherwise the winner is 1, the other is 0
             data = {'player1': [player1], 'player2': [player2], 'game_num': [game_num], 'time_taken': [0], 'moves': [move], 'nbr_of_prior': [nbr_of_prior], 'per_of_hit': [per_of_hit], 'win_1': 1 if returns[0]==1.0 else 0, 'win_2': 1 if returns[1]==1.0 else 0, 'pieces_1': [pieces0], 'pieces_2': [pieces1]}
-            save_to_csv("./games/stats.csv", data)
+            save_to_csv("./temp/games/stats.csv", data)
             return returns, history, allStates, move, nbr_of_prior, per_of_hit, [pieces0, pieces1]
 
         current_player = state.current_player()
@@ -151,13 +150,13 @@ def play_game_versus_doi(game_num, player1, player2):
             action = bot.step(generated)
             # print("time for generate and play a move:", time.time()-start)
             if str(bot) == "custom":
-                save_to_csv("./games/"+player1+"-"+player2+str(game_num)+".csv", data_for_games(move, state, generated, bot.evaluator))
+                save_to_csv("./temp/games/"+player1+"-"+player2+str(game_num)+".csv", data_for_games(move, state, generated, bot.evaluator))
         elif str(bot) == "hunter":
             action = bot.step(state)
         else:
             while True:
                 try:
-                    with open(('t.txt'), 'r') as file:
+                    with open(('temp/t.txt'), 'r') as file:
                         lines = file.readlines()
                         if len(lines) > play:
                             break
@@ -203,7 +202,7 @@ def play_game_versus_doi(game_num, player1, player2):
     saveGame("games/"+player1+"-"+player2+str(game_num), allStates)
     # In case of tie, both win_1 and win_2 are equal to 0, otherwise the winner is 1, the other is 0
     data = {'player1': [player1], 'player2': [player2], 'game_num': [game_num], 'time_taken': [0], 'moves': [move], 'nbr_of_prior': [nbr_of_prior], 'per_of_hit': [per_of_hit], 'win_1': 1 if returns[0]==1.0 else 0, 'win_2': 1 if returns[1]==1.0 else 0, 'pieces_1': [pieces0], 'pieces_2': [pieces1]}
-    save_to_csv("./games/stats.csv", data)
+    save_to_csv("./temp/games/stats.csv", data)
     return returns, history, allStates, move, nbr_of_prior, per_of_hit, [pieces0, pieces1]
 
 def _play_game(game, bots, game_num):
@@ -263,7 +262,7 @@ def _play_game(game, bots, game_num):
             log("====================================================\n")
             # print("time for generate and play a move:", time.time()-start)
             if str(bot) == "custom":
-                save_to_csv("./games/"+str(bots[0])+"-"+str(bots[1])+str(game_num)+".csv", data_for_games(move, state, generated, bot.evaluator))
+                save_to_csv("./temp/games/"+str(bots[0])+"-"+str(bots[1])+str(game_num)+".csv", data_for_games(move, state, generated, bot.evaluator))
             
         else:
             action = bot.step(state)
@@ -324,7 +323,7 @@ def play_n_games(player1, player2, num_games, replay=False, auto=False):
             saveGame("games/"+player1+"-"+player2+str(game_num), allStates)
             # In case of tie, both win_1 and win_2 are equal to 0, otherwise the winner is 1, the other is 0
             data = {'player1': [player1], 'player2': [player2], 'game_num': [game_num], 'time_taken': [time_taken], 'moves': [move], 'nbr_of_prior': [nbr_of_prior], 'per_of_hit': [per_of_hit], 'win_1': 1 if returns[0]==1.0 else 0, 'win_2': 1 if returns[1]==1.0 else 0, 'pieces_1': [pieces[0]], 'pieces_2': [pieces[1]]}
-            save_to_csv("./games/stats.csv", data)
+            save_to_csv("./temp/games/stats.csv", data)
             
             histories[" ".join(history)] += 1
             for i, v in enumerate(returns):
@@ -346,7 +345,7 @@ def play_n_games(player1, player2, num_games, replay=False, auto=False):
     print("Players:", player1, player2)
     print("Overall wins", overall_wins)
     data = {'player1': [player1], 'player2': [player2], 'game_num': [game_num+1], 'time_taken': [avg_time_taken], 'moves': [avg_move], 'nbr_of_prior': [0], 'per_of_hit': [0], 'win_1': [int((overall_wins[0]/(game_num+1))*100)], 'win_2': [int((overall_wins[1]/(game_num+1))*100)], 'pieces_1': [0], 'pieces_2': [0]}
-    save_to_csv("./games/stats.csv", data)
+    save_to_csv("./temp/games/stats.csv", data)
     return data
 
 def benchmark(num_games):
@@ -420,7 +419,7 @@ if __name__ == "__main__":
     # benchmark(50)
 
     # try:
-    #     open("log.txt", 'w').close() # Del log file
+    #     open("temp/log.txt", 'w').close() # Del log file
     # except IOError:
     #     print('Failure')
     ### Launch n games, params: player1, player2, game_nums, replay, auto
@@ -440,42 +439,8 @@ if __name__ == "__main__":
     # everythingEverywhereAllAtOnce("states/state.pkl", 10000) # 100000, 3sec/step
 
     # play_game_versus_doi(0, "doi", "custom")
-    # /bin/python3 /home/thomas/Bureau/tfe/main.py < t.txt
+    # /bin/python3 /home/thomas/Bureau/tfe/main.py < temp/t.txt
     # Bureau/stratego-0.13.4/src$ ./run_stratego.sh 
 
     # script_md_evaluate_benchmark("bench-final-nodoi/")
     script_md_evaluate_benchmark("games/")
-
-
-# Suicide nos scout sur les scout adverses quand ils sont déjà discover, donc c'est pas l'effet voulu
-# Se serait cool si yavait plus de proba pour scouter les pieces plus loins car elles ont plus de valeur
-
-# Quand Doi essaye de bluffer avec mon ia ca marche pas bien et doi perd un avantage là dans ces situations
-
-# Bcp de moment je vais chase une pièce que j'ai bcp de chance de prendre au lieu de me positionner pour le bloquer par example.
-# Devrait, quand il a le choix pour prendre une pièce chosir l'option qui revele le moins d'info. Ex: Si on a un sergeant connu de l'ennemi et un marshal inconnu qui peuvent prendre un miner, on privilegie le seargeant parce qu'il est connu
-
-# Cette technique est meilleur que l'evaluation simple de tous les coups à un instant T et de prendre le meilleurs, car avec les simulations il permet de faire des plans du futur. Mais le problème est que les plans ne sont pas tjrs respecté, il commence une idée mais s'arrete en chemin, ce qui crée de situation pas favorables.
-
-# Check dans les derniers coups jouer (on garde les 4 ou 5 déjà pour le 2square rule), si on joue pas trop au même endroit, pour permettre de stopper de rester tjrs avec des grosses pièces à hesiter devant des pièces qu'il peut pas trop prendre.
-
-# Je bouge trop mes pièces autour du flag, alors que normalement ya du poids à la protection quoi. Peut etre pas assez
-
-# Ya une game ou j'ai perdu parce que ma pièce qui était sensé chase les enemies et tout gagné était bloqué devant des bombes connues au lieu de chases les pièces qui bougaient encore. On aurait du faire une recherche différentes par rapport à l'avancement de la game aussi. Genre ca encouragerait les grosses pièces pour les combats et les miners pour aller deminer en même temps.
-
-# Tellement de fois Doi attend avec une piece, on va pour aller l'attaquer et pile quand on est à coté, il en profite pour s'echatpper vers nos autres pièces, donc vraiment chiant. On pourrait, quand on chase une piece prioriser les gauches droite au fait d'aller de haut en base pour eviter ça. Dans ce cas, c'est l'algo de search sur le board a modif
-
-# Often not defending enough, because filler option are to go to the enemy fla, so when there is nother around or too dangerous thing, instead of search for solution, it just flee.
-
-# Futur: Manipuler l'information, on prend en compte le fait que l'adversaire va aller vers des pièces qui ont déjà bougé (c'est notre strategie aussi)
-
-# LOTS OF ENDLESS CHASE
-# 1360moves, je devais gagner 1000X mais il a fait que des chases en boucle et a perdu a force
-
-# Sometimes it is more worth it to continue your way past a piece to get some that are behind, hunter do that better than me versus doi.
-
-# Hunter a utiliser une technique où il avance deux pièces en même temps, c'est plutot interessant car ça permet de répondre à plus de situation 
-
-# Comme on peut voir dans doi vs custom, mon bot a surtout du mal à gérer le late game quand il y a bcp de choix. Il ne garde pas un bon contrôle alors qu'il a l'avantage la plupart du temps
-
-
